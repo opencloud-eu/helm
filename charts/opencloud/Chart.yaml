@@ -1,0 +1,15 @@
+apiVersion: v2
+type: application
+name: opencloud
+version: 0.1.0
+description: Plain deployment of the OpenCloud dockerfile.
+  The initial helm chart follows the description given for starting a docker instance
+  https://docs.opencloud.eu/docs/admin/getting-started/docker
+  It is thought as a first starting point.
+home: https://github.com/opencloud-eu/helm
+image: https://raw.githubusercontent.com/opencloud-eu/opencloud/refs/heads/main/opencloud_logo.png
+sources:
+- https://github.com/opencloud-eu/helm
+appVersion: 2.0.0
+
+
