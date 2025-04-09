@@ -1,0 +1,24 @@
+{{- if .Values.opencloud.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9200
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 9233
+      targetPort: 9233
+      protocol: TCP
+      name: nats
+  selector:
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+{{- end }}

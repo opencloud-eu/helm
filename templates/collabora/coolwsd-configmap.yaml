@@ -1,0 +1,125 @@
+{{- if .Values.collabora.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.fullname" . }}-coolwsd-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+data:
+  coolwsd.xml: |
+    <config>
+        <allowed_languages desc="List of allowed languages on this instance." default="de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru">de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru</allowed_languages>
+        <sys_template_path desc="Path to a template tree with shared libraries etc to be used as source for chroot jails for child processes." type="path" relative="true" default="systemplate"></sys_template_path>
+        <child_root_path desc="Path to the directory under which the chroot jails for the child processes will be created. Should be on the same file system as systemplate and not visible to other users." type="path" relative="true" default="jails"></child_root_path>
+        <file_server_root_path desc="Path to the directory that should be considered root for the file server. This should be the directory containing loleaflet." type="path" relative="true" default="loleaflet/../"></file_server_root_path>
+        <loleaflet_html desc="Allows UI customization by replacing the loleaflet.html file" type="path" relative="true" default="loleaflet/dist/loleaflet.html"></loleaflet_html>
+        <logging>
+            <color type="bool">false</color>
+            <level type="string" desc="Can be 0-8, or none (turns off logging), fatal, critical, error, warning, notice, information, debug, trace" default="warning">trace</level>
+            <protocol type="bool" desc="Enable minimal protocol logging." default="false">false</protocol>
+        </logging>
+        <loleaflet_logging>
+            <level type="string" desc="Can be 0-3, or none (turns off logging), error, warning, info, debug" default="warning">warning</level>
+        </loleaflet_logging>
+        <trace>
+            <path desc="Output to a file. If empty, then stderr is used." type="path" relative="false" default=""></path>
+            <outgoing>
+                <record desc="Whether or not to record outgoing messages" type="bool" default="false">false</record>
+            </outgoing>
+        </trace>
+        <net>
+            <proto type="string" default="all" desc="Protocol to use IPv4, IPv6 or all for both">all</proto>
+            <listen type="string" default="any" desc="Listen address that coolwsd binds to. Can be 'any' or 'loopback'.">any</listen>
+            <service_root type="path" default="" desc="Prefix all the pages, websockets, etc. with this path."></service_root>
+            <post_allow desc="Allow/deny client IP address for POST(REST)." default="true">true</post_allow>
+            <frame_ancestors desc="Specify who is allowed to embed the LO Online iframe (coolwsd and WOPI host are always allowed). Separate multiple hosts by space."></frame_ancestors>
+            <connection_timeout_secs desc="Idle connection timeout (in seconds). Default: 30 seconds" type="int" default="30">300</connection_timeout_secs>
+            <socket_timeout_secs desc="Socket timeout (in seconds). Default: 30 seconds" type="int" default="30">300</socket_timeout_secs>
+            <keepalive_timeout_secs desc="Timeout after which an idle client is disconnected. Default: 30 seconds" type="int" default="30">300</keepalive_timeout_secs>
+            <listen_backlog desc="Maximum number of queued connections. Default: 64" type="int" default="64">1024</listen_backlog>
+            <poll_timeout_secs desc="Timeout for poll() call. Default: 10 seconds" type="int" default="10">60000</poll_timeout_secs>
+            <max_connections desc="Maximum number of connections. Default: 20" type="int" default="20">1000</max_connections>
+            <prespawn_child_processes desc="Number of child processes to keep started in advance and waiting for new clients." type="int" default="1">10</prespawn_child_processes>
+        </net>
+        <ssl desc="SSL settings">
+            <enable type="bool" desc="Controls whether SSL encryption is enable (do not disable for production deployment). If default is false, must first be compiled with SSL support to enable." default="true">false</enable>
+            <termination desc="Connection via proxy where coolwsd acts as working via https, but actually uses http." type="bool" default="true">true</termination>
+            <cert_file_path desc="Path to the cert file" relative="false" default="/etc/loolwsd/cert.pem">/etc/coolwsd/cert.pem</cert_file_path>
+            <key_file_path desc="Path to the key file" relative="false" default="/etc/loolwsd/key.pem">/etc/coolwsd/key.pem</key_file_path>
+            <ca_file_path desc="Path to the ca file" relative="false" default="/etc/loolwsd/ca-chain.cert.pem">/etc/coolwsd/ca-chain.cert.pem</ca_file_path>
+            <cipher_list desc="List of OpenSSL ciphers to accept" default="ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"></cipher_list>
+            <hpkp desc="Enable HTTP Public key pinning" enable="false" report_only="false">
+                <max_age desc="HPKP's max-age directive - time in seconds browser should remember the pins" default="1000">1000</max_age>
+                <report_uri desc="HPKP's report-uri directive - pin validation failure are reported at this URL" default=""></report_uri>
+                <pins desc="Base64 encoded SPKI fingerprints of keys to be pinned">
+                </pins>
+            </hpkp>
+        </ssl>
+        <security desc="Altering these defaults potentially opens you to significant risk">
+            <seccomp desc="Should we use the seccomp system call filtering." type="bool" default="true">false</seccomp>
+            <capabilities desc="Should we require capabilities to isolate processes." type="bool" default="true">false</capabilities>
+            <jwt_expiry_secs desc="Time in seconds before the Admin Console JWT token expires" type="int" default="1800">1800</jwt_expiry_secs>
+            <enable_macros_execution desc="Specifies whether the macro execution is enabled in general. This will enable Basic, Beanshell, Javascript and Python scripts. If it is set to false, the macro_security_level is ignored. If it is set to true, the mentioned entry specified the level of macro security." type="bool" default="false">false</enable_macros_execution>
+            <macro_security_level desc="Level of Macro security. 1 (Medium) Confirmation required before executing macros from untrusted sources. 0 (Low, not recommended) All macros will be executed without confirmation." type="int" default="1">1</macro_security_level>
+            <enable_metrics_unauthenticated desc="When enabled, the /cool/getMetrics endpoint will not require authentication." type="bool" default="false">false</enable_metrics_unauthenticated>
+        </security>
+        <storage desc="Backend storage">
+            <filesystem allow="false" />
+            <wopi desc="Allow/deny wopi storage." allow="true">
+                <max_file_size desc="Maximum document size in bytes to load. 0 for unlimited." type="uint">0</max_file_size>
+                <locking desc="Locking settings">
+                    <refresh desc="How frequently we should re-acquire a lock with the storage server, in seconds (default 15 mins) or 0 for no refresh" type="int" default="900">900</refresh>
+                </locking>
+                <alias_groups desc="default mode is 'first' it allows only the first host when groups are not defined. set mode to 'groups' and define group to allow multiple host and its aliases" mode="groups">
+                    <group>
+                        <host desc="hostname to allow or deny." allow="true">localhost</host>
+                    </group>
+                </alias_groups>
+            </wopi>
+        </storage>
+        <tile_cache_persistent desc="Should the tiles persist between two editing sessions of the given document?" type="bool" default="true">true</tile_cache_persistent>
+        <admin_console desc="Web admin console settings.">
+            <enable desc="Enable the admin console functionality" type="bool" default="true">true</enable>
+            <enable_pam desc="Enable admin user authentication with PAM" type="bool" default="false">false</enable_pam>
+            <username desc="The username of the admin console. Ignored if PAM is enabled."></username>
+            <password desc="The password of the admin console. Deprecated on most platforms. Instead, use PAM or coolconfig to set up a secure password."></password>
+        </admin_console>
+        <monitors desc="Addresses of servers we connect to on start for monitoring">
+        </monitors>
+        <per_document desc="Document-specific settings, including timeouts and filters. Some timeouts are related to editing, while others are related to the time the document stays in memory after the last view is gone.">
+            <max_concurrency desc="Maximum number of clients to serve for each document." type="uint" default="4">4</max_concurrency>
+            <batch_priority desc="Priority of batch operations over interactive ones." type="string" default="low">low</batch_priority>
+            <document_signing_url desc="The endpoint URL of signing server, if empty the document signing is disabled" type="string" default=""></document_signing_url>
+            <redlining_as_comments desc="If true show red-lines as comments" type="bool" default="false">false</redlining_as_comments>
+            <pdf_resolution_dpi desc="Resolution (in DPI) to use when rendering PDFs" type="int" default="96">96</pdf_resolution_dpi>
+            <idle_timeout_secs desc="The maximum number of seconds before unloading an idle document. 0 for unlimited." type="int" default="300">300</idle_timeout_secs>
+            <idlesave_duration_secs desc="The number of idle seconds after which document, if modified, should be saved. 0 disables idle saves." type="int" default="30">30</idlesave_duration_secs>
+            <autosave_duration_secs desc="The number of seconds after which document, if modified, should be saved. 0 disables autosave." type="int" default="300">300</autosave_duration_secs>
+            <always_save_on_exit desc="On exiting the last editor, always perform the save, even if the document is not modified." type="bool" default="false">false</always_save_on_exit>
+            <limit_virt_mem_mb desc="The maximum virtual memory allowed to each document process. 0 for unlimited." type="uint" default="0">0</limit_virt_mem_mb>
+            <limit_stack_mem_kb desc="The maximum stack size allowed to each document process. 0 for unlimited." type="uint" default="8000">8000</limit_stack_mem_kb>
+            <limit_file_size_mb desc="The maximum file size allowed to each document process to write. 0 for unlimited." type="uint" default="0">0</limit_file_size_mb>
+            <limit_num_open_files desc="The maximum number of files allowed to each document process to open. 0 for unlimited." type="uint" default="0">0</limit_num_open_files>
+            <limit_load_secs desc="Maximum number of seconds to wait for a document load to succeed. 0 for unlimited." type="uint" default="100">100</limit_load_secs>
+            <limit_convert_secs desc="Maximum number of seconds to wait for a document conversion to succeed. 0 for unlimited." type="uint" default="100">100</limit_convert_secs>
+            <cleanup desc="Cleanup settings">
+                <cleanup_interval_ms desc="Time interval for checking expired sessions in ms" type="int" default="10000">10000</cleanup_interval_ms>
+                <bad_behavior_period_secs desc="The minimum period second for bad-behavior check" type="int" default="60">60</bad_behavior_period_secs>
+            </cleanup>
+        </per_document>
+        <per_view desc="View-specific settings.">
+            <out_of_focus_timeout_secs desc="The maximum number of seconds before dimming and stopping updates when the browser tab is no longer in focus. 0 for no timeout. Default: 120 seconds." type="int" default="120">120</out_of_focus_timeout_secs>
+            <idle_timeout_secs desc="The maximum number of seconds before dimming and stopping updates when the user is no longer active (even if the browser is in focus). 0 for no timeout. Default: 15 minutes." type="int" default="900">900</idle_timeout_secs>
+        </per_view>
+        <user_interface>
+            <use_integration_theme desc="Use theme from the integrator." type="bool" default="true">true</use_integration_theme>
+            <show_welcome desc="Shows welcome dialog when no document is open." type="bool" default="true">false</show_welcome>
+        </user_interface>
+        <watermark>
+            <opacity desc="Opacity of on-screen watermark from 0.0 to 1.0" type="double" default="0.2">0.2</opacity>
+            <text desc="Watermark text to be displayed on the document if entered" type="string"></text>
+        </watermark>
+    </config>
+{{- end }}

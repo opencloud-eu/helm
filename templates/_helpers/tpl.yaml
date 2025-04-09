@@ -1,0 +1,161 @@
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "opencloud.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "opencloud.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "opencloud.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "opencloud.labels" -}}
+helm.sh/chart: {{ include "opencloud.chart" . }}
+{{ include "opencloud.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "opencloud.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "opencloud.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "opencloud.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "opencloud.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create a fully qualified OpenCloud name.
+*/}}
+{{- define "opencloud.opencloud.fullname" -}}
+{{- printf "%s-opencloud" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a fully qualified Keycloak name.
+*/}}
+{{- define "opencloud.keycloak.fullname" -}}
+{{- printf "%s-keycloak" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a fully qualified PostgreSQL name.
+*/}}
+{{- define "opencloud.postgres.fullname" -}}
+{{- printf "%s-postgres" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a fully qualified MinIO name.
+*/}}
+{{- define "opencloud.minio.fullname" -}}
+{{- printf "%s-minio" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Return the OpenCloud domain
+*/}}
+{{- define "opencloud.domain" -}}
+{{- .Values.global.domain.opencloud }}
+{{- end }}
+
+{{/*
+Return the Keycloak domain
+*/}}
+{{- define "opencloud.keycloak.domain" -}}
+{{- .Values.global.domain.keycloak }}
+{{- end }}
+
+{{/*
+Return the MinIO domain
+*/}}
+{{- define "opencloud.minio.domain" -}}
+{{- .Values.global.domain.minio }}
+{{- end }}
+
+{{/*
+Return the Collabora domain
+*/}}
+{{- define "opencloud.collabora.domain" -}}
+{{- .Values.global.domain.collabora }}
+{{- end }}
+
+{{/*
+Return the OnlyOffice domain
+*/}}
+{{- define "opencloud.onlyoffice.domain" -}}
+{{- .Values.global.domain.onlyoffice }}
+{{- end }}
+
+{{/*
+Return the Companion domain
+*/}}
+{{- define "opencloud.companion.domain" -}}
+{{- .Values.global.domain.companion }}
+{{- end }}
+
+{{/*
+Create a fully qualified Tika name.
+*/}}
+{{- define "opencloud.tika.fullname" -}}
+{{- printf "%s-tika" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Return the namespace to use
+*/}}
+{{- define "opencloud.namespace" -}}
+{{- if .Values.namespace -}}
+{{- .Values.namespace -}}
+{{- else -}}
+{{- .Release.Namespace -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Return the appropriate apiVersion for ingress
+*/}}
+{{- define "opencloud.ingress.apiVersion" -}}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
+{{- print "networking.k8s.io/v1" -}}
+{{- else -}}
+{{- print "networking.k8s.io/v1beta1" -}}
+{{- end -}}
+{{- end -}}

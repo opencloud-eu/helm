@@ -1,0 +1,24 @@
+{{- if and .Values.collaboration.enabled .Values.collabora.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collaboration
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collaboration
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9300
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 9301
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: collaboration
+{{- end }}

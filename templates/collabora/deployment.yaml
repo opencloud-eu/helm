@@ -1,0 +1,105 @@
+{{- if .Values.collabora.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: collabora
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: collabora
+    spec:
+      securityContext:
+        fsGroup: 1000  
+      initContainers:
+        # Initialize PVC directories with correct permissions
+        - name: init-directories
+          image: busybox
+          command: ['sh', '-c', 'mkdir -p /opt/cool/systemplate/etc && touch /opt/cool/systemplate/etc/passwd && mkdir -p /opt/cool/child-roots/tmp/sharedpresets/template && for i in $(seq 1 5); do id=$(head /dev/urandom | tr -dc a-f0-9 | head -c 8); mkdir -p /opt/cool/child-roots/1-$id/tmp/sharedpresets/template /opt/cool/child-roots/1-$id/lo; done && chmod -R 777 /opt/cool/systemplate /opt/cool/child-roots']
+          volumeMounts:
+            - name: systemplate
+              mountPath: /opt/cool/systemplate
+            - name: child-roots
+              mountPath: /opt/cool/child-roots
+      containers:
+        - name: collabora
+          image: {{ .Values.collabora.repository }}:{{ .Values.collabora.tag }}
+          imagePullPolicy: {{ .Values.collabora.pullPolicy }}
+          command: ['/bin/bash', '-c']
+          args: ['coolconfig generate-proof-key && /start-collabora-online.sh']
+          env:
+            - name: aliasgroup1
+              value: https://{{ .Values.global.domain.wopi }}:443
+            - name: DONT_GEN_SSL_CERT
+              value: "YES"
+            - name: extra_params
+              value: |
+                --o:ssl.enable={{ .Values.collabora.ssl.enabled }} \
+                --o:ssl.ssl_verification={{ .Values.collabora.ssl.verification }} \
+                --o:ssl.termination=true \
+                --o:welcome.enable=false \
+                --o:net.frame_ancestors={{ include "opencloud.domain" . }} \
+                --o:storage.wopi.host={{ .Values.global.domain.wopi }}
+            - name: username
+              value: {{ .Values.collabora.adminUser }}
+            - name: password
+              value: {{ .Values.collabora.adminPassword }}
+          ports:
+            - name: http
+              containerPort: 9980
+              protocol: TCP
+          securityContext:
+            capabilities:
+              add:
+                - MKNOD
+                - DAC_OVERRIDE
+          startupProbe:
+            httpGet:
+              path: /hosting/discovery
+              port: 9980
+            periodSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /hosting/discovery
+              port: 9980
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /hosting/discovery
+              port: 9980
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+          {{- if .Values.collabora.persistence.enabled }}
+          volumeMounts:
+            - name: systemplate
+              mountPath: /opt/cool/systemplate
+            - name: child-roots
+              mountPath: /opt/cool/child-roots
+          {{- end }}
+          resources:
+            {{- toYaml .Values.collabora.resources | nindent 12 }}
+      {{- if .Values.collabora.persistence.enabled }}
+      volumes:
+        - name: systemplate
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.fullname" . }}-collabora-systemplate
+        - name: child-roots
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.fullname" . }}-collabora-child-roots
+      {{- end }}
+{{- end }}

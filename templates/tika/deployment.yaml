@@ -1,0 +1,35 @@
+{{- if and .Values.opencloud.enabled .Values.tika.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}-tika
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: tika
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: tika
+    spec:
+      containers:
+        - name: tika
+          image: {{ .Values.tika.repository }}:{{ .Values.tika.tag }}
+          imagePullPolicy: {{ .Values.tika.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9998
+              protocol: TCP
+          env:
+            - name: JAVA_OPTS
+              value: "-Xmx3g"
+          resources:
+            {{- toYaml .Values.tika.resources | nindent 12 }}
+{{- end }}

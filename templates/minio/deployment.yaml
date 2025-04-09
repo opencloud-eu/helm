@@ -1,0 +1,99 @@
+{{- if .Values.opencloud.storage.s3.internal.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.minio.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: minio
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: init-minio-bucket
+          image: busybox
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          command: ['sh', '-c', 'mkdir -p /data/{{ .Values.opencloud.storage.s3.internal.bucketName }}']
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          args: ["server", "--console-address", ":9001", "/data"]
+          env:
+            - name: MINIO_ROOT_USER
+              value: {{ .Values.opencloud.storage.s3.internal.rootUser | quote }}
+            - name: MINIO_ROOT_PASSWORD
+              value: {{ .Values.opencloud.storage.s3.internal.rootPassword | quote }}
+          ports:
+            - name: api
+              containerPort: 9000
+            - name: console
+              containerPort: 9001
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          startupProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            periodSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            # Increased period to check less frequently
+            periodSeconds: 60
+            # Increased timeout to allow more time for response
+            timeoutSeconds: 20
+            # Increased failure threshold to be more tolerant
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            # Increased period to check less frequently
+            periodSeconds: 30
+            # Increased timeout to allow more time for response
+            timeoutSeconds: 10
+            # Increased failure threshold to be more tolerant
+            failureThreshold: 5
+          resources:
+            {{- toYaml .Values.opencloud.storage.s3.internal.resources | nindent 12 }}
+      volumes:
+        - name: data
+          {{- if .Values.opencloud.storage.s3.internal.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.minio.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}

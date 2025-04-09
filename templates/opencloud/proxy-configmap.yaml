@@ -1,0 +1,45 @@
+{{- if .Values.opencloud.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-proxy-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+data:
+  proxy.yaml: |-
+    role_assignment:
+      driver: oidc
+      oidc_role_mapper:
+        role_claim: roles
+        role_mapping:
+          # Map standard role names
+          - role_name: admin
+            claim_value: admin
+          - role_name: spaceadmin
+            claim_value: spaceadmin
+          - role_name: user
+            claim_value: user 
+          - role_name: guest
+            claim_value: guest
+          # Map OpenCloud specific role names from the roles claim
+          - role_name: admin
+            claim_value: opencloudAdmin
+          - role_name: spaceadmin
+            claim_value: opencloudSpaceAdmin
+          - role_name: user
+            claim_value: opencloudUser
+          - role_name: guest
+            claim_value: opencloudGuest
+          # Map default Keycloak roles
+          - role_name: user
+            claim_value: default-roles-opencloud
+          - role_name: user
+            claim_value: offline_access
+          - role_name: user
+            claim_value: uma_authorization
+          # Map groups claim values
+          - role_name: user
+            claim_value: users
+{{- end }}

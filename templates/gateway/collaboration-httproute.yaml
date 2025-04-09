@@ -1,0 +1,25 @@
+{{- if and .Values.cilium.httproute.enabled .Values.collaboration.enabled .Values.collabora.enabled }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collaboration-httproute
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collaboration
+spec:
+  parentRefs:
+    - name: {{ .Values.cilium.httproute.gateway.name }}
+      namespace: {{ .Values.cilium.httproute.gateway.namespace | default .Values.namespace }}
+      sectionName: collaboration-https
+  hostnames:
+    - {{ .Values.global.domain.wopi | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ include "opencloud.fullname" . }}-collaboration
+          port: 9300
+{{- end }}

@@ -1,0 +1,99 @@
+{{- if and .Values.keycloak.enabled .Values.keycloak.internal.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.keycloak.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keycloak
+spec:
+  replicas: {{ .Values.keycloak.replicas }}
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: keycloak
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: keycloak
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:25.0.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          command: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
+          args: ["start", "--proxy=edge", "--spi-connections-http-client-default-disable-trust-manager={{ .Values.opencloud.insecure }}", "--import-realm"]
+          env:
+            - name: OC_DOMAIN
+              value: {{ include "opencloud.domain" . }}
+            - name: KC_HOSTNAME
+              value: {{ include "opencloud.keycloak.domain" . }}
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_URL
+              value: jdbc:postgresql://{{ include "opencloud.postgres.fullname" . }}:5432/{{ .Values.postgres.database }}
+            - name: KC_DB_USERNAME
+              value: {{ .Values.postgres.user }}
+            - name: KC_DB_PASSWORD
+              value: {{ .Values.postgres.password }}
+            - name: KC_FEATURES
+              value: impersonation
+            - name: KEYCLOAK_ADMIN
+              value: {{ .Values.keycloak.adminUser }}
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: {{ .Values.keycloak.adminPassword }}
+            {{- if .Values.keycloak.cors.enabled }}
+            - name: KC_SPI_CORS_ENABLED
+              value: "true"
+            {{- if .Values.keycloak.cors.allowAllOrigins }}
+            - name: KC_SPI_CORS_ORIGINS
+              value: "*"
+            {{- else }}
+            - name: KC_SPI_CORS_ORIGINS
+              value: {{ join "," .Values.keycloak.cors.origins | quote }}
+            {{- end }}
+            - name: KC_SPI_CORS_METHODS
+              value: {{ .Values.keycloak.cors.methods | quote }}
+            - name: KC_SPI_CORS_HEADERS
+              value: {{ .Values.keycloak.cors.headers | quote }}
+            - name: KC_SPI_CORS_EXPOSED_HEADERS
+              value: {{ .Values.keycloak.cors.exposedHeaders | quote }}
+            - name: KC_SPI_CORS_ALLOW_CREDENTIALS
+              value: {{ .Values.keycloak.cors.allowCredentials | quote }}
+            - name: KC_SPI_CORS_MAX_AGE
+              value: {{ .Values.keycloak.cors.maxAge | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: script
+              mountPath: /opt/keycloak/bin/docker-entrypoint-override.sh
+              subPath: docker-entrypoint-override.sh
+            - name: realm-config
+              mountPath: /opt/keycloak/data/import-dist/opencloud-realm.json
+              subPath: opencloud-realm.json
+          resources:
+            {{- toYaml .Values.keycloak.resources | nindent 12 }}
+      volumes:
+        - name: script
+          configMap:
+            name: {{ include "opencloud.keycloak.fullname" . }}-script
+            defaultMode: 0755
+        - name: realm-config
+          configMap:
+            name: {{ include "opencloud.keycloak.fullname" . }}-realm
+{{- end }}

@@ -1,0 +1,41 @@
+{{- if and .Values.collabora.enabled .Values.collabora.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora-systemplate
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.collabora.persistence.size | default "1Gi" }}
+  {{- if .Values.global.storage.storageClass }}
+  storageClassName: {{ .Values.global.storage.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora-child-roots
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.collabora.persistence.size | default "1Gi" }}
+  {{- if .Values.global.storage.storageClass }}
+  storageClassName: {{ .Values.global.storage.storageClass }}
+  {{- end }}
+{{- end }}

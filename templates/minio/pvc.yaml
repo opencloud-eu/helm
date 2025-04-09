@@ -1,0 +1,25 @@
+{{- if .Values.opencloud.storage.s3.internal.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.minio.fullname" . }}-data
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  accessModes:
+    - {{ .Values.opencloud.storage.s3.internal.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.opencloud.storage.s3.internal.persistence.size | quote }}
+  {{- if .Values.opencloud.storage.s3.internal.persistence.storageClass }}
+  {{- if (eq "-" .Values.opencloud.storage.s3.internal.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.opencloud.storage.s3.internal.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,177 @@
+{{- if .Values.opencloud.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+data:
+  # App registry configuration
+  app-registry.yaml: |-
+    app_registry:
+      mimetypes:
+      - mime_type: application/pdf
+        extension: pdf
+        name: PDF
+        description: PDF document
+        icon: ''
+        default_app: ''
+        allow_creation: false
+      - mime_type: application/vnd.oasis.opendocument.text
+        extension: odt
+        name: OpenDocument
+        description: OpenDocument text document
+        icon: ''
+        default_app: Collabora
+        allow_creation: true
+      - mime_type: application/vnd.oasis.opendocument.spreadsheet
+        extension: ods
+        name: OpenSpreadsheet
+        description: OpenDocument spreadsheet document
+        icon: ''
+        default_app: Collabora
+        allow_creation: true
+      - mime_type: application/vnd.oasis.opendocument.presentation
+        extension: odp
+        name: OpenPresentation
+        description: OpenDocument presentation document
+        icon: ''
+        default_app: Collabora
+        allow_creation: true
+      - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        extension: docx
+        name: Microsoft Word
+        description: Microsoft Word document
+        icon: ''
+        default_app: OnlyOffice
+        allow_creation: true
+      - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.form
+        extension: docxf
+        name: Form Document
+        description: Form Document
+        icon: ''
+        default_app: OnlyOffice
+        allow_creation: true
+      - mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        extension: xlsx
+        name: Microsoft Excel
+        description: Microsoft Excel document
+        icon: ''
+        default_app: OnlyOffice
+        allow_creation: true
+      - mime_type: application/vnd.openxmlformats-officedocument.presentationml.presentation
+        extension: pptx
+        name: Microsoft PowerPoint
+        description: Microsoft PowerPoint document
+        icon: ''
+        default_app: OnlyOffice
+        allow_creation: true
+      - mime_type: application/vnd.jupyter
+        extension: ipynb
+        name: Jupyter Notebook
+        description: Jupyter Notebook
+        icon: ''
+        default_app: ''
+        allow_creation: true
+
+  # CSP configuration
+  csp.yaml: |-
+    directives:
+      child-src:
+        - '''self'''
+        - '*'
+      connect-src:
+        - '''self'''
+        - 'blob:'
+        - 'https://{{ .Values.global.domain.companion }}/'
+        - 'wss://{{ .Values.global.domain.companion }}/'
+        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+        - 'https://{{ include "opencloud.keycloak.domain" . }}/'
+        - 'http://{{ include "opencloud.fullname" . }}-collabora:9980/'
+        - '*'
+      default-src:
+        - '''self'''
+        - '*'
+      font-src:
+        - '''self'''
+        - '*'
+      frame-ancestors:
+        - '''self'''
+        - '*'
+      frame-src:
+        - '''self'''
+        - 'blob:'
+        - 'https://embed.diagrams.net/'
+        - 'https://{{ .Values.global.domain.onlyoffice }}/'
+        - 'https://{{ .Values.global.domain.collabora }}/'
+        - 'http://{{ include "opencloud.fullname" . }}-collabora:9980/'
+        - 'https://docs.opencloud.eu'
+        - '*'
+      img-src:
+        - '''self'''
+        - 'data:'
+        - 'blob:'
+        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+        - 'https://{{ .Values.global.domain.onlyoffice }}/'
+        - 'https://{{ .Values.global.domain.collabora }}/'
+        - 'http://{{ include "opencloud.fullname" . }}-collabora:9980/'
+        - '*'
+      manifest-src:
+        - '''self'''
+        - '*'
+      media-src:
+        - '''self'''
+        - '*'
+      object-src:
+        - '''self'''
+        - 'blob:'
+        - '*'
+      script-src:
+        - '''self'''
+        - '''unsafe-inline'''
+        - '''unsafe-eval'''
+        - '*'
+      style-src:
+        - '''self'''
+        - '''unsafe-inline'''
+        - '*'
+
+  # Banned password list
+  banned-password-list.txt: |-
+    password
+    12345678
+    123
+    OpenCloud
+    OpenCloud-1
+
+  # Search configuration
+  search.yaml: |-
+    {
+      "mapping": {
+        "file": {
+          "properties": {
+            "name": {
+              "type": "text",
+              "analyzer": "standard"
+            },
+            "content": {
+              "type": "text",
+              "analyzer": "standard"
+            },
+            "mime_type": {
+              "type": "keyword"
+            },
+            "owner": {
+              "type": "keyword"
+            },
+            "path": {
+              "type": "text",
+              "analyzer": "standard"
+            }
+          }
+        }
+      }
+    }
+{{- end }}

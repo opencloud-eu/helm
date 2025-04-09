@@ -1,0 +1,17 @@
+{{- if .Values.opencloud.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-config-json
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+data:
+  config.json: |-
+    {
+      "server": "https://{{ include "opencloud.domain" . }}",
+      "theme": "owncloud",
+      "version": "0.1.0"
+    }
+{{- end }}

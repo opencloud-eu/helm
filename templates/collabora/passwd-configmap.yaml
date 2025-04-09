@@ -1,0 +1,15 @@
+{{- if .Values.collabora.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.fullname" . }}-passwd-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+data:
+  passwd: |
+    root:x:0:0:root:/root:/bin/bash
+    nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+    cool:x:100:101:cool:/home/cool:/bin/bash
+{{- end }}

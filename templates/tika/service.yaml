@@ -1,0 +1,20 @@
+{{- if and .Values.opencloud.enabled .Values.tika.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.fullname" . }}-tika
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9998
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+{{- end }}

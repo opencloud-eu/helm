@@ -1,0 +1,49 @@
+{{- if and .Values.opencloud.enabled .Values.opencloud.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+spec:
+  accessModes:
+    - {{ .Values.opencloud.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.opencloud.persistence.configSize | quote }}
+  {{- if .Values.opencloud.persistence.storageClass }}
+  {{- if (eq "-" .Values.opencloud.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.opencloud.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-data
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+spec:
+  accessModes:
+    - {{ .Values.opencloud.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.opencloud.persistence.size | quote }}
+  {{- if .Values.opencloud.persistence.storageClass }}
+  {{- if (eq "-" .Values.opencloud.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.opencloud.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}

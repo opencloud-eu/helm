@@ -1,0 +1,163 @@
+{{- if .Values.global.tls.selfSigned }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-opencloud-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-opencloud-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.opencloud }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-opencloud-minio-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-opencloud-minio-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.minio }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-keycloak-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-keycloak-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.keycloak }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-collabora-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.collabora }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collaboration-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-collaboration-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.collaboration | default (printf "collaboration.%s" .Values.global.domain.opencloud) }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opencloud.fullname" . }}-wopi-tls
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: {{ include "opencloud.fullname" . }}-wopi-tls
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - OpenCloud
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - {{ .Values.global.domain.wopi }}
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+{{- end }}
