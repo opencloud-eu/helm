@@ -1,0 +1,37 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+IMPORTANT: This is a development deployment intended for testing purposes only.
+
+Access OpenCloud:
+---------------
+This chart deploys a single container version of OpenCloud.
+
+For accessing the OpenCloud instance:
+
+1. Set up port-forwarding:
+   $ kubectl port-forward -n {{ .Release.Namespace }} svc/opencloud-service 9200:443
+
+2. Access the OpenCloud web interface:
+   https://localhost:9200
+
+3. Login with the default credentials:
+   - Username: admin
+   - Password: {{ if .Values.adminPassword }}{{ .Values.adminPassword }}{{ else }}admin{{ end }}
+
+{{- if .Values.url }}
+Note: The OpenCloud instance is configured to use {{ .Values.url }} as the public URL.
+{{- else }}
+Note: No custom URL is configured. If you need to access OpenCloud from an external URL, 
+upgrade the release with:
+  $ helm upgrade {{ .Release.Name }} -n {{ .Release.Namespace }} ./charts/opencloud-dev --set=url="<YOUR-PUBLIC-URL>"
+{{- end }}
+
+For more information, please refer to the OpenCloud documentation:
+  https://docs.opencloud.eu/docs/admin/getting-started/docker/
