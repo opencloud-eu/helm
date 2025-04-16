@@ -7,6 +7,8 @@ metadata:
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: collaboration
+  annotations:
+    helm.sh/hook-weight: "10"
 spec:
   replicas: 1
   selector:
@@ -25,18 +27,7 @@ spec:
         # Wait for OpenCloud to be ready
         - name: wait-for-opencloud
           image: busybox
-          command: ['sh', '-c', 'until wget -q -O- http://{{ include "opencloud.opencloud.fullname" . }}:9200/health; do echo waiting for opencloud; sleep 5; done;']
-        
-        {{- if not .Values.opencloud.persistence.enabled }}
-        # Copy config from OpenCloud API if persistence is disabled
-        - name: copy-config
-          image: busybox
-          command: ['sh', '-c', 'mkdir -p /etc/opencloud && wget -q -O /etc/opencloud/config.json http://{{ include "opencloud.opencloud.fullname" . }}:9200/api/v1/config/secrets || echo "Failed to get config from OpenCloud"']
-          volumeMounts:
-            - name: etc-opencloud
-              mountPath: /etc/opencloud
-        {{- end }}
-        
+          command: ['sh', '-c', 'until wget -q -O- http://{{ include "opencloud.opencloud.fullname" . }}:9200/health; do echo waiting for opencloud; sleep 5; done;']         
         # Wait for OnlyOffice to be ready
         - name: wait-for-onlyoffice
           image: busybox
@@ -76,6 +67,16 @@ spec:
               value: "{{ .Values.opencloud.logLevel }}"
             - name: OC_URL
               value: "https://{{ include "opencloud.domain" . }}"
+            - name: OC_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: jwt-secret
+            - name: COLLABORATION_WOPI_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: wopi-secret
           ports:
             - name: http
               containerPort: 9300
@@ -96,19 +97,10 @@ spec:
             initialDelaySeconds: 200
             periodSeconds: 5
             failureThreshold: 1
-          volumeMounts:
-            - name: etc-opencloud
-              mountPath: /etc/opencloud
           resources:
             {{- toYaml .Values.onlyoffice.collaboration.resources | nindent 12 }}
       volumes:
         - name: etc-opencloud
-          {{- if .Values.opencloud.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "opencloud.opencloud.fullname" . }}-config
-            readOnly: true
-          {{- else }}
-          # If persistence is disabled, use an init container to copy the config
+          # Use emptyDir instead of mounting the PVC to avoid conflicts
           emptyDir: {}
-          {{- end }}
 {{- end }}
