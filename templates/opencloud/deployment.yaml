@@ -156,8 +156,6 @@ spec:
               value: "{{ .Values.global.domain.onlyoffice }}"
             - name: COMPANION_DOMAIN
               value: "{{ .Values.global.domain.companion }}"
-            - name: SEARCH_EXTRACTOR_TIKA_TIKA_URL
-              value: "http://{{ include "opencloud.tika.fullname" . }}:9998"
             # Sharing settings
             - name: OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
               value: "false"
