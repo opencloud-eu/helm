@@ -156,6 +156,8 @@ spec:
               value: "{{ .Values.global.domain.onlyoffice }}"
             - name: COMPANION_DOMAIN
               value: "{{ .Values.global.domain.companion }}"
+            - name: SEARCH_EXTRACTOR_TIKA_TIKA_URL
+              value: "http://{{ include "opencloud.tika.fullname" . }}:9998"
             # Sharing settings
             - name: OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
               value: "false"
@@ -242,6 +244,18 @@ spec:
               value: "decomposeds3"
             - name: STORAGE_SYSTEM_DRIVER
               value: "decomposed"
+            
+            # Collaboration secrets
+            - name: OC_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: jwt-secret
+            - name: OC_WOPI_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: wopi-secret
             
             # S3 storage configuration
             - name: STORAGE_USERS_DECOMPOSEDS3_ENDPOINT
