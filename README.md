@@ -674,7 +674,7 @@ https://docs.opencloud.eu/docs/admin/getting-started/docker/docker
 Deployment from the file system:
 
 ```
-$ helm install opencloud -n opencloud --create-namespace ./opencloud-dev --set=adminPassword="<MY-SECURE-PASSWORD>" --set=url="<PUBLIC-URL>"
+$ helm install opencloud -n opencloud --create-namespace ./charts/opencloud-dev --set=adminPassword="<MY-SECURE-PASSWORD>" --set=url="<PUBLIC-URL>"
 ```
 
 It is important that the public-url is reachable, and forwarded to the backend-service opencloud-service:443,
@@ -683,7 +683,7 @@ otherwise login will not be possible or the message "missing or invalid config" 
 For testing with the default settings port-forwarding from localhost can be used:
 
 ```
-$ helm install opencloud -n opencloud --create-namespace ./opencloud-dev
+$ helm install opencloud -n opencloud --create-namespace ./charts/opencloud-dev
 
   Release "opencloud" does not exist. Installing it now.
   NAME: opencloud
