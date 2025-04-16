@@ -245,6 +245,18 @@ spec:
             - name: STORAGE_SYSTEM_DRIVER
               value: "decomposed"
             
+            # Collaboration secrets
+            - name: OC_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: jwt-secret
+            - name: OC_WOPI_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.fullname" . }}-oc-secrets
+                  key: wopi-secret
+            
             # S3 storage configuration
             - name: STORAGE_USERS_DECOMPOSEDS3_ENDPOINT
               value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.endpoint | quote }}{{ else }}"http://{{ include "opencloud.minio.fullname" . }}:9000"{{ end }}

@@ -16,7 +16,6 @@
 # 5. OnlyOffice Secret Keys: secret.inbox/outbox/session.string: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
 # 6. RabbitMQ: url: amqp://guest:guest@localhost
 
-
 # =====================================================================
 # GLOBAL SETTINGS
 # =====================================================================
@@ -364,6 +363,10 @@ image:
 opencloud:
   # Enable OpenCloud
   enabled: true
+  # JWT secret for collaboration (will be auto-generated if not provided)
+  jwtSecret: ""
+  # WOPI secret for collaboration (will be auto-generated if not provided)
+  wopiSecret: ""
   # Number of replicas (Note: When using multiple replicas, persistence should be disabled
   # or use a storage class that supports ReadWriteMany access mode)
   replicas: 1
