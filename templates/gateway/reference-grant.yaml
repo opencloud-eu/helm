@@ -1,9 +1,9 @@
-{{- if .Values.cilium.httproute.enabled }}
+{{- if .Values.httpRoute.enabled }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: {{ include "opencloud.fullname" . }}-reference-grant
-  namespace: {{ .Values.cilium.httproute.gateway.namespace | default "kube-system" }}
+  namespace: {{ .Values.httpRoute.gateway.namespace | default "kube-system" }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
 spec:
@@ -14,7 +14,7 @@ spec:
   to:
     - group: gateway.networking.k8s.io
       kind: Gateway
-      name: {{ .Values.cilium.httproute.gateway.name }}
+      name: {{ .Values.httpRoute.gateway.name }}
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
@@ -27,7 +27,7 @@ spec:
   from:
     - group: gateway.networking.k8s.io
       kind: Gateway
-      namespace: {{ .Values.cilium.httproute.gateway.namespace | default "kube-system" }}
+      namespace: {{ .Values.httpRoute.gateway.namespace | default "kube-system" }}
   to:
     - group: ""
       kind: Secret

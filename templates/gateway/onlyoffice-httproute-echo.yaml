@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/component: onlyoffice
 spec:
   parentRefs:
-    - name: {{ .Values.cilium.httproute.gateway.name }}
-      namespace: {{ .Values.cilium.httproute.gateway.namespace | default .Values.namespace }}
+    - name: {{ .Values.httpRoute.gateway.name }}
+      namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       sectionName: onlyoffice-https
   hostnames:
     - {{ .Values.global.domain.onlyoffice | quote }}

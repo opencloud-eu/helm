@@ -47,7 +47,7 @@ global:
   tls:
     # Enable TLS (set to false when using gateway TLS termination externally)
     enabled: false
-    # Use self-signed certificates. Disable if you don't want to use cert-manager to generate self-signed certs for cilium gateway-api
+    # Use self-signed certificates. Disable if you don't want to use cert-manager to generate self-signed certs for gateway-api
     selfSigned: true
     # ACME email for Let's Encrypt
     acmeEmail: example@example.org
@@ -493,18 +493,23 @@ opencloud:
         createBucket: true
 
 # =====================================================================
-# GATEWAY (CILIUM, PROXY)
+# GATEWAY-API HTTPRoute
 # =====================================================================
 
-# Cilium Gateway API configuration
-cilium:
-  # HTTPRoute configuration
-  httproute:
-    # Enable HTTPRoute
-    enabled: true
-    # Gateway configuration
-    gateway:
-      # Gateway name
-      name: cilium-gateway
-      # Gateway namespace (defaults to Release.Namespace)
-      namespace: "kube-system"
+# Requires Gateway API resources and suitable controller installed within the cluster
+# (see: https://gateway-api.sigs.k8s.io/guides/)
+httpRoute:
+  enabled: true
+
+  # Gateway configuration
+  gateway:
+    # Create the gateway
+    create: true
+    # Gateway name
+    name: opencloud-gateway
+    # Gateway class (defaults to "gateway")
+    className: traefik
+    # Gateway namespace (defaults to Release.Namespace)
+    namespace: "kube-system"
+    # Gateway annotations
+    annotations:

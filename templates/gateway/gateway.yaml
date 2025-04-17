@@ -1,0 +1,75 @@
+{{- if .Values.httpRoute.gateway.create }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ .Values.httpRoute.gateway.name }}
+  namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
+spec:
+  gatewayClassName: {{ .Values.httpRoute.gateway.className }}
+  infrastructure:
+    annotations:
+      {{- range $key, $value := .Values.httpRoute.gateway.annotations }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+  listeners:
+    - name: opencloud-https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domain.opencloud | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: keycloak-https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domain.keycloak | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: minio-https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domain.minio | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: onlyoffice-https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domain.onlyoffice | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: collaboration-https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.global.domain.wopi | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+{{- end }}

@@ -1,4 +1,4 @@
-{{- if .Values.cilium.httproute.enabled }}
+{{- if .Values.httpRoute.enabled }}
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -8,8 +8,8 @@ metadata:
     {{- include "opencloud.labels" . | nindent 4 }}
 spec:
   parentRefs:
-    - name: {{ .Values.cilium.httproute.gateway.name }}
-      namespace: {{ .Values.cilium.httproute.gateway.namespace | default .Values.namespace }}
+    - name: {{ .Values.httpRoute.gateway.name }}
+      namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       sectionName: opencloud-https
   hostnames:
     - {{ include "opencloud.domain" . | quote }}

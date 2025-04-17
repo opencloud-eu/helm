@@ -22,8 +22,8 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
   - [OnlyOffice Settings](#onlyoffice-settings)
   - [Collabora Settings](#collabora-settings)
   - [Collaboration Service Settings](#collaboration-service-settings)
-- [Cilium Gateway API Configuration](#cilium-gateway-api-configuration)
-  - [Cilium HTTPRoute Settings](#cilium-httproute-settings)
+- [Gateway API Configuration](#gateway-api-configuration)
+  - [HTTPRoute Settings](#httproute-settings)
 - [Setting Up Gateway API with Talos, Cilium, and cert-manager](#setting-up-gateway-api-with-talos-cilium-and-cert-manager)
 - [Installing the DEV Helm Charts](#-installing-the-dev-helm-charts)
 - [License](#-license)
@@ -69,8 +69,8 @@ To install the chart with the release name `opencloud`:
 helm install opencloud . \
   --namespace opencloud \
   --create-namespace \
-  --set cilium.httproute.gateway.name=cilium-gateway \
-  --set cilium.httproute.gateway.namespace=kube-system
+  --set httproute.gateway.name=opencloud-gateway \
+  --set httproute.gateway.namespace=kube-system
 ```
 
 ## Architecture
@@ -307,19 +307,19 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
-## Cilium Gateway API Configuration
+## Gateway API Configuration
 
-This chart includes Cilium HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.
+This chart includes HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.
 
-### Cilium HTTPRoute Settings
+### HTTPRoute Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `cilium.httproute.enabled` | Enable Cilium HTTPRoutes | `true` |
-| `cilium.httproute.gateway.name` | Gateway name | `cilium-gateway` |
-| `cilium.httproute.gateway.namespace` | Gateway namespace | `""` (defaults to Release.Namespace) |
+| `httproute.enabled` | Enable HTTPRoutes | `true` |
+| `httproute.gateway.name` | Gateway name | `opencloud-gateway` |
+| `httproute.gateway.namespace` | Gateway namespace | `""` (defaults to Release.Namespace) |
 
-The following HTTPRoutes are created when `cilium.httproute.enabled` is set to `true`:
+The following HTTPRoutes are created when `httproute.enabled` is set to `true`:
 
 1. **OpenCloud HTTPRoute**:
    - Hostname: `global.domain.opencloud`
@@ -368,7 +368,7 @@ The following HTTPRoutes are created when `cilium.httproute.enabled` is set to `
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
-All HTTPRoutes are configured to use the same Gateway specified by `cilium.httproute.gateway.name` and `cilium.httproute.gateway.namespace`.
+All HTTPRoutes are configured to use the same Gateway specified by `httproute.gateway.name` and `httproute.gateway.namespace`.
 
 ## Setting Up Gateway API with Talos, Cilium, and cert-manager
 
@@ -392,7 +392,7 @@ helm repo add cilium https://helm.cilium.io/
 helm install cilium cilium/cilium \
   --namespace kube-system \
   --set gatewayAPI.enabled=true \
-  --set kubeProxyReplacement=strict \
+  --set kubeProxyReplacement=true \
   --set k8sServiceHost=<your-kubernetes-api-server-ip> \
   --set k8sServicePort=6443
 ```
@@ -402,14 +402,8 @@ helm install cilium cilium/cilium \
 Install cert-manager to manage TLS certificates:
 
 ```bash
-# Add the Jetstack Helm repository
-helm repo add jetstack https://charts.jetstack.io
-
-# Install cert-manager
-helm install cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --set installCRDs=true
+# install the default cert manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
 ```
 
 ### Step 3: Create a ClusterIssuer for cert-manager
@@ -469,6 +463,8 @@ kubectl apply -f cluster-issuer.yaml
 ### Step 4: Create the Gateway
 
 Create a Gateway resource to expose your services:
+
+FIXME we can deploy an opencloud-gateway
 
 ```yaml
 # gateway.yaml
@@ -616,8 +612,8 @@ cd opencloud-helm
 helm install opencloud . \
   --namespace opencloud \
   --create-namespace \
-  --set cilium.httproute.gateway.name=cilium-gateway \
-  --set cilium.httproute.gateway.namespace=kube-system
+  --set httproute.gateway.name=opencloud-gateway \
+  --set httproute.gateway.namespace=kube-system
 ```
 
 ### Troubleshooting

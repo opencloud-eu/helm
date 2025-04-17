@@ -54,10 +54,10 @@ The following services have been deployed:
 {{- end }}
 
 
-{{- if .Values.cilium.httproute.enabled }}
-IMPORTANT: This chart includes Cilium HTTPRoute resources that route traffic to the OpenCloud, Keycloak, and MinIO services.
-All HTTPRoutes are configured to use the Gateway named "{{ .Values.cilium.httproute.gateway.name }}" in the
-{{ if .Values.cilium.httproute.gateway.namespace }}{{ .Values.cilium.httproute.gateway.namespace }}{{ else }}{{ .Values.namespace }}{{ end }} namespace.
+{{- if .Values.httpRoute.enabled }}
+IMPORTANT: This chart includes HTTPRoute resources that route traffic to the OpenCloud, Keycloak, and MinIO services.
+All HTTPRoutes are configured to use the Gateway named "{{ .Values.httpRoute.gateway.name }}" in the
+{{ if .Values.httpRoute.gateway.namespace }}{{ .Values.httpRoute.gateway.namespace }}{{ else }}{{ .Values.namespace }}{{ end }} namespace.
 
 Make sure the Gateway exists and is properly configured to accept traffic for the following domains:
 - OpenCloud: {{ include "opencloud.domain" . }} (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)
@@ -72,7 +72,7 @@ Make sure the Gateway exists and is properly configured to accept traffic for th
 {{- end }}
 
 {{- else }}
-IMPORTANT: The Cilium HTTPRoutes are disabled. You need to configure your own ingress controller
+IMPORTANT: The HTTPRoutes are disabled. You need to configure your own ingress controller
 to expose these services externally.
 
 Example domains for your ingress configuration:
