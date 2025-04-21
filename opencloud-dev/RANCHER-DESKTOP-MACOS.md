@@ -6,6 +6,12 @@ This guide shows you how to set up a local Kubernetes environment on macOS using
 
 1. A macOS system (tested on macOS Sequoia 15.4)
 2. Homebrew package manager
+3. Helm (installed via Homebrew)
+
+```bash
+# Install Helm using Homebrew
+brew install helm
+```
 
 ## Local Kubernetes Options for macOS
 
