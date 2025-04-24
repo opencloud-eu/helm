@@ -1,0 +1,19 @@
+{{- if and .Values.prometheus.enabled .Values.prometheus.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}
+  namespace: {{ include "opencloud.namespace" . }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    {{- with .Values.prometheus.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 4 }}      
+  endpoints:
+    - port: metrics
+      path: "/metrics"
+{{- end }}
