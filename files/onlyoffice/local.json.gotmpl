@@ -1,0 +1,62 @@
+{
+  "services": {
+    "CoAuthoring": {
+      "token": {
+        "enable": {
+          "request": {
+            "inbox": true,
+            "outbox": true
+          },
+          "browser": true
+        },
+        "inbox": {
+          "header": "Authorization"
+        },
+        "outbox": {
+          "header": "Authorization"
+        }
+      },
+      "secret": {
+        "inbox": {
+          "string": "{{ .Values.onlyoffice.config.coAuthoring.secret.inbox.string }}"
+        },
+        "outbox": {
+          "string": "{{ .Values.onlyoffice.config.coAuthoring.secret.outbox.string }}"
+        },
+        "session": {
+          "string": "{{ .Values.onlyoffice.config.coAuthoring.secret.session.string }}"
+        }
+      }
+    }
+  },
+  "rabbitmq": {
+    "url": "{{ .Values.onlyoffice.config.rabbitmq.url }}"
+  },
+  "FileConverter": {
+    "converter": {
+      "inputLimits": [
+        {
+          "type": "docx;dotx;docm;dotm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        },
+        {
+          "type": "xlsx;xltx;xlsm;xltm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        },
+        {
+          "type": "pptx;ppsx;potx;pptm;ppsm;potm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        }
+      ]
+    }
+  }
+}
