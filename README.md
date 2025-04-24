@@ -25,6 +25,7 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
 - [Gateway API Configuration](#gateway-api-configuration)
   - [HTTPRoute Settings](#httproute-settings)
 - [Setting Up Gateway API with Talos, Cilium, and cert-manager](#setting-up-gateway-api-with-talos-cilium-and-cert-manager)
+- [Setting up Ingress](#setting-up-ingress)
 - [Installing the DEV Helm Charts](#-installing-the-dev-helm-charts)
 - [License](#-license)
 - [Community Maintained](#community-maintained)
@@ -187,9 +188,7 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
-| `global.tls.selfSigned` | Use self-signed certificates | `true` |
-| `global.tls.acmeEmail` | ACME email for Let's Encrypt | `example@example.org` |
-| `global.tls.acmeCAServer` | ACME CA server | `https://acme-v02.api.letsencrypt.org/directory` |
+| `global.tls.secretName` | Secret name for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
 
 ### Image Settings
@@ -426,7 +425,7 @@ Apply the ClusterIssuer:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 3: Create a Wildcard Certificate for OpenCloud Domains
+### Step 4: Create a Wildcard Certificate for OpenCloud Domains
 
 Create a wildcard certificate for all OpenCloud subdomains:
 
@@ -460,7 +459,7 @@ Apply the certificate:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 4: Create the Gateway
+### Step 5: Create the Gateway
 
 Create a Gateway resource to expose your services:
 
@@ -578,7 +577,7 @@ Apply the Gateway:
 kubectl apply -f gateway.yaml
 ```
 
-### Step 5: Configure DNS
+### Step 6: Configure DNS
 
 Configure your DNS to point to the Gateway IP address. You can use a wildcard DNS record or individual records for each service:
 
@@ -598,7 +597,7 @@ Alternatively, for local testing, you can add entries to your `/etc/hosts` file:
 192.168.178.77  wopiserver.opencloud.test
 ```
 
-### Step 6: Install OpenCloud
+### Step 7: Install OpenCloud
 
 Finally, install OpenCloud using Helm:
 
@@ -654,6 +653,120 @@ For OnlyOffice-specific issues, check that the PostgreSQL, Redis, and RabbitMQ s
 kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-postgresql
 kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-redis
 kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-rabbitmq
+```
+
+## Setting up Ingress
+
+For some deployments the kubernetes gateway API is not readily available. Using the traditional Ingress objects can be easier to
+set up. The chart only deploys the necessary Ingress objects, e.g.
+minio is not reachable.
+
+### Step 1: Install cert-manager
+
+Install cert-manager to manage TLS certificates:
+
+```bash
+# install the default cert manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
+```
+
+### Step 2: Create a ClusterIssuer for cert-manager
+
+Create a ClusterIssuer for cert-manager to issue certificates:
+
+```yaml
+# cluster-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+```
+
+Apply the ClusterIssuer:
+
+```bash
+kubectl apply -f cluster-issuer.yaml
+```
+
+### Step 3: Create a Wildcard Certificate for OpenCloud Domains
+
+Create a wildcard certificate for all OpenCloud subdomains:
+
+```yaml
+# cluster-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: opencloud-wildcard-tls
+  namespace: kube-system
+spec:
+  secretName: opencloud-wildcard-tls
+  dnsNames:
+    - "opencloud.test"
+    - "*.opencloud.test"
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+```
+
+Apply the certificate:
+
+```bash
+kubectl apply -f cluster-issuer.yaml
+```
+
+### Step 4: Install OpenCloud
+
+Finally, install OpenCloud using Helm:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-repo/opencloud-helm.git
+cd opencloud-helm
+```
+
+Customize the chart to use Ingress objects instead of the newer gateway API
+
+```yaml
+global:
+  # TLS settings
+  tls:
+    # Enable TLS
+    enabled: true
+    secretName: opencloud-wildcard-tls
+
+# Disable Gateway API configuration
+httpRoute:
+  enabled: false
+
+# Enable ingress
+ingress:
+  enabled: true
+  # set an Ingress class name (defaults to traefik)
+  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
+  # The chart currently knows how to add this header for traefik, nginx,
+  # haproxy, contour, and istio. PR welcome.
+  ingressClassName: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+```
+
+```bash
+# Install OpenCloud
+helm install opencloud . \
+  --namespace opencloud \
+  --create-namespace \
+  --set httpRoute.gateway.name=opencloud-gateway \
+  --set httpRoute.gateway.namespace=kube-system
 ```
 
 ## 📦 Installing the DEV Helm Charts

@@ -47,12 +47,8 @@ global:
   tls:
     # Enable TLS (set to false when using gateway TLS termination externally)
     enabled: false
-    # Use self-signed certificates. Disable if you don't want to use cert-manager to generate self-signed certs for gateway-api
-    selfSigned: true
-    # ACME email for Let's Encrypt
-    acmeEmail: example@example.org
-    # ACME CA server
-    acmeCAServer: https://acme-v02.api.letsencrypt.org/directory
+    # secretName for TLS certificate
+    secretName: ""
 
   # Global storage settings
   storage:
@@ -506,6 +502,7 @@ opencloud:
 # Requires Gateway API resources and suitable controller installed within the cluster
 # (see: https://gateway-api.sigs.k8s.io/guides/)
 httpRoute:
+  # Enable HTTPRoute
   enabled: true
 
   # Gateway configuration
@@ -525,3 +522,20 @@ httpRoute:
     # Gateway annotations
     infrastructure:
       annotations: {}
+
+# =====================================================================
+# INGRESS
+# =====================================================================
+
+# Ingress configuration
+ingress:
+  # Enable Ingress
+  enabled: false
+  # ingress class to use (defaults to traefik)
+  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
+  # The chart currently knows how to add this header for traefik, nginx,
+  # haproxy, contour, and istio. PR welcome.
+  ingressClassName: traefik
+  # Ingress annotations applied to all ingress objects
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
