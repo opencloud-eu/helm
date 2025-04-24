@@ -1,0 +1,26 @@
+{
+  "mapping": {
+    "file": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "content": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "mime_type": {
+          "type": "keyword"
+        },
+        "owner": {
+          "type": "keyword"
+        },
+        "path": {
+          "type": "text",
+          "analyzer": "standard"
+        }
+      }
+    }
+  }
+}
