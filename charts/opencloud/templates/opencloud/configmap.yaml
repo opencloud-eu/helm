@@ -14,7 +14,7 @@ data:
   csp.yaml: {{ tpl (.Files.Get "files/opencloud/csp.yaml.gotmpl") . | quote }}
 
   # Banned password list
-  banned-password-list.txt: {{ .Files.Get "files/opencloud/banned-password-list.txt" | quote }}
+  banned-password-list.txt: {{ tpl (.Files.Get "files/opencloud/banned-password-list.txt.gotmpl") . | quote }}
 
   # Search configuration
   search.yaml: {{ .Files.Get "files/opencloud/search.yaml" | quote }}
