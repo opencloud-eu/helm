@@ -404,6 +404,7 @@ opencloud:
     accessMode: ReadWriteOnce
   # Configuration files
   config:
+    theme: "owncloud"
     # App registry configuration
     appRegistry: {}
     # CSP configuration

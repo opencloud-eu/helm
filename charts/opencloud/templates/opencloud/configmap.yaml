@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/component: opencloud
 data:
   # App registry configuration
-  app-registry.yaml: {{ .Files.Get "files/opencloud/app-registry.yaml" | quote }}
+  app-registry.yaml: {{ empty .Values.opencloud.config.appRegistry |  ternary (.Files.Get "files/opencloud/app-registry.yaml") (toYaml (dict "app_registry" .Values.opencloud.config.appRegistry)) | quote }}
 
   # CSP configuration
-  csp.yaml: {{ tpl (.Files.Get "files/opencloud/csp.yaml.gotmpl") . | quote }}
+  csp.yaml: {{ empty .Values.opencloud.config.csp | ternary (tpl (.Files.Get "files/opencloud/csp.yaml.gotmpl") .) (toYaml (dict "directives" .Values.opencloud.config.csp)) | quote }}
 
   # Banned password list
   banned-password-list.txt: {{ tpl (.Files.Get "files/opencloud/banned-password-list.txt.gotmpl") . | quote }}
