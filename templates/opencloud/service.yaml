@@ -14,6 +14,12 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if .Values.prometheus.enabled }}
+    - port: 9205
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    {{- end }}
     - port: 9233
       targetPort: 9233
       protocol: TCP

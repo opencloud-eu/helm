@@ -146,6 +146,10 @@ spec:
             - name: OC_EXCLUDE_RUN_SERVICES
               value: {{ join "," . | quote }}
             {{- end }}
+            {{- if .Values.prometheus.enabled }}
+            - name: "PROXY_DEBUG_ADDR"
+              value: ":9205"
+            {{- end }}
             # Do not use SSL between proxy and OpenCloud
             - name: PROXY_TLS
               value: "false"
@@ -269,6 +273,10 @@ spec:
           ports:
             - name: http
               containerPort: 9200
+            {{- if .Values.prometheus.enabled }}
+            - name: metrics
+              containerPort: 9205
+            {{- end }}
             - name: nats
               containerPort: 9233
           startupProbe:
