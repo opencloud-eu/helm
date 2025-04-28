@@ -1,0 +1,38 @@
+#!/bin/sh
+set -e
+
+# Create apps directory if it doesn't exist
+mkdir -p /var/lib/opencloud/web/assets/apps
+
+# Copy extensions to the apps directory
+{{- if .Values.webExtensions.extensions.drawio.enabled }}
+echo "Initializing Draw.io extension..."
+cp -R /extensions/draw-io/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+{{- if .Values.webExtensions.extensions.externalsites.enabled }}
+echo "Initializing External Sites extension..."
+cp -R /extensions/external-sites/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+{{- if .Values.webExtensions.extensions.importer.enabled }}
+echo "Initializing Importer extension..."
+cp -R /extensions/importer/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+{{- if .Values.webExtensions.extensions.jsonviewer.enabled }}
+echo "Initializing JSON Viewer extension..."
+cp -R /extensions/json-viewer/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+{{- if .Values.webExtensions.extensions.progressbars.enabled }}
+echo "Initializing Progress Bars extension..."
+cp -R /extensions/progress-bars/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+{{- if .Values.webExtensions.extensions.unzip.enabled }}
+echo "Initializing Unzip extension..."
+cp -R /extensions/unzip/ /var/lib/opencloud/web/assets/apps/
+{{- end }}
+
+echo "Web extensions initialization completed."

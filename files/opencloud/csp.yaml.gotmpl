@@ -1,0 +1,48 @@
+directives:
+  child-src:
+    - '''self'''
+  connect-src:
+    - '''self'''
+    - 'blob:'
+    - 'https://{{ .Values.global.domain.companion }}/'
+    - 'wss://{{ .Values.global.domain.companion }}/'
+    - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+    - 'https://{{ .Values.global.domain.keycloak  }}/'
+  default-src:
+    - '''none'''
+  font-src:
+    - '''self'''
+  frame-ancestors:
+    - '''self'''
+  frame-src:
+    - '''self'''
+    - 'blob:'
+    - 'https://embed.diagrams.net/'
+    # In contrary to bash and docker the default is given after the | character
+    - 'https://{{ .Values.global.domain.onlyoffice }}/'
+    - 'https://{{ .Values.global.domain.collabora }}/'
+    # This is needed for the external-sites web extension when embedding sites
+    - 'https://docs.opencloud.eu'
+  img-src:
+    - '''self'''
+    - 'data:'
+    - 'blob:'
+    - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+    # In contrary to bash and docker the default is given after the | character
+    - 'https://{{ .Values.global.domain.onlyoffice }}/'
+    - 'https://{{ .Values.global.domain.collabora }}/'
+  manifest-src:
+    - '''self'''
+  media-src:
+    - '''self'''
+  object-src:
+    - '''self'''
+    - 'blob:'
+  script-src:
+    - '''self'''
+    - '''unsafe-inline'''
+  style-src:
+    - '''self'''
+    - '''unsafe-inline'''
+  worker-src:
+    - '''self'''
