@@ -48,12 +48,16 @@ For general OpenCloud discussions:
 
 ## 💡 Contributing
 
-We encourage contributions from the community! If you'd like to contribute:
-- Fork this repository
-- Submit a Pull Request
-- Discuss and collaborate on issues
+We encourage contributions from the community! This repository follows a community-driven development model with defined roles and responsibilities.
 
-Please ensure that your PR follows best practices and includes necessary documentation.
+For detailed contribution guidelines, please see our [CONTRIBUTING.md](./CONTRIBUTING.md) document.
+
+This includes:
+- How to submit contributions
+- Our community governance model
+- How to become a reviewer or maintainer
+
+The current maintainers and reviewers are listed in [MAINTAINERS.md](./MAINTAINERS.md).
 
 ## Prerequisites
 
