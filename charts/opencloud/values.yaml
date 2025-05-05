@@ -516,6 +516,8 @@ httpRoute:
     className: cilium
     # Gateway namespace (defaults to Release.Namespace)
     namespace: ""
+    # Use wildcard hostnames (e.g. *.opencloud.test instead of cloud.opencloud.test)
+    useWildcardHostnames: false
     # Gateway annotations
     annotations:
     # Gateway annotations
