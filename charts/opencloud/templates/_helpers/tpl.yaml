@@ -119,6 +119,13 @@ Return the OnlyOffice domain
 {{- end }}
 
 {{/*
+Return the Collabora domain
+*/}}
+{{- define "opencloud.collabora.domain" -}}
+{{- .Values.global.domain.collabora }}
+{{- end }}
+
+{{/*
 Return the Companion domain
 */}}
 {{- define "opencloud.companion.domain" -}}

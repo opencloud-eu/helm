@@ -66,6 +66,23 @@ spec:
             matchLabels:
               kubernetes.io/metadata.name: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
     {{- end }}
+    {{- if .Values.collabora.enabled }}
+    - name: collabora-https
+      protocol: HTTPS
+      port: {{ .Values.httpRoute.gateway.port | default 443 }}
+      hostname: {{ .Values.global.domain.collabora | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
+    {{- end }}
     {{- if .Values.onlyoffice.enabled }}
     - name: onlyoffice-https
       protocol: HTTPS

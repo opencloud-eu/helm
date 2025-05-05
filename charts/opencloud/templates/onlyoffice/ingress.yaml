@@ -1,0 +1,45 @@
+{{- if and .Values.ingress.enabled .Values.onlyoffice.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "opencloud.fullname" . }}-onlyoffice
+  namespace: {{ include "opencloud.namespace" . }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- if eq .Values.ingress.ingressClassName "traefik" }}
+    # Traefik: attach our pre-defined Middleware
+    traefik.ingress.kubernetes.io/router.middlewares: {{ include "opencloud.namespace" . }}-add-x-forwarded-proto-https@kubernetescrd
+    {{- else if eq .Values.ingress.ingressClassName "nginx" }}
+    # NGINX: inject custom header via configuration-snippet
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Forwarded-Proto: https";
+    {{- else if eq .Values.ingress.ingressClassName "haproxy" }}
+    # HAProxy: inject custom header via request-set-headers
+    haproxy.ingress.kubernetes.io/request-set-headers: "X-Forwarded-Proto https"
+    {{- else if eq .Values.ingress.ingressClassName "contour" }}
+    # Contour: inject custom header via request-add
+    projectcontour.io/request-add: "X-Forwarded-Proto: https"
+    {{- else if eq .Values.ingress.ingressClassName "istio" }}
+    # Istio: inject custom header via EnvoyFilter
+    istio.io/request-headers: "X-Forwarded-Proto: https"
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- if .Values.global.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain.onlyoffice | quote }}
+      secretName: {{ .Values.global.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain.onlyoffice | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "opencloud.fullname" . }}-onlyoffice
+                port:
+                  number: 80
+{{- end }}

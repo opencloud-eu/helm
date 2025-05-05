@@ -38,6 +38,8 @@ global:
     minio: minio.opencloud.test
     # Domain for WOPI server
     wopi: wopiserver.opencloud.test
+    # Domain for Collabora CODE
+    collabora: collabora.opencloud.test
     # Domain for OnlyOffice
     onlyoffice: onlyoffice.opencloud.test
     # Domain for Companion
@@ -47,12 +49,8 @@ global:
   tls:
     # Enable TLS (set to false when using gateway TLS termination externally)
     enabled: false
-    # Use self-signed certificates. Disable if you don't want to use cert-manager to generate self-signed certs for gateway-api
-    selfSigned: true
-    # ACME email for Let's Encrypt
-    acmeEmail: example@example.org
-    # ACME CA server
-    acmeCAServer: https://acme-v02.api.letsencrypt.org/directory
+    # secretName for TLS certificate
+    secretName: ""
 
   # Global storage settings
   storage:
@@ -242,6 +240,29 @@ webExtensions:
       enabled: true
       repository: opencloudeu/web-extensions
       tag: unzip-1.0.0
+
+# =====================================================================
+# COLLABORATION (COLLABORA)
+# =====================================================================
+
+collabora:
+  enabled: false
+  repository: collabora/code
+  tag: 24.04.13.2.1
+  pullPolicy: IfNotPresent
+  ssl:
+    enabled: true
+    verification: true
+  admin:
+    user: admin
+    password: admin
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
 
 # =====================================================================
 # COLLABORATION (ONLYOFFICE)
@@ -526,3 +547,20 @@ httpRoute:
     # Gateway annotations
     infrastructure:
       annotations: {}
+
+# =====================================================================
+# INGRESS
+# =====================================================================
+
+# Ingress configuration
+ingress:
+  # Enable Ingress
+  enabled: false
+  # ingress class to use (defaults to traefik)
+  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
+  # The chart currently knows how to add this header for traefik, nginx,
+  # haproxy, contour, and istio. PR welcome.
+  ingressClassName: traefik
+  # Ingress annotations applied to all ingress objects
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
