@@ -518,6 +518,9 @@ httpRoute:
     namespace: ""
     # Use wildcard hostnames (e.g. *.opencloud.test instead of cloud.opencloud.test)
     useWildcardHostnames: false
+    # Specific wildcard hostname to use when useWildcardHostnames is true
+    # If not specified, automatically derived from the domain (*.domain.tld)
+    wildcardHostname: ""
     # Gateway annotations
     annotations:
     # Gateway annotations
