@@ -20,7 +20,7 @@ spec:
     - name: opencloud-https
       protocol: HTTPS
       port: {{ .Values.httpRoute.gateway.port | default 443 }}
-      hostname: {{ .Values.global.domain.opencloud | quote }}
+      hostname: {{ include "opencloud.gateway.hostname" (dict "domain" .Values.global.domain.opencloud "Values" .Values) }}
       tls:
         mode: Terminate
         certificateRefs:
@@ -36,7 +36,7 @@ spec:
     - name: keycloak-https
       protocol: HTTPS
       port: {{ .Values.httpRoute.gateway.port | default 443 }}
-      hostname: {{ .Values.global.domain.keycloak | quote }}
+      hostname: {{ include "opencloud.gateway.hostname" (dict "domain" .Values.global.domain.keycloak "Values" .Values) }}
       tls:
         mode: Terminate
         certificateRefs:
@@ -53,7 +53,7 @@ spec:
     - name: minio-https
       protocol: HTTPS
       port: {{ .Values.httpRoute.gateway.port | default 443 }}
-      hostname: {{ .Values.global.domain.minio | quote }}
+      hostname: {{ include "opencloud.gateway.hostname" (dict "domain" .Values.global.domain.minio "Values" .Values) }}
       tls:
         mode: Terminate
         certificateRefs:
@@ -70,7 +70,7 @@ spec:
     - name: onlyoffice-https
       protocol: HTTPS
       port: {{ .Values.httpRoute.gateway.port | default 443 }}
-      hostname: {{ .Values.global.domain.onlyoffice | quote }}
+      hostname: {{ include "opencloud.gateway.hostname" (dict "domain" .Values.global.domain.onlyoffice "Values" .Values) }}
       tls:
         mode: Terminate
         certificateRefs:
@@ -87,7 +87,7 @@ spec:
     - name: collaboration-https
       protocol: HTTPS
       port: {{ .Values.httpRoute.gateway.port | default 443 }}
-      hostname: {{ .Values.global.domain.wopi | quote }}
+      hostname: {{ include "opencloud.gateway.hostname" (dict "domain" .Values.global.domain.wopi "Values" .Values) }}
       tls:
         mode: Terminate
         certificateRefs:
