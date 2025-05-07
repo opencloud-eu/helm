@@ -3,7 +3,6 @@ apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
   name: {{ include "opencloud.fullname" . }}-onlyoffice-tlsroute
-  namespace: {{ include "opencloud.namespace" . }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: onlyoffice

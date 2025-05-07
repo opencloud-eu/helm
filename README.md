@@ -209,7 +209,7 @@ The following sections outline the main configuration parameters for the product
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `namespace` | Namespace to install the chart into | `opencloud` |
+| `namespace` | Deprecated: Namespace is now controlled by Helm (.Release.Namespace) | (removed) |
 | `global.domain.opencloud` | Domain for OpenCloud | `cloud.opencloud.test` |
 | `global.domain.keycloak` | Domain for Keycloak | `keycloak.opencloud.test` |
 | `global.domain.minio` | Domain for MinIO | `minio.opencloud.test` |

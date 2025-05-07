@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "opencloud.opencloud.fullname" . }}
-  namespace: {{ include "opencloud.namespace" . }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: opencloud

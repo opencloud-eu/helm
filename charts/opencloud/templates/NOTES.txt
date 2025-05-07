@@ -57,7 +57,7 @@ The following services have been deployed:
 {{- if .Values.httpRoute.enabled }}
 IMPORTANT: This chart includes HTTPRoute resources that route traffic to the OpenCloud, Keycloak, and MinIO services.
 All HTTPRoutes are configured to use the Gateway named "{{ .Values.httpRoute.gateway.name }}" in the
-{{ if .Values.httpRoute.gateway.namespace }}{{ .Values.httpRoute.gateway.namespace }}{{ else }}{{ .Values.namespace }}{{ end }} namespace.
+{{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }} namespace.
 
 Make sure the Gateway exists and is properly configured to accept traffic for the following domains:
 - OpenCloud: {{ include "opencloud.domain" . }} (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)

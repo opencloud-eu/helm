@@ -21,8 +21,6 @@
 # GLOBAL SETTINGS
 # =====================================================================
 
-# Namespace to install the chart into
-namespace: ""
 # Create the namespace if it doesn't exist
 createNamespace: true
 

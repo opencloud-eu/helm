@@ -3,7 +3,6 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: add-x-forwarded-proto-https
-  namespace: {{ .Values.namespace }}
 spec:
   headers:
     customRequestHeaders:

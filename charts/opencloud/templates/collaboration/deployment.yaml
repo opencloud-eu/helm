@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "opencloud.fullname" . }}-collaboration
-  namespace: {{ include "opencloud.namespace" . }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: collaboration
@@ -55,7 +54,7 @@ spec:
             - name: MICRO_REGISTRY
               value: "nats-js-kv"
             - name: MICRO_REGISTRY_ADDRESS
-              value: "{{ include "opencloud.opencloud.fullname" . }}.{{ include "opencloud.namespace" . }}.svc.cluster.local:9233"
+              value: "{{ include "opencloud.opencloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9233"
             - name: COLLABORATION_WOPI_SRC
               value: "https://{{ include "opencloud.wopi.domain" . }}"
             - name: COLLABORATION_APP_NAME

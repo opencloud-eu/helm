@@ -10,7 +10,7 @@ spec:
   from:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      namespace: {{ include "opencloud.namespace" . }}
+      namespace: {{ .Release.Namespace }}
   to:
     - group: gateway.networking.k8s.io
       kind: Gateway
@@ -20,7 +20,6 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: {{ include "opencloud.fullname" . }}-cert-reference-grant
-  namespace: {{ include "opencloud.namespace" . }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
 spec:

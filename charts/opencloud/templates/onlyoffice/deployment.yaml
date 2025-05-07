@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "opencloud.fullname" . }}-onlyoffice
-  namespace: {{ include "opencloud.namespace" . }}
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: onlyoffice
