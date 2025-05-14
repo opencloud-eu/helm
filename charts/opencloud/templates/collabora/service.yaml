@@ -1,0 +1,19 @@
+{{- if .Values.collabora.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9980
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+{{- end }}

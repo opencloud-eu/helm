@@ -1,0 +1,29 @@
+{{- if and .Values.ingress.enabled .Values.onlyoffice.collaboration.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collaboration
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  {{- if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.global.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain.wopi | quote }}
+      secretName: {{ .Values.global.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain.wopi | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "opencloud.fullname" . }}-collaboration
+                port:
+                  number: 9300
+{{- end }}

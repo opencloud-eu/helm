@@ -203,9 +203,7 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
-| `global.tls.selfSigned` | Use self-signed certificates | `true` |
-| `global.tls.acmeEmail` | ACME email for Let's Encrypt | `example@example.org` |
-| `global.tls.acmeCAServer` | ACME CA server | `https://acme-v02.api.letsencrypt.org/directory` |
+| `global.tls.secretName` | secretName for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
 
 ### Image Settings
@@ -301,14 +299,21 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
 | `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
 
+If you use Traefik and enable OnlyOffice, this chart will automatically create a `Middleware`
+named `add-x-forwarded-proto-https`, used by:
+* Ingress (if `annotationsPreset: traefik`)
+* Gateway API `HTTPRoute` (if `gateway.className: traefik`)
+
+This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyOffice.
+
 ### Collabora Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `collabora.enabled` | Enable Collabora | `true` |
-| `collabora.repository` | Collabora image repository | `collabora/code` |
-| `collabora.tag` | Collabora image tag | `24.04.13.2.1` |
-| `collabora.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.image.repository` | Collabora image repository | `collabora/code` |
+| `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
+| `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `collabora.adminUser` | Admin user | `admin` |
 | `collabora.adminPassword` | Admin password | `admin` |
 | `collabora.ssl.enabled` | Enable SSL | `true` |

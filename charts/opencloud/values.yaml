@@ -33,6 +33,8 @@ global:
     minio: minio.opencloud.test
     # Domain for WOPI server
     wopi: wopiserver.opencloud.test
+    # Domain for Collabora CODE
+    collabora: collabora.opencloud.test
     # Domain for OnlyOffice
     onlyoffice: onlyoffice.opencloud.test
     # Domain for Companion
@@ -42,12 +44,8 @@ global:
   tls:
     # Enable TLS (set to false when using gateway TLS termination externally)
     enabled: false
-    # Use self-signed certificates. Disable if you don't want to use cert-manager to generate self-signed certs for gateway-api
-    selfSigned: true
-    # ACME email for Let's Encrypt
-    acmeEmail: example@example.org
-    # ACME CA server
-    acmeCAServer: https://acme-v02.api.letsencrypt.org/directory
+    # secretName for TLS certificate
+    secretName: ""
 
   # Global storage settings
   storage:
@@ -237,6 +235,30 @@ webExtensions:
       enabled: true
       repository: opencloudeu/web-extensions
       tag: unzip-1.0.0
+
+# =====================================================================
+# COLLABORATION (COLLABORA)
+# =====================================================================
+
+collabora:
+  enabled: false
+  image:
+    repository: collabora/code
+    pullPolicy: IfNotPresent
+    tag: 24.04.13.2.1
+  ssl:
+    enabled: true
+    verification: true
+  admin:
+    user: admin
+    password: admin
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
 
 # =====================================================================
 # COLLABORATION (ONLYOFFICE)
@@ -521,3 +543,37 @@ httpRoute:
     # Gateway annotations
     infrastructure:
       annotations: {}
+
+# =====================================================================
+# INGRESS
+# =====================================================================
+
+# Ingress configuration
+ingress:
+  # Whether to enable ingress resources for components
+  enabled: false
+
+  # The ingress class name to use (e.g., nginx, traefik). Leave empty to use the cluster default.
+  # Note: This sets the Kubernetes `spec.ingressClassName` field.
+  ingressClassName: ""
+
+  # Some components (e.g., OnlyOffice) require the X-Forwarded-Proto header to be set.
+  #
+  # Set 'annotationsPreset' to inject known ingress-controller-specific annotations
+  # for injecting the header. Supported values: nginx, traefik, haproxy, contour, istio
+  #
+  # If set to "traefik" and OnlyOffice is enabled, the chart will create a Middleware
+  # named 'add-x-forwarded-proto-https' for use in both Ingress and Gateway HTTPRoute.
+  #
+  # This is required because Traefik does not allow simple header injection via annotations
+  # or Gateway filters and instead expects a Middleware to be referenced.
+  #
+  # These annotations are added in addition to any defined in 'annotations'.
+  # If there's a conflict, Helm will error. To avoid this, set annotationsPreset: ""
+  # and define all annotations manually (including creating any required Middleware).
+  annotationsPreset: ""  # optional, default ""
+
+  # Custom annotations applied to all ingress resources.
+  # These are merged with any annotations from 'annotationsPreset' (if set).
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt

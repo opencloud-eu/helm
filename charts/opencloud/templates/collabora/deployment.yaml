@@ -1,0 +1,66 @@
+{{- if .Values.collabora.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}-collabora
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collabora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: collabora
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: collabora
+    spec:
+      containers:
+        - name: collabora
+          image: {{ .Values.collabora.image.repository }}:{{ .Values.collabora.image.tag }}
+          imagePullPolicy: {{ .Values.collabora.image.pullPolicy | default "IfNotPresent" }}
+          command: ['/bin/bash', '-c']
+          args:
+            - 'coolconfig generate-proof-key && /start-collabora-online.sh'
+          env:
+            - name: aliasgroup1
+              value: "http://opencloud-collaboration:9300,https://{{ .Values.global.domain.wopi }}"
+            - name: DONT_GEN_SSL_CERT
+              value: "YES"
+            - name: extra_params
+              value: |
+                --o:ssl.enable={{ .Values.collabora.ssl.enabled }} \
+                --o:ssl.ssl_verification={{ .Values.collabora.ssl.verification }} \
+                --o:ssl.termination=true \
+                --o:welcome.enable=false \
+                --o:net.frame_ancestors={{ include "opencloud.domain" . }}
+            - name: username
+              value: "{{ .Values.collabora.admin.user | default "admin" }}"
+            - name: password
+              value: "{{ .Values.collabora.admin.password | default "admin" }}"
+          ports:
+            - containerPort: 9980
+              name: http
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.collabora.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /hosting/discovery
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /hosting/discovery
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          securityContext:
+            capabilities:
+              add:
+                - MKNOD
+{{- end }}

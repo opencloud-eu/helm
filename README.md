@@ -27,6 +27,7 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
 - [Gateway API Configuration](#gateway-api-configuration)
   - [HTTPRoute Settings](#httproute-settings)
 - [Setting Up Gateway API with Talos, Cilium, and cert-manager](#setting-up-gateway-api-with-talos-cilium-and-cert-manager)
+- [Setting up Ingress](#setting-up-ingress)
 - [License](#-license)
 - [Community Maintained](#community-maintained)
 
@@ -217,9 +218,7 @@ The following sections outline the main configuration parameters for the product
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
-| `global.tls.selfSigned` | Use self-signed certificates | `true` |
-| `global.tls.acmeEmail` | ACME email for Let's Encrypt | `example@example.org` |
-| `global.tls.acmeCAServer` | ACME CA server | `https://acme-v02.api.letsencrypt.org/directory` |
+| `global.tls.secretName` | Secret name for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
 
 ### Image Settings
@@ -315,14 +314,21 @@ The following sections outline the main configuration parameters for the product
 | `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
 | `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
 
+If you use Traefik and enable OnlyOffice, this chart will automatically create a `Middleware`
+named `add-x-forwarded-proto-https`, used by:
+* Ingress (if `annotationsPreset: traefik`)
+* Gateway API `HTTPRoute` (if `gateway.className: traefik`)
+
+This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyOffice.
+
 ### Collabora Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `collabora.enabled` | Enable Collabora | `true` |
-| `collabora.repository` | Collabora image repository | `collabora/code` |
-| `collabora.tag` | Collabora image tag | `24.04.13.2.1` |
-| `collabora.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.image.repository` | Collabora image repository | `collabora/code` |
+| `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
+| `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `collabora.adminUser` | Admin user | `admin` |
 | `collabora.adminPassword` | Admin password | `admin` |
 | `collabora.ssl.enabled` | Enable SSL | `true` |
@@ -501,7 +507,7 @@ Apply the ClusterIssuer:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 3: Create a Wildcard Certificate for OpenCloud Domains
+### Step 4: Create a Wildcard Certificate for OpenCloud Domains
 
 Create a wildcard certificate for all OpenCloud subdomains:
 
@@ -535,7 +541,7 @@ Apply the certificate:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 4: Create the Gateway
+### Step 5: Create the Gateway
 
 Create a Gateway resource to expose your services:
 
@@ -653,7 +659,7 @@ Apply the Gateway:
 kubectl apply -f gateway.yaml
 ```
 
-### Step 5: Configure DNS
+### Step 6: Configure DNS
 
 Configure your DNS to point to the Gateway IP address. You can use a wildcard DNS record or individual records for each service:
 
@@ -673,7 +679,7 @@ Alternatively, for local testing, you can add entries to your `/etc/hosts` file:
 192.168.178.77  wopiserver.opencloud.test
 ```
 
-### Step 6: Install OpenCloud
+### Step 7: Install OpenCloud
 
 Finally, install OpenCloud using Helm:
 
@@ -731,6 +737,145 @@ kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-postgres
 kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-redis
 kubectl get pods -n opencloud -l app.kubernetes.io/component=onlyoffice-rabbitmq
 ```
+
+## Setting up Ingress
+
+For some deployments the kubernetes gateway API is not readily available. Using the traditional Ingress objects can be easier to
+set up. The chart only deploys the necessary Ingress objects, e.g.
+minio is not reachable.
+
+### Step 1: Install cert-manager
+
+Install cert-manager to manage TLS certificates:
+
+```bash
+# install the default cert manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
+```
+
+### Step 2: Create a ClusterIssuer for cert-manager
+
+Create a ClusterIssuer for cert-manager to issue certificates:
+
+```yaml
+# cluster-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+```
+
+Apply the ClusterIssuer:
+
+```bash
+kubectl apply -f cluster-issuer.yaml
+```
+
+### Step 3: Create a Wildcard Certificate for OpenCloud Domains
+
+Create a wildcard certificate for all OpenCloud subdomains:
+
+```yaml
+# cluster-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: opencloud-wildcard-tls
+  namespace: kube-system
+spec:
+  secretName: opencloud-wildcard-tls
+  dnsNames:
+    - "opencloud.test"
+    - "*.opencloud.test"
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+```
+
+Apply the certificate:
+
+```bash
+kubectl apply -f cluster-issuer.yaml
+```
+
+### Step 4: Install OpenCloud
+
+Finally, install OpenCloud using Helm:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-repo/opencloud-helm.git
+cd opencloud-helm
+```
+
+Customize the chart to use Ingress objects instead of the newer gateway API
+
+```yaml
+global:
+  # TLS settings
+  tls:
+    # Enable TLS
+    enabled: true
+    secretName: opencloud-wildcard-tls
+
+# Disable Gateway API configuration
+httpRoute:
+  enabled: false
+
+# Enable ingress
+ingress:
+  enabled: true
+  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
+  # The chart currently knows how to add this header for traefik, nginx,
+  # haproxy, contour, and istio. PR welcome.
+  annotationsPreset: "traefik"  # optional, default ""
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+```
+
+```bash
+# Install OpenCloud
+helm install opencloud . \
+  --namespace opencloud \
+  --create-namespace \
+  --set httpRoute.gateway.name=opencloud-gateway \
+  --set httpRoute.gateway.namespace=kube-system
+```
+
+
+### 🔧 Traefik Middleware for OnlyOffice
+If you enable:
+```yaml
+ingress:
+  enabled: true
+  annotationsPreset: "traefik"
+onlyoffice:
+  enabled: true
+```
+
+The chart will automatically:
+* Create a Traefik `Middleware` resource named `add-x-forwarded-proto-https` in the chart's namespace.
+* Attach that Middleware to the OnlyOffice Ingress via:
+  ```yaml
+  traefik.ingress.kubernetes.io/router.middlewares: <namespace>-add-x-forwarded-proto-https@kubernetescrd
+  ```
+
+If you disable the preset and define custom annotations:
+```yaml
+annotationsPreset: ""
+ingress.annotations:
+  traefik.ingress.kubernetes.io/router.middlewares: my-custom-middleware@kubernetescrd
+```
+Then you are responsible for creating the referenced Middleware yourself.
 
 
 ## 📜 License

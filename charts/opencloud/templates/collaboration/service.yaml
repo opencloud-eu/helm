@@ -1,4 +1,4 @@
-{{- if and .Values.onlyoffice.collaboration.enabled .Values.onlyoffice.enabled }}
+{{- if or .Values.onlyoffice.enabled .Values.collabora.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
