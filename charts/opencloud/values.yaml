@@ -404,12 +404,18 @@ opencloud:
     accessMode: ReadWriteOnce
   # Configuration files
   config:
+    theme: "owncloud"
     # App registry configuration
     appRegistry: {}
     # CSP configuration
     csp: {}
     # Banned password list
-    bannedPasswordList: []
+    bannedPasswordList:
+      - "password"
+      - "12345678"
+      - "123"
+      - "OpenCloud"
+      - "OpenCloud-1"
   
   # =====================================================================
   # EMAIL (SMTP)

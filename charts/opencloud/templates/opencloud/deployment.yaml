@@ -30,6 +30,10 @@ spec:
       labels:
         {{- include "opencloud.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: opencloud
+      annotations:
+        checksum/config-json: {{ include (print $.Template.BasePath "/opencloud/config-json-configmap.yaml") . | sha256sum }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/opencloud/configmap.yaml") . | sha256sum }}
+        checksum/web-extensions-init: {{ include (print $.Template.BasePath "/opencloud/web-extensions-init.yaml") . | sha256sum }}
     spec:
       securityContext:
         fsGroup: 1000
