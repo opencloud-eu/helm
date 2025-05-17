@@ -95,9 +95,6 @@ spec:
             initialDelaySeconds: 200
             periodSeconds: 5
             failureThreshold: 1
-          volumeMounts:
-            - name: etc-opencloud
-              mountPath: /etc/opencloud
           resources:
             {{- toYaml .Values.onlyoffice.collaboration.resources | nindent 12 }}
       volumes:
