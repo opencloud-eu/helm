@@ -13,6 +13,9 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
 - [Available Charts](#-available-charts)
   - [Production Chart](#production-chart-chartsopencloud)
   - [Development Chart](#development-chart-chartsopencloud-dev)
+- [Installation](#-installation)
+  - [Installing from Git Repository](#installing-from-git-repository)
+  - [Installing from OCI Registry](#installing-from-oci-registry)
 - [Architecture](#architecture)
   - [Component Interaction Diagram](#component-interaction-diagram)
 - [Configuration](#configuration)
@@ -76,15 +79,6 @@ The complete OpenCloud deployment with all components for production use:
 - Document editing with Collabora and/or OnlyOffice
 - Full Gateway API integration
 
-```bash
-helm install opencloud ./charts/opencloud \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
-```
-
 [View Production Chart Documentation](./charts/opencloud/README.md)
 
 ### Development Chart (`charts/opencloud-dev`)
@@ -95,13 +89,59 @@ A lightweight single-container deployment for development and testing:
 - Minimal resource requirements
 - Quick setup for testing
 
+[View Development Chart Documentation](./charts/opencloud-dev/README.md)
+
+## 🚀 Installation
+
+You can install the Helm charts either directly from this Git repository or from the OCI registry.
+
+### Installing from Git Repository
+
 ```bash
+# Clone the repository
+git clone https://github.com/opencloud-eu/helm.git
+cd helm
+
+# Install Production Chart
+helm install opencloud ./charts/opencloud \
+  --namespace opencloud \
+  --create-namespace \
+  --set httpRoute.enabled=true \
+  --set httpRoute.gateway.name=opencloud-gateway \
+  --set httpRoute.gateway.namespace=kube-system
+
+# Or install Development Chart
 helm install opencloud ./charts/opencloud-dev \
   --namespace opencloud \
   --create-namespace
 ```
 
-[View Development Chart Documentation](./charts/opencloud-dev/README.md)
+### Installing from OCI Registry
+
+The charts are also available in the GitHub Container Registry (GHCR) as OCI artifacts:
+
+```bash
+# Install Production Chart
+helm install opencloud oci://ghcr.io/opencloud-eu/helm-charts/opencloud \
+  --version 0.1.4 \
+  --namespace opencloud \
+  --create-namespace \
+  --set httpRoute.enabled=true \
+  --set httpRoute.gateway.name=opencloud-gateway \
+  --set httpRoute.gateway.namespace=kube-system
+
+# Or install Development Chart
+helm install opencloud-dev oci://ghcr.io/opencloud-eu/helm-charts/opencloud-dev \
+  --version 0.1.0 \
+  --namespace opencloud \
+  --create-namespace
+```
+
+You can list available versions with:
+
+```bash
+helm search repo oci://ghcr.io/opencloud-eu/helm-charts --versions
+```
 
 ## Architecture
 
