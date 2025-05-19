@@ -516,10 +516,9 @@ httpRoute:
     className: cilium
     # Gateway namespace (defaults to Release.Namespace)
     namespace: ""
-    # Use wildcard hostnames (e.g. *.opencloud.test instead of cloud.opencloud.test)
-    useWildcardHostnames: false
-    # Specific wildcard hostname to use when useWildcardHostnames is true
-    # If not specified, automatically derived from the domain (*.domain.tld)
+    # Wildcard hostname to use (e.g. *.opencloud.test)
+    # When specified, this will be used instead of the specific domain
+    # If empty, specific domain names will be used (e.g. cloud.opencloud.test)
     wildcardHostname: ""
     # Gateway annotations
     annotations:

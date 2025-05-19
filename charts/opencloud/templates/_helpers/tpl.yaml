@@ -154,16 +154,12 @@ Return the appropriate apiVersion for ingress
 
 {{/*
 Helper function to format hostname for Gateway API resource
-Uses wildcard pattern if enabled in configuration
+Uses wildcard pattern if specified, otherwise uses specific domain
 */}}
 {{- define "opencloud.gateway.hostname" -}}
 {{- $domain := .domain -}}
-{{- if $.Values.httpRoute.gateway.useWildcardHostnames -}}
 {{- with $.Values.httpRoute.gateway.wildcardHostname -}}
 {{- . | quote -}}
-{{- else -}}
-{{- printf "*.%s" ($domain | regexFind "[^.]+\\.[^.]+$") | quote -}}
-{{- end -}}
 {{- else -}}
 {{- $domain | quote -}}
 {{- end -}}
