@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  # TODO make like minio
+  name: {{ .Release.Name }}-oc-proxy
+  namespace: {{ template "oc.namespace" . }}
+  labels:
+    {{- include "oc.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - name: cilium-gateway
+      namespace: kube-system
+      sectionName: oc-proxy-https
+  hostnames:
+    - {{ .Values.externalDomain}}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: proxy
+          port: 9200
+

@@ -1,0 +1,5 @@
+{{- if not .Values.configRefs.storageusersConfigRef }}
+{{- $params := (dict)}}
+{{- $_ := set $params "storage-uuid" (uuidv4) }}
+{{- include "oc.configMap" (dict "scope" . "name" "storage-users" "labels" .Values.backup.configMapLabels "params" $params)}}
+{{- end }}
