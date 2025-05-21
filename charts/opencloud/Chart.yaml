@@ -3,8 +3,6 @@ name: opencloud
 description: OpenCloud Helm community chart
 keywords:
   - opencloud
-  - owncloud
-  - ocis
 maintainers:
   - name: OpenCloud EU
     email: info@opencloud.eu
@@ -16,5 +14,4 @@ appVersion: latest
 kubeVersion: ""
 sources:
   - https://github.com/opencloud-eu/opencloud
-  - https://github.com/owncloud/ocis
   - https://github.com/cs3org/reva

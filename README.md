@@ -93,7 +93,7 @@ Please ensure that your PR follows best practices and includes necessary documen
 
 The production chart (`charts/opencloud`) deploys the following components:
 
-1. **OpenCloud** - Main application (fork of ownCloud Infinite Scale)
+1. **OpenCloud** - Main application
 2. **Keycloak** - Authentication provider with OpenID Connect
 3. **PostgreSQL** - Database for Keycloak and OnlyOffice
 4. **MinIO** - S3-compatible object storage

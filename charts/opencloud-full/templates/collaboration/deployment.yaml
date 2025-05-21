@@ -61,7 +61,7 @@ spec:
               value: {{ default $officeSuite.name $officeSuite.product | quote }}
 
             - name: COLLABORATION_APP_LOCKNAME
-              value: com.github.owncloud.collaboration-{{ $officeSuite.name }}
+              value: com.github.opencloud.collaboration-{{ $officeSuite.name }}
 
             - name: COLLABORATION_APP_INSECURE
               value: {{ $officeSuite.insecure | quote }}

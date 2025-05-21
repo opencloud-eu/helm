@@ -10,7 +10,7 @@ data:
   config.json: |-
     {
       "server": "https://{{ include "opencloud.domain" . }}",
-      "theme": "owncloud",
+      "theme": "opencloud",
       "version": "0.1.0"
     }
 {{- end }}
