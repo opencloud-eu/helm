@@ -4,7 +4,30 @@
 
 Welcome to the **OpenCloud Helm Charts** repository! This repository is intended as a community-driven space for developing and maintaining Helm charts for deploying OpenCloud on Kubernetes.
 
-## 📑 Table of Contents
+## 🚀 Installation
+
+This repository contains multiple Helm charts for deploying OpenCloud. Below are the instructions for installing the `opencloud-full` chart, which provides a comprehensive OpenCloud deployment.
+
+### Installing Chart 1 `opencloud-full`
+
+This is the full chart that includes LDAP, OIDC, S3 storage, and various plugins. To install the `opencloud-full` chart, navigate to its deployment directory and synchronize the Helmfile:
+
+```bash
+cd charts/opencloud-full/deployments
+helmfile sync
+```
+
+This command will deploy all the necessary components for a full OpenCloud instance, including its dependencies.
+
+### Installing Chart 2 (Placeholder)
+
+(Details on how to install this chart will be added later.)
+
+### Installing Chart 3 (Placeholder)
+
+(Details on how to install this chart will be added later.)
+
+##  Table of Contents
 
 - [About](#-about)
 - [Community](#-community)
@@ -58,49 +81,11 @@ Please ensure that your PR follows best practices and includes necessary documen
 
 ## Prerequisites
 
-- Kubernetes 1.19+
-- Helm 3.2.0+
-- PV provisioner support in the underlying infrastructure (if persistence is enabled)
+- Kubernetes 1.19+ (e.g. Talos Kubernetes, RKE2)
+- Helm 3.2.0+ or Timoni Bundle (flux-helm-release)
+- PVC provisioner support in the underlying infrastructure (if persistence is enabled)
 - External ingress controller (e.g., Cilium Gateway API) for routing traffic to the services
 
-## 📦 Available Charts
-
-This repository contains the following charts:
-
-### Production Chart (`charts/opencloud`)
-
-The complete OpenCloud deployment with all components for production use:
-
-- Full microservices architecture
-- Keycloak for authentication
-- MinIO for object storage
-- Document editing with Collabora and/or OnlyOffice
-- Full Gateway API integration
-
-```bash
-helm install opencloud ./charts/opencloud \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
-```
-
-[View Production Chart Documentation](./charts/opencloud/README.md)
-
-### Development Chart (`charts/opencloud-dev`)
-
-A lightweight single-container deployment for development and testing:
-
-- Simplified deployment (single Docker container)
-- Minimal resource requirements
-- Quick setup for testing
-
-```bash
-helm install opencloud ./charts/opencloud-dev \
-  --namespace opencloud \
-  --create-namespace
-```
 
 [View Development Chart Documentation](./charts/opencloud-dev/README.md)
 
@@ -108,7 +93,7 @@ helm install opencloud ./charts/opencloud-dev \
 
 The production chart (`charts/opencloud`) deploys the following components:
 
-1. **OpenCloud** - Main application (fork of ownCloud Infinite Scale)
+1. **OpenCloud** - Main application
 2. **Keycloak** - Authentication provider with OpenID Connect
 3. **PostgreSQL** - Database for Keycloak and OnlyOffice
 4. **MinIO** - S3-compatible object storage
@@ -117,6 +102,7 @@ The production chart (`charts/opencloud`) deploys the following components:
 7. **Collaboration Service** - WOPI server that connects OpenCloud with document editors
 8. **Redis** - Cache for OnlyOffice
 9. **RabbitMQ** - Message queue for OnlyOffice
+10. **OpenLDAP** - LDAP server for user and group management
 
 All services are deployed with `ClusterIP` type, which means they are only accessible within the Kubernetes cluster. You need to configure your own ingress controller (e.g., Cilium Gateway API) to expose the services externally.
 
@@ -139,6 +125,8 @@ graph TD
         
         OpenCloud -->|Authentication| Keycloak
         OpenCloud -->|File Storage| MinIO
+        OpenCloud -->|Messaging| NATS[NATS]
+        OpenCloud -->|User/Group Management| OpenLDAP[OpenLDAP]
         
         Collabora -->|WOPI Protocol| Collaboration
         OnlyOffice -->|WOPI Protocol| Collaboration
@@ -153,13 +141,19 @@ graph TD
         OnlyOffice -->|Message Queue| RabbitMQ[RabbitMQ]
     end
     
+    Keycloak -->|User Federation| OpenLDAP
+    
     classDef pod fill:#f9f,stroke:#333,stroke-width:2px;
     classDef gateway fill:#bbf,stroke:#333,stroke-width:2px;
     classDef user fill:#bfb,stroke:#333,stroke-width:2px;
     classDef db fill:#dfd,stroke:#333,stroke-width:2px;
-    
+    classDef mq fill:#ffd,stroke:#333,stroke-width:2px;
+    classDef ldap fill:#cff,stroke:#333,stroke-width:2px;
+
     class OpenCloud,Collabora,OnlyOffice,Collaboration,Keycloak,MinIO pod;
-    class PostgreSQL,Redis,RabbitMQ db;
+    class PostgreSQL,Redis db;
+    class RabbitMQ,NATS mq;
+    class OpenLDAP ldap;
     class Gateway gateway;
     class User user;
 ```
@@ -343,6 +337,21 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
+### LDAP Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `ldap.enabled` | Enable LDAP integration | `false` |
+| `ldap.host` | LDAP server hostname or IP | `""` |
+| `ldap.port` | LDAP server port | `389` |
+| `ldap.useTLS` | Use TLS for LDAP connection | `false` |
+| `ldap.bindDN` | Bind DN for LDAP authentication | `""` |
+| `ldap.bindPassword` | Bind password for LDAP authentication | `""` |
+| `ldap.userSearchBase` | Base DN for user searches | `""` |
+| `ldap.userSearchFilter` | Filter for user searches | `(objectClass=person)` |
+| `ldap.groupSearchBase` | Base DN for group searches | `""` |
+| `ldap.groupSearchFilter` | Filter for group searches | `(objectClass=groupOfNames)` |
+
 ## Gateway API Configuration
 
 The production chart includes HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.
@@ -402,19 +411,19 @@ The chart now automatically uses the correct namespace across all resources, eli
 
 The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
 
-1. **OpenCloud HTTPRoute**:
+1. **OpenCloud Proxy HTTPRoute (`oc-proxy-https`)**:
    - Hostname: `global.domain.opencloud`
    - Service: `{{ release-name }}-opencloud`
    - Port: 9200
    - Headers: Removes Permissions-Policy header to prevent browser console errors
 
-2. **Keycloak HTTPRoute** (when `keycloak.enabled` is `true`):
+2. **Keycloak HTTPRoute (`oc-keycloak-https`)** (when `keycloak.enabled` is `true`):
    - Hostname: `global.domain.keycloak`
    - Service: `{{ release-name }}-keycloak`
    - Port: 8080
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
-3. **MinIO HTTPRoute** (when `opencloud.storage.s3.internal.enabled` is `true`):
+3. **MinIO HTTPRoute (`oc-minio-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
    - Hostname: `global.domain.minio`
    - Service: `{{ release-name }}-minio`
    - Port: 9001
@@ -423,27 +432,33 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    default user: opencloud
    pass: opencloud-secret-key
 
-4. **OnlyOffice HTTPRoute** (when `onlyoffice.enabled` is `true`):
+4. **MinIO Console HTTPRoute (`oc-minio-console-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
+   - Hostname: `console.minio.opencloud.test` (or `global.domain.minioConsole` if defined)
+   - Service: `{{ release-name }}-minio`
+   - Port: 9001
+   - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
+
+5. **OnlyOffice HTTPRoute (`oc-onlyoffice-https`)** (when `onlyoffice.enabled` is `true`):
    - Hostname: `global.domain.onlyoffice`
    - Service: `{{ release-name }}-onlyoffice`
-   - Port: 80
+   - Port: 443 (or 80 if using HTTP)
    - Path: "/"
    - This route is used to access the OnlyOffice Document Server for collaborative editing
 
-5. **WOPI HTTPRoute** (when `onlyoffice.collaboration.enabled` and `onlyoffice.enabled` are `true`):
-   - Hostname: `global.domain.wopi`
+6. **WOPI HTTPRoute (`oc-wopi-https`)** (when `onlyoffice.collaboration.enabled` and `onlyoffice.enabled` are `true`):
+   - Hostname: `global.domain.wopi` (or `collaboration.wopiDomain`)
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Path: "/"
    - This route is used for the WOPI protocol communication between OnlyOffice and the collaboration service
 
-6. **Collabora HTTPRoute** (when `collabora.enabled` is `true`):
+7. **Collabora HTTPRoute** (when `collabora.enabled` is `true`):
    - Hostname: `global.domain.collabora`
    - Service: `{{ release-name }}-collabora`
    - Port: 9980
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
-7. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
+8. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
    - Hostname: `collaboration.wopiDomain`
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
@@ -567,7 +582,7 @@ spec:
     - type: IPAddress
       value: 192.168.178.77  # Replace with your desired IP
   listeners:
-    - name: opencloud-https
+    - name: oc-proxy-https
       protocol: HTTPS
       port: 443
       hostname: "cloud.opencloud.test"
@@ -579,19 +594,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: keycloak-https
-      protocol: HTTPS
-      port: 443
-      hostname: "keycloak.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: minio-https
+    - name: oc-minio-https
       protocol: HTTPS
       port: 443
       hostname: "minio.opencloud.test"
@@ -603,10 +606,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: onlyoffice-https
+    - name: oc-minio-console-https
       protocol: HTTPS
       port: 443
-      hostname: "onlyoffice.opencloud.test"
+      hostname: "console.minio.opencloud.test"
       tls:
         mode: Terminate
         certificateRefs:
@@ -615,10 +618,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: collabora-https
+    - name: oc-keycloak-https
       protocol: HTTPS
       port: 443
-      hostname: "collabora.opencloud.test"
+      hostname: "keycloak.opencloud.test"
       tls:
         mode: Terminate
         certificateRefs:
@@ -627,22 +630,22 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: collaboration-https
-      protocol: HTTPS
-      port: 443
-      hostname: "collaboration.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: wopi-https
+    - name: oc-wopi-https
       protocol: HTTPS
       port: 443
       hostname: "wopiserver.opencloud.test"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-wildcard-tls
+            namespace: kube-system
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: oc-onlyoffice-https
+      protocol: HTTPS
+      port: 443
+      hostname: "onlyoffice.opencloud.test"
       tls:
         mode: Terminate
         certificateRefs:
@@ -681,20 +684,15 @@ Alternatively, for local testing, you can add entries to your `/etc/hosts` file:
 
 ### Step 7: Install OpenCloud
 
-Finally, install OpenCloud using Helm:
+Finally, install OpenCloud using Helmfile:
 
 ```bash
 # Clone the repository
 git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd opencloud-helm
+cd charts/opencloud-full/deployments
 
 # Install OpenCloud
-helm install opencloud ./charts/opencloud \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
+helmfile sync
 ```
 
 ### Troubleshooting

@@ -1,0 +1,2 @@
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNamePostprocessing" "appNameSuffix" "") -}}
+{{ include "oc.pdb" . }}

@@ -1,0 +1,47 @@
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloak" "appNameSuffix" "") -}}
+{{- if .Values.keycloak.enabled  }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: {{ include "oc.keycloak.fullname" . }}
+  labels:
+    {{- include "oc.labels" . | nindent 4 }}
+    app.kubernetes.io/component: keycloak
+spec:
+  parentRefs:
+    - name: {{ .Values.gateway.httproute.gateway.name }}
+      namespace: {{ .Values.gateway.httproute.gateway.namespace }}
+      sectionName: oc-keycloak-https
+  hostnames:
+    - {{ .Values.keycloak.domain }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ .appName }}
+          port: 80
+{{- end }}
+# ---
+# {{- if and (not .Values.keycloak.enabled) (and .Values.features.externalUserManagement.enabled .Values.features.externalUserManagement.oidc.domain) }}
+# apiVersion: gateway.networking.k8s.io/v1beta2
+# kind: TLSRoute
+# metadata:
+#   name: {{ include "oc.keycloak.fullname" . }}-extern
+#   namespace: keycloak
+#   labels:
+#     {{- include "oc.labels" . | nindent 4 }}
+#     app.kubernetes.io/component: keycloak
+# spec:
+#   parentRefs:
+#     - name: {{ .Values.gateway.httproute.gateway.name }}
+#       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
+#       sectionName: keycloak-ext-tls
+#   hostnames:
+#     - keycloakext.opencloud.test
+#   rules:
+#   - backendRefs:
+#       - name: oc-keycloak-service
+#         port: 8443
+# {{- end }}
