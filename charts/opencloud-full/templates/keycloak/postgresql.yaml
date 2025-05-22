@@ -7,12 +7,8 @@ metadata:
   labels:
     {{- include "oc.labels" . | nindent 4 }}
 spec:
+ {{- include "oc.selector" . | nindent 2 }}
   replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: keycloak-postgresql
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/name: {{ include "oc.name" . }}
   template:
     metadata:
       labels:
