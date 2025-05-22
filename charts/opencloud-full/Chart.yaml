@@ -7,7 +7,7 @@ keywords:
 maintainers:
   - name: Community 
 type: application
-version: 0.9.0
+version: 0.9.1
 # renovate: datasource=docker depName=opencloud/opencloud
 appVersion: 2.3.0
 kubeVersion: "" # please see https://doc.opencloud.com/opencloud/next/deployment/container/orchestration/orchestration.html#get-the-chart for compatible Kubernetes versions
