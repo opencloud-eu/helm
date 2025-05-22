@@ -1,17 +1,15 @@
 apiVersion: v2
-name: oc
-description: openCloud  (OC) Helm chart
+name: opencloud-full
+description: openCloud Helm chart
 keywords:
   - opencloud
   - oc
 maintainers:
-  - name: openCloud GmbH
-    email: devops@opencloud.com
-    url: https://opencloud.com
+  - name: Community 
 type: application
-version: 0.7.0
+version: 0.9.0
 # renovate: datasource=docker depName=opencloud/opencloud
-appVersion: 7.1.2
+appVersion: 2.3.0
 kubeVersion: "" # please see https://doc.opencloud.com/opencloud/next/deployment/container/orchestration/orchestration.html#get-the-chart for compatible Kubernetes versions
 sources:
   - https://github.com/opencloud/opencloud-charts
