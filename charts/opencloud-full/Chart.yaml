@@ -1,0 +1,17 @@
+apiVersion: v2
+name: opencloud-full
+description: openCloud Helm chart
+keywords:
+  - opencloud
+  - oc
+maintainers:
+  - name: Community 
+type: application
+version: 0.9.0
+# renovate: datasource=docker depName=opencloud/opencloud
+appVersion: 2.3.0
+kubeVersion: "" # please see https://doc.opencloud.com/opencloud/next/deployment/container/orchestration/orchestration.html#get-the-chart for compatible Kubernetes versions
+sources:
+  - https://github.com/opencloud/opencloud-charts
+  - https://github.com/opencloud/opencloud
+  - https://github.com/cs3org/reva
