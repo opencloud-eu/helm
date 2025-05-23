@@ -41,6 +41,30 @@ When making changes, please ensure you:
 - Ensure your PR has a clear description of the changes
 - At least one reviewer must approve before a maintainer can merge
 
+## Release Process
+
+### Creating a Release
+
+Only maintainers can create releases. The process is:
+
+1. **Update versions**: Update the version in all Chart.yaml files
+2. **Update documentation**: Add release notes to CHANGELOG.md (if exists)
+3. **Create PR**: Submit a PR with the version changes
+4. **Tag after merge**: After the PR is merged, create and push a tag:
+   ```bash
+   git tag -a v0.x.x -m "Release v0.x.x"
+   git push origin v0.x.x
+   ```
+
+### Version Guidelines (0.x.x phase)
+
+During the initial development phase (0.x.x), we follow these conventions:
+- `0.x.0` - Breaking changes (incompatible API/values changes)
+- `0.x.y` - New features (backwards compatible)
+- `0.x.y-z` - Bug fixes only
+
+Note: As per [SemVer 2.0](https://semver.org/spec/v2.0.0.html#spec-item-4), the 0.x.x range indicates the API is not stable and breaking changes may occur.
+
 ## Code of Conduct
 
 This project follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
