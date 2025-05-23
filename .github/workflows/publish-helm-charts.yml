@@ -2,9 +2,7 @@ name: Publish Helm charts to OCI Registry
 
 on:
   push:
-    branches:
-      - main
-    # Publish when a new tag is pushed
+    # Publish ONLY when a new tag is pushed (not on every main push)
     tags:
       - 'v*'
   # Allow manual trigger
@@ -47,10 +45,15 @@ jobs:
             echo ""
             echo "## Publishing for tag: v$TAG_VERSION"
             
-            # Check if tag matches chart versions
+            # Strict version check - at least one chart must match the tag
             if [ "$PROD_VERSION" != "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
-              echo "⚠️ WARNING: Tag doesn't match any chart version"
-              echo "  Both charts will be updated from their current versions to $TAG_VERSION"
+              echo "❌ ERROR: Neither chart version matches the tag version"
+              echo "  - opencloud chart: $PROD_VERSION"
+              echo "  - opencloud-dev chart: $DEV_VERSION"
+              echo "  - Git tag: v$TAG_VERSION"
+              echo ""
+              echo "Please update Chart.yaml files to match the tag version before creating the release."
+              exit 1
             elif [ "$PROD_VERSION" = "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
               echo "⚠️ Dev chart will be updated from $DEV_VERSION to $TAG_VERSION"
             elif [ "$DEV_VERSION" = "$TAG_VERSION" ] && [ "$PROD_VERSION" != "$TAG_VERSION" ]; then
