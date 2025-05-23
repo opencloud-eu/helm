@@ -22,6 +22,44 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check chart versions
+        run: |
+          echo "## Checking Chart Versions"
+          
+          # Get versions
+          PROD_VERSION=$(grep "^version:" charts/opencloud/Chart.yaml | awk '{print $2}')
+          DEV_VERSION=$(grep "^version:" charts/opencloud-dev/Chart.yaml | awk '{print $2}')
+          
+          echo "- opencloud: $PROD_VERSION"
+          echo "- opencloud-dev: $DEV_VERSION"
+          
+          # Basic semver check (x.y.z format)
+          for version in "$PROD_VERSION" "$DEV_VERSION"; do
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "❌ ERROR: Version '$version' is not valid semver"
+              exit 1
+            fi
+          done
+          
+          # Check tag consistency if this is a tag push
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            echo ""
+            echo "## Publishing for tag: v$TAG_VERSION"
+            
+            # Check if tag matches chart versions
+            if [ "$PROD_VERSION" != "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
+              echo "⚠️ WARNING: Tag doesn't match any chart version"
+              echo "  Both charts will be updated from their current versions to $TAG_VERSION"
+            elif [ "$PROD_VERSION" = "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
+              echo "⚠️ Dev chart will be updated from $DEV_VERSION to $TAG_VERSION"
+            elif [ "$DEV_VERSION" = "$TAG_VERSION" ] && [ "$PROD_VERSION" != "$TAG_VERSION" ]; then
+              echo "⚠️ Production chart will be updated from $PROD_VERSION to $TAG_VERSION"
+            else
+              echo "✅ Both charts already at version $TAG_VERSION"
+            fi
+          fi
+
       - name: Set up Helm
         uses: azure/setup-helm@v3
         with:
