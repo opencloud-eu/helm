@@ -37,7 +37,8 @@ spec:
               mountPath: /data
       containers:
         - name: minio
-          image: minio/minio:latest
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.opencloud.storage.s3.internal.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.opencloud.storage.s3.internal.image.pullPolicy "global" .Values.global) }}
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000

@@ -24,8 +24,8 @@ spec:
         fsGroup: 999  # Default PostgreSQL group ID
       containers:
         - name: postgres
-          image: {{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}
-          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.postgres.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.postgres.image.pullPolicy "global" .Values.global) }}
           env:
             - name: POSTGRES_DB
               value: {{ .Values.postgres.database | quote }}
