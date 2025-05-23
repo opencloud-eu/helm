@@ -31,9 +31,9 @@ jobs:
           echo "- opencloud: $PROD_VERSION"
           echo "- opencloud-dev: $DEV_VERSION"
           
-          # Basic semver check (x.y.z format)
+          # Basic semver check (x.y.z or x.y.z-prerelease format)
           for version in "$PROD_VERSION" "$DEV_VERSION"; do
-            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+)?$ ]]; then
               echo "❌ ERROR: Version '$version' is not valid semver"
               exit 1
             fi
