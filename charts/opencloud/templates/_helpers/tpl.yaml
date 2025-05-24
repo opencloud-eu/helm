@@ -158,3 +158,16 @@ Return the appropriate apiVersion for ingress
 {{- print "networking.k8s.io/v1beta1" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Helper function to format hostname for Gateway API resource
+Uses wildcard pattern if specified, otherwise uses specific domain
+*/}}
+{{- define "opencloud.gateway.hostname" -}}
+{{- $domain := .domain -}}
+{{- with $.Values.httpRoute.gateway.wildcardHostname -}}
+{{- . | quote -}}
+{{- else -}}
+{{- $domain | quote -}}
+{{- end -}}
+{{- end -}}
