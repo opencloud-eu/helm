@@ -33,7 +33,7 @@ runtime: {
         "WOPI_COLLABORA_TLS_HOST": "wopi-collabora.kube.opencloud.test"
         "ONLYOFFICE_URI": "https://onlyoffice.opencloud.test"
         "ONLYOFFICE_ICON_URI": "https://onlyoffice.opencloud.test/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
-        "OPENCLOUD_WEB_URL": "https://www.opencloud.com"
+        "OPENCLOUD_WEB_URL": "https://www.opencloud.eu"
         "LDAP_GLOBAL_DOMAIN": "opencloud.eu"
     }
 }

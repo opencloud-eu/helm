@@ -131,7 +131,7 @@ releases:
                   config:
                     sites:
                       - name: openCloud
-                        url: https://www.opencloud.com
+                        url: https://www.opencloud.eu
                         target: external
                         color: "#0D856F"
                         icon: cloud
