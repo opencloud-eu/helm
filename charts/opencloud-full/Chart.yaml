@@ -1,0 +1,19 @@
+apiVersion: v2
+name: opencloud-full
+description: openCloud Helm chart
+keywords:
+  - opencloud
+  - oc
+maintainers:
+  - name: OpenCloud EU
+    email: info@opencloud.eu
+    url: https://opencloud.eu
+type: application
+version: 0.2.9
+# renovate: datasource=docker depName=opencloudeu/opencloud-rolling
+appVersion: latest
+kubeVersion: ""
+sources:
+  - https://github.com/opencloud-eu/opencloud
+  - https://github.com/owncloud/ocis
+  - https://github.com/cs3org/reva

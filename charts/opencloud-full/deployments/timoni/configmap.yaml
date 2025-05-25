@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opencloud-config
+  namespace: opencloud
+data:
+  EXTERNAL_DOMAIN: "cloud.opencloud.test"
+  KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
+  MINIO_DOMAIN: "minio.opencloud.test"
+  LDAP_URI: "ldap://openldap.openldap.svc.cluster.local:389"
+  OIDC_ISSUER_URI: "https://keycloak.opencloud.test/realms/openCloud"
+  COLLABORA_URI: "https://collabora.opencloud.test"
+  COLLABORA_ICON_URI: "https://collabora.opencloud.test/favicon.ico"
+  WOPI_INGRESS_DOMAIN: "wopi.opencloud.test"
+  WOPI_COLLABORA_TLS_HOST: "wopi-collabora.kube.opencloud.test"
+  ONLYOFFICE_URI: "https://onlyoffice.opencloud.test"
+  ONLYOFFICE_ICON_URI: "https://onlyoffice.opencloud.test/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
+  OPENCLOUD_WEB_URL: "https://www.opencloud.com"
+  LDAP_GLOBAL_DOMAIN: "opencloud.eu"
