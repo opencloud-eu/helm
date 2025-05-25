@@ -38,7 +38,7 @@ image:
   # required: false
   # @schema
   # -- Image tag. Defaults to the chart's appVersion.
-  tag: latest
+  tag: 2.3.0
   # @schema
   # type: [string, null]
   # required: false
