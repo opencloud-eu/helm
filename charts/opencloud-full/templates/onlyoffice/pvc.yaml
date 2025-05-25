@@ -6,7 +6,6 @@ metadata:
   name: {{ .appName }}-data
   namespace: {{ template "oc.namespace" . }}
   annotations:
-    helm.sh/resource-policy: "keep"
   labels:
     app: {{ .appName }}
     oc-metrics: enabled

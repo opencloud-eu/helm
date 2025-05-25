@@ -10,7 +10,6 @@ metadata:
   {{- with .Values.services.thumbnails.persistence.annotations  }}
   annotations:
 {{ toYaml . | indent 4 }}
-    helm.sh/resource-policy: "keep"
   {{- end }}
   {{- with .Values.services.thumbnails.persistence.finalizers  }}
   finalizers:
