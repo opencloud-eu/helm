@@ -38,6 +38,7 @@ spec:
         - name: data
           emptyDir: {}
 ---
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloak" "appNameSuffix" "") -}}
 apiVersion: v1
 kind: Service
 metadata:
