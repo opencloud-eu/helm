@@ -13156,14 +13156,29 @@
           },
           "type": "object"
         },
-        "postgresql": {
-          "additionalProperties": false,
-          "properties": {
-            "version": {
-              "type": "string"
-            }
-          },
-          "type": "object"
+         "postgresql": {
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "database": {
+                "type": "string"
+              },
+              "host": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              },
+              "port": {
+                "type": "string"
+              }
+            },
+            "type": "object"
         },
         "config": {
           "additionalProperties": false,

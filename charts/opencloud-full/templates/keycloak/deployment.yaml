@@ -58,11 +58,11 @@ spec:
             - name: KC_DB
               value: postgres
             - name: KC_DB_URL
-              value: jdbc:postgresql://{{ .appName }}-postgresql:5432/keycloak
+              value: jdbc:postgresql://{{ .Values.keycloak.postgresql.host }}:{{ .Values.keycloak.postgresql.port }}/{{ .Values.keycloak.postgresql.database }}
             - name: KC_DB_USERNAME
-              value: keycloak
+              value: {{ .Values.keycloak.postgresql.username }}
             - name: KC_DB_PASSWORD
-              value: keycloak
+              value: {{ .Values.keycloak.postgresql.password }}
             - name: KC_FEATURES
               value: impersonation
             - name: KC_PROXY

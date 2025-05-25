@@ -6439,8 +6439,38 @@ keycloak:
     # @schema
     # -- Keycloak image tag
     tag: "25.0.0"
-  # PostgreSQL version
+    # PostgreSQL configuration
   postgresql:
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- PostgreSQL host
+    host: "keycloak-postgresql"
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- PostgreSQL port
+    port: "5432"
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- PostgreSQL database
+    database: "keycloak"
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- PostgreSQL username
+    username: "keycloak"
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- PostgreSQL password
+    password: "keycloak"
     # @schema
     # type: string
     # required: true

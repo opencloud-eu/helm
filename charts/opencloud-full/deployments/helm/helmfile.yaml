@@ -15,7 +15,7 @@ releases:
   # Deploys the main OpenCloud application with all its integrated services.
   - name: opencloud-4
     namespace: opencloud-4 # Dedicated namespace for the OpenCloud deployment.
-    chart: ../ # Path to the OpenCloud Helm chart.
+    chart: ../../ # Path to the OpenCloud Helm chart.
     values:
       # --- General Settings ---
       - logging:

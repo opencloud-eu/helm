@@ -15,11 +15,11 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_USER
-              value: keycloak
+              value: {{ .Values.keycloak.postgresql.username }}
             - name: POSTGRES_PASSWORD
-              value: keycloak
+              value: {{ .Values.keycloak.postgresql.password }}
             - name: POSTGRES_DB
-              value: keycloak
+              value: {{ .Values.keycloak.postgresql.database }}
           ports:
             - name: postgresql
               containerPort: 5432
@@ -38,11 +38,10 @@ spec:
         - name: data
           emptyDir: {}
 ---
-{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloak" "appNameSuffix" "") -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .appName }}-postgresql
+  name: {{ .appName }}
   labels:
     {{- include "oc.labels" . | nindent 4 }}
 spec:
