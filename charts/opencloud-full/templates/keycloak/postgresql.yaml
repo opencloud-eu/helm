@@ -1,4 +1,4 @@
-{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloakPG" "appNameSuffix" "") -}}
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloak" "appNameSuffix" "") -}}
 {{- if .Values.keycloak.enabled }}
 apiVersion: apps/v1
 kind: Deployment

@@ -296,7 +296,8 @@ bundle: {
                     version: "4.3.3"
                 }
                 sync: {
-                    timeout: 25
+                    timeout: 5
+                    createNamespace: true
                 }
                 helmValues: {
                     ltb_passwd: {
