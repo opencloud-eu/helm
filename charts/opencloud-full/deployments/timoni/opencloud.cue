@@ -300,7 +300,7 @@ bundle: {
                     createNamespace: true
                 }
                 helmValues: {
-                    ltb_passwd: {
+                    "ltb-passwd": {
                         enabled: false
                     }
                     replication: {
@@ -312,7 +312,7 @@ bundle: {
                         configPassword: "config"
                     }
                     customLdifFiles: {
-                        opencloud_root_ldif: """
+                        "opencloud_root.ldif": """
                             dn: dc=opencloud,dc=eu
                             objectClass: organization
                             objectClass: dcObject
@@ -338,82 +338,64 @@ bundle: {
                             objectClass: organizationalUnit
                             ou: custom
                             """
-                        users_ldif: ""
-                        groups_ldif: """
+                        "users.ldif": """
+                            """
+                        "groups.ldif": """
                             dn: cn=users,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: users
-                            description: Users
-                            member: uid=alan,ou=users,dc=opencloud,dc=eu
-                            member: uid=mary,ou=users,dc=opencloud,dc=eu
-                            member: uid=margaret,ou=users,dc=opencloud,dc=eu
-                            member: uid=dennis,ou=users,dc=opencloud,dc=eu
-                            member: uid=lynn,ou=users,dc=opencloud,dc=eu
-                            member: uid=admin,ou=users,dc=opencloud,dc=eu
-
                             dn: cn=chess-lovers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: chess-lovers
                             description: Chess lovers
-                            member: uid=alan,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=machine-lovers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: machine-lovers
                             description: Machine Lovers
-                            member: uid=alan,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=bible-readers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: bible-readers
                             description: Bible readers
-                            member: uid=mary,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=apollos,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: apollos
                             description: Contributors to the Appollo mission
-                            member: uid=margaret,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=unix-lovers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: unix-lovers
                             description: Unix lovers
-                            member: uid=dennis,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=basic-haters,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: basic-haters
                             description: Haters of the Basic programming language
-                            member: uid=dennis,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=vlsi-lovers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: vlsi-lovers
                             description: Lovers of VLSI microchip design
-                            member: uid=lynn,ou=users,dc=opencloud,dc=eu
 
                             dn: cn=programmers,ou=groups,dc=opencloud,dc=eu
                             objectClass: groupOfNames
                             objectClass: top
                             cn: programmers
                             description: Computer Programmers
-                            member: uid=alan,ou=users,dc=opencloud,dc=eu
-                            member: uid=margaret,ou=users,dc=opencloud,dc=eu
-                            member: uid=dennis,ou=users,dc=opencloud,dc=eu
-                            member: uid=lynn,ou=users,dc=opencloud,dc=eu
                             """
                     }
                     customSchemaFiles: {
-                        "10_opencloud_schema_ldif": """
+                        "10_opencloud_schema.ldif": """
                             dn: cn=opencloud,cn=schema,cn=config
                             objectClass: olcSchemaConfig
                             cn: opencloud
