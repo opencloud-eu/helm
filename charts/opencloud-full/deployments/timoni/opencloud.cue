@@ -14,7 +14,7 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "0.2.9"
+                    version: "2.0.2"
                 }
                 sync: {
                     timeout: 5
@@ -296,7 +296,7 @@ bundle: {
                     version: "4.3.3"
                 }
                 sync: {
-                    timeout: 5
+                    timeout: 25
                     createNamespace: true
                 }
                 helmValues: {
