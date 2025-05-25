@@ -246,7 +246,6 @@ releases:
             objectClass: person
             cn: admin
             sn: admin
-            uid: ldapadmin
 
             dn: ou=groups,dc=opencloud,dc=eu
             objectClass: organizationalUnit

@@ -970,7 +970,7 @@ features:
     # Note: Enabling `roleAssignment` will disable `adminUUID`.
     adminUUID: "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53"
     # Autoprovisioning of user accounts via OIDC
-    autoprovisionAccounts:
+    autoprovisionAccounts: 
       # @schema
       # type: boolean
       # required: true
@@ -978,7 +978,7 @@ features:
       # -- Enables account auto provisioning.
       # It will create missing users on the LDAP server from OIDC information.
       # Needs `features.externalUserManagement.ldap.writeable` to be be set to `true`.
-      enabled: false
+      enabled: true
       # @schema
       # type: string
       # required: true
@@ -1155,12 +1155,12 @@ features:
       # @schema
       # -- If the LDAP server is set to writable in general, some user attributes can be restricted to read only in the UI.
       # Note: This only disables editing in the UI. The readonly permissions need to be enforced in the LDAP server itself.
-      readOnlyAttributes: []
-      # - user.onPremisesSamAccountName # username
-      # - user.displayName # display name
-      # - user.mail # mail
-      # - user.passwordProfile # password
-      # - user.memberOf
+      readOnlyAttributes: 
+      - user.onPremisesSamAccountName # username
+      - user.displayName # display name
+      - user.mail # mail
+      - user.passwordProfile # password
+      - user.memberOf
       # - user.appRoleAssignments # role
       # - user.accountEnabled # login allowed
       # - drive.quota # quota
@@ -1279,7 +1279,7 @@ features:
         # required: false
         # @schema
         # -- LDAP filter to add to the default filters for user search like `(objectclass=openCloud)`.
-        filter:
+        filter: (objectclass=inetOrgPerson)
         # @schema
         # type: string
         # required: true
@@ -1344,7 +1344,7 @@ features:
         # All existing groups with a DN outside the `features.externalUserManagement.ldap.group.createBaseDN` will be treated as read-only groups.
         # Defaults to the value `features.externalUserManagement.ldap.group.baseDN`.
         # Only applicable if `features.externalUserManagement.ldap.writeable` is set to `true`
-        createBaseDN:
+        createBaseDN: ou=custom,ou=groups,dc=opencloud,dc=eu
         # @schema
         # type: string
         # required: true

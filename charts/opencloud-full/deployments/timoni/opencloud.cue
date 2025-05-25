@@ -296,7 +296,7 @@ bundle: {
                     version: "4.3.3"
                 }
                 sync: {
-                    timeout: 25
+                    timeout: 5
                     createNamespace: true
                 }
                 helmValues: {
@@ -328,7 +328,6 @@ bundle: {
                             objectClass: person
                             cn: admin
                             sn: admin
-                            uid: ldapadmin
 
                             dn: ou=groups,dc=opencloud,dc=eu
                             objectClass: organizationalUnit
