@@ -1,4 +1,4 @@
-{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloak" "appNameSuffix" "") -}}
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameKeycloakPG" "appNameSuffix" "") -}}
 {{- if .Values.keycloak.enabled }}
 apiVersion: apps/v1
 kind: Deployment
@@ -51,7 +51,5 @@ spec:
       protocol: TCP
       name: postgresql
   selector:
-    app.kubernetes.io/component: keycloak-postgresql
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/name: {{ include "oc.name" . }}
+    app: {{ .appName }}
 {{- end }}
