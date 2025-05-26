@@ -14,7 +14,7 @@
 # 2. OpenCloud Admin: adminPassword: admin
 # 3. PostgreSQL: user: keycloak, password: keycloak
 # 4. MinIO: rootUser: opencloud, rootPassword: opencloud-secret-key
-# 5. OnlyOffice Secret Keys: secret.inbox/outbox/session.string: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
+# 5. OnlyOffice Secret Keys: secret.inbox/outbox/session: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
 # 6. RabbitMQ: url: amqp://guest:guest
 # 7. LDAP bind password and configuration password must be secure.
 #
@@ -339,7 +339,7 @@ deploymentStrategy:
 # required: true
 # @schema
 # -- Domain where OC is reachable for the outside world
-externalDomain:
+externalDomain: cloud.opencloud.test
 
 # Insecure options.
 # These are useful for some limited environments like CI or on a test cluster.
@@ -6011,27 +6011,25 @@ onlyoffice:
           header: "Authorization"
       # Secret settings
       secret:
-        inbox:
-          # @schema
-          # type: string
-          # required: true
-          # @schema
-          # -- Inbox secret string
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-        outbox:
-          # @schema
-          # type: string
-          # required: true
-          # @schema
-          # -- Outbox secret string
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-        session:
-          # @schema
-          # type: string
-          # required: true
-          # @schema
-          # -- Session secret string
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Inbox secret string
+        inbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Outbox secret string
+        outbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Session secret string
+        session: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+
     # RabbitMQ settings
     rabbitmq:
       # @schema

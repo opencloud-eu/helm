@@ -12799,35 +12799,18 @@
                   },
                   "type": "object"
                 },
-                "secret": {
+                
+                 "secret": {
                   "additionalProperties": false,
                   "properties": {
                     "inbox": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "string": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
+                      "type": "string"
                     },
                     "outbox": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "string": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
+                      "type": "string"
                     },
                     "session": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "string": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
+                      "type": "string"
                     }
                   },
                   "type": "object"
