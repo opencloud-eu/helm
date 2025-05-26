@@ -22,7 +22,7 @@ data:
 
   OIDC_IDP_INSECURE: "true"
   OC_HTTP_API_INSECURE: "true"
-  
+
   NATS_PERSISTENCE_ENABLED: "true"
   SEARCH_PERSISTENCE_ENABLED: "true"
   STORAGE_SYSTEM_PERSISTENCE_ENABLED: "true"
@@ -46,7 +46,7 @@ data:
   ###############################################################################
   # LDAP Configuration
   ###############################################################################
-  LDAP_URI: "ldap://openldap.openldap.svc.cluster.local:389"
+  LDAP_URI: "ldaps://openldap.openldap.svc.cluster.local:389"
   LDAP_GLOBAL_DOMAIN: "opencloud.eu"
   LDAP_WRITEABLE: "true"
   LDAP_INSECURE: "true"

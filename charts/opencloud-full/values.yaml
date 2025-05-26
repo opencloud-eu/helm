@@ -32,13 +32,13 @@ image:
   # required: true
   # @schema
   # -- Image repository
-  repository: opencloudeu/opencloud
+  repository: opencloudeu/opencloud-rolling
   # @schema
   # type: [string, null]
   # required: false
   # @schema
   # -- Image tag. Defaults to the chart's appVersion.
-  tag: 2.0.2
+  tag: 2.3.0
   # @schema
   # type: [string, null]
   # required: false

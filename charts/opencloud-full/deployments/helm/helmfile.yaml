@@ -59,7 +59,7 @@ releases:
               userIDClaimAttributeMapping: username
             ldap:
               writeable: true
-              uri: ldap://openldap.openldap.svc.cluster.local:389
+              uri: ldaps://openldap.openldap.svc.cluster.local:636
               insecure: true
               bindDN: cn=admin,dc=opencloud,dc=eu
               user:
