@@ -191,6 +191,25 @@ Key interactions:
 
 The following table lists the configurable parameters of the OpenCloud chart and their default values.
 
+### Using Private Registries
+
+The chart supports using private container registries through global overrides. This is useful for:
+- Air-gapped environments
+- Corporate registry mirrors
+- Pull-through caches
+
+To use a private registry for all images:
+
+```bash
+helm install opencloud ./charts/opencloud \
+  --set global.image.registry=my-registry.com \
+  --set global.image.pullPolicy=Always
+```
+
+This will prepend `my-registry.com/` to all image references in the chart. For example:
+- `keycloak/keycloak:26.1.4` becomes `my-registry.com/keycloak/keycloak:26.1.4`
+- `opencloudeu/opencloud-rolling:latest` becomes `my-registry.com/opencloudeu/opencloud-rolling:latest`
+
 ### Global Settings
 
 | Parameter | Description | Default |
@@ -205,11 +224,14 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | secretName for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
+| `global.image.registry` | Global registry override for all images (e.g., `my-registry.com`) | `""` |
+| `global.image.pullPolicy` | Global pull policy override for all images (`Always`, `IfNotPresent`, `Never`) | `""` |
 
 ### Image Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
+| `image.registry` | OpenCloud image registry | `docker.io` |
 | `image.repository` | OpenCloud image repository | `opencloudeu/opencloud-rolling` |
 | `image.tag` | OpenCloud image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |

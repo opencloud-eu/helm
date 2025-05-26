@@ -39,7 +39,8 @@ spec:
         fsGroup: 1000
       initContainers:
         - name: init-config
-          image: busybox
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.busybox.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.busybox.image.pullPolicy "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /etc/opencloud /var/lib/opencloud']
           volumeMounts:
             - name: config
@@ -50,7 +51,7 @@ spec:
         # Web extensions init containers
         {{- if .Values.webExtensions.extensions.drawio.enabled }}
         - name: init-drawio
-          image: {{ .Values.webExtensions.extensions.drawio.repository }}:{{ .Values.webExtensions.extensions.drawio.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.drawio.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/draw-io && cp -R /usr/share/nginx/html/draw-io/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -58,7 +59,7 @@ spec:
         {{- end }}
         {{- if .Values.webExtensions.extensions.externalsites.enabled }}
         - name: init-externalsites
-          image: {{ .Values.webExtensions.extensions.externalsites.repository }}:{{ .Values.webExtensions.extensions.externalsites.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.externalsites.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/external-sites && cp -R /usr/share/nginx/html/external-sites/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -66,7 +67,7 @@ spec:
         {{- end }}
         {{- if .Values.webExtensions.extensions.importer.enabled }}
         - name: init-importer
-          image: {{ .Values.webExtensions.extensions.importer.repository }}:{{ .Values.webExtensions.extensions.importer.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.importer.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/importer && cp -R /usr/share/nginx/html/importer/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -74,7 +75,7 @@ spec:
         {{- end }}
         {{- if .Values.webExtensions.extensions.jsonviewer.enabled }}
         - name: init-jsonviewer
-          image: {{ .Values.webExtensions.extensions.jsonviewer.repository }}:{{ .Values.webExtensions.extensions.jsonviewer.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.jsonviewer.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/json-viewer && cp -R /usr/share/nginx/html/json-viewer/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -82,7 +83,7 @@ spec:
         {{- end }}
         {{- if .Values.webExtensions.extensions.progressbars.enabled }}
         - name: init-progressbars
-          image: {{ .Values.webExtensions.extensions.progressbars.repository }}:{{ .Values.webExtensions.extensions.progressbars.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.progressbars.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/progress-bars && cp -R /usr/share/nginx/html/progress-bars/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -90,7 +91,7 @@ spec:
         {{- end }}
         {{- if .Values.webExtensions.extensions.unzip.enabled }}
         - name: init-unzip
-          image: {{ .Values.webExtensions.extensions.unzip.repository }}:{{ .Values.webExtensions.extensions.unzip.tag }}
+          image: {{ include "opencloud.image" (dict "imageValues" (merge (dict "tag" .Values.webExtensions.extensions.unzip.tag) .Values.webExtensions.image) "global" .Values.global) | quote }}
           command: ['sh', '-c', 'mkdir -p /extensions/unzip && cp -R /usr/share/nginx/html/unzip/ /extensions/']
           volumeMounts:
             - name: extensions
@@ -98,7 +99,8 @@ spec:
         {{- end }}
         # Final init container to copy all extensions to the apps directory
         - name: init-web-extensions
-          image: busybox
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.busybox.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.busybox.image.pullPolicy "global" .Values.global) | quote }}
           command: ['sh', '/scripts/init-web-extensions.sh']
           volumeMounts:
             - name: extensions
@@ -110,7 +112,7 @@ spec:
         {{- end }}
       containers:
         - name: opencloud
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.image "global" .Values.global) | quote }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -119,7 +121,7 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.image.pullPolicy "global" .Values.global) }}
           command: ["/bin/sh"]
           args: ["-c", "opencloud init || true; opencloud server"]
           {{- with .Values.opencloud.envFrom }}

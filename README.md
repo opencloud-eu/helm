@@ -158,6 +158,24 @@ You can list available versions with:
 helm search repo oci://ghcr.io/opencloud-eu/helm-charts --versions
 ```
 
+## 🔒 Private Registry Support
+
+The **production chart** (`charts/opencloud`) supports using private container registries for all images. This is useful for:
+- Air-gapped environments  
+- Corporate registry mirrors
+- Pull-through caches
+
+Simply use the global override:
+```bash
+helm install opencloud ./charts/opencloud \
+  --set global.image.registry=my-registry.com \
+  --set global.image.pullPolicy=Always
+```
+
+See the [production chart documentation](./charts/opencloud/README.md#using-private-registries) for detailed configuration.
+
+**Note:** This feature is currently only available in the production chart.
+
 ## Architecture
 
 The production chart (`charts/opencloud`) deploys the following components:

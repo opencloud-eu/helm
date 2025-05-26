@@ -51,6 +51,31 @@ global:
   storage:
     # Storage class for persistent volumes
     storageClass: ""
+  
+  # Global image settings
+  image:
+    # Global registry override - if set, it will override all image registries
+    # Example: my-private-registry.com
+    registry: ""
+    # Global pull policy override - if set, it will override all image pull policies
+    # Options: Always, IfNotPresent, Never
+    pullPolicy: ""
+
+# =====================================================================
+# UTILITY IMAGES
+# =====================================================================
+
+# Busybox image settings (used for init containers)
+busybox:
+  image:
+    # Busybox image registry
+    registry: docker.io
+    # Busybox image repository
+    repository: library/busybox
+    # Busybox image tag
+    tag: "1.36"
+    # Image pull policy
+    pullPolicy: IfNotPresent
 
 # =====================================================================
 # IDENTITY PROVIDER (KEYCLOAK)
@@ -63,8 +88,10 @@ keycloak:
   
   # Keycloak image settings
   image:
+    # Keycloak image registry
+    registry: quay.io
     # Keycloak image repository
-    repository: quay.io/keycloak/keycloak
+    repository: keycloak/keycloak
     # Keycloak image tag
     tag: "26.1.4"
     # Image pull policy
@@ -145,6 +172,8 @@ postgres:
   enabled: true
   # PostgreSQL image settings
   image:
+    # PostgreSQL image registry
+    registry: docker.io
     # PostgreSQL image repository
     repository: postgres
     # PostgreSQL image tag
@@ -184,12 +213,16 @@ postgres:
 tika:
   # Enable Tika
   enabled: true
-  # Tika image repository
-  repository: apache/tika
-  # Tika image tag
-  tag: "2.9.2.1-full"
-  # Image pull policy
-  pullPolicy: IfNotPresent
+  # Tika image settings
+  image:
+    # Tika image registry
+    registry: docker.io
+    # Tika image repository
+    repository: apache/tika
+    # Tika image tag
+    tag: "2.9.2.1-full"
+    # Image pull policy
+    pullPolicy: IfNotPresent
   # Resources allocation
   resources:
     requests:
@@ -203,37 +236,39 @@ tika:
 webExtensions:
   # Enable web extensions
   enabled: true
+  # Common image settings for all extensions
+  image:
+    # Registry for web extensions
+    registry: docker.io
+    # Repository for web extensions
+    repository: opencloudeu/web-extensions
+    # Image pull policy
+    pullPolicy: IfNotPresent
   # List of extensions to install
   extensions:
     # Draw.io extension
     drawio:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: draw-io-1.0.0
     # External Sites extension
     externalsites:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: external-sites-1.0.0
     # Importer extension
     importer:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: importer-1.0.0
     # JSON Viewer extension
     jsonviewer:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: json-viewer-1.0.0
     # Progress Bars extension
     progressbars:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: progress-bars-1.0.0
     # Unzip extension
     unzip:
       enabled: true
-      repository: opencloudeu/web-extensions
       tag: unzip-1.0.0
 
 # =====================================================================
@@ -243,6 +278,7 @@ webExtensions:
 collabora:
   enabled: false
   image:
+    registry: docker.io
     repository: collabora/code
     pullPolicy: IfNotPresent
     tag: 24.04.13.2.1
@@ -268,12 +304,16 @@ collabora:
 onlyoffice:
   # Enable OnlyOffice
   enabled: true
-  # OnlyOffice image repository
-  repository: onlyoffice/documentserver
-  # OnlyOffice image tag
-  tag: 8.2.2
-  # Image pull policy
-  pullPolicy: IfNotPresent
+  # OnlyOffice image settings
+  image:
+    # OnlyOffice image registry
+    registry: docker.io
+    # OnlyOffice image repository
+    repository: onlyoffice/documentserver
+    # OnlyOffice image tag
+    tag: 8.2.2
+    # Image pull policy
+    pullPolicy: IfNotPresent
   # WOPI settings
   wopi:
     # Enable WOPI
@@ -368,8 +408,10 @@ onlyoffice:
 
 # Image settings for OpenCloud
 image:
+  # OpenCloud image registry
+  registry: docker.io
   # OpenCloud image repository
-  repository: docker.io/opencloudeu/opencloud-rolling
+  repository: opencloudeu/opencloud-rolling
   # OpenCloud image tag
   tag: "2.1.0"
   # Image pull policy
@@ -480,6 +522,16 @@ opencloud:
       internal:
         # Enable internal test MinIO instance (default: true)
         enabled: true
+        # MinIO image settings
+        image:
+          # MinIO image registry
+          registry: docker.io
+          # MinIO image repository
+          repository: minio/minio
+          # MinIO image tag
+          tag: latest
+          # Image pull policy
+          pullPolicy: IfNotPresent
         # httpRoute configuration
         httpRoute:
           # Enable HTTPRoute for MinIO (default: false)
