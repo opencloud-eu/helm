@@ -35,18 +35,19 @@ data:
   ###############################################################################
   KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
   KEYCLOAK_ENABLED: "true"
-  # KEYCLOAK_ADMIN_PASSWORD: "admin" # Removed from configmap
+
 
   ###############################################################################
   # Minio Configuration
   ###############################################################################
   MINIO_DOMAIN: "minio.opencloud.test"
   MINIO_ENABLED: "true"
+  MINIO_PERSISTENCE_SIZE: "40Gi"
 
   ###############################################################################
   # LDAP Configuration
   ###############################################################################
-  LDAP_URI: "ldaps://openldap.openldap.svc.cluster.local:389"
+  LDAP_URI: "ldaps://openldap.openldap.svc.cluster.local:636"
   LDAP_GLOBAL_DOMAIN: "opencloud.eu"
   LDAP_WRITEABLE: "true"
   LDAP_INSECURE: "true"
@@ -84,6 +85,7 @@ data:
   # OnlyOffice Configuration
   ###############################################################################
   ONLYOFFICE_URI: "https://onlyoffice.opencloud.test"
+  ONLYOFFICE_DOMAIN: "onlyoffice.opencloud.test"
   ONLYOFFICE_ICON_URI: "https://onlyoffice.opencloud.test/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
   ONLYOFFICE_ENABLED: "true"
   ONLYOFFICE_INSECURE: "true"

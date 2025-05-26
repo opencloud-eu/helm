@@ -29,6 +29,12 @@ releases:
       - minio:
           enabled: true # Enable MinIO for object storage.
           domain: minio.opencloud.test # Domain for MinIO.
+          config:
+            persistence:
+              size: "40Gi"
+      - onlyoffice:
+          enabled: true
+          domain: onlyoffice.opencloud.test # Domain for OnlyOffice.
 
       # --- Networking Configuration ---
       - ingress:

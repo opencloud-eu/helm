@@ -47,6 +47,7 @@ runtime: {
                 "EXTERNAL_DOMAIN":           "obj.data.EXTERNAL_DOMAIN"
                 "KEYCLOAK_DOMAIN":           "obj.data.KEYCLOAK_DOMAIN"
                 "MINIO_DOMAIN":              "obj.data.MINIO_DOMAIN"
+                "MINIO_PERSISTENCE_SIZE":    "obj.data.MINIO_PERSISTENCE_SIZE"
                 "LDAP_URI":                  "obj.data.LDAP_URI"
                 "OIDC_ISSUER_URI":           "obj.data.OIDC_ISSUER_URI"
                 "COLLABORA_URI":             "obj.data.COLLABORA_URI"
@@ -132,6 +133,8 @@ runtime: {
         OPENCLOUD_LOGGING_LEVEL: "debug"
         KEYCLOAK_ENABLED: true
         MINIO_ENABLED: true
+        MINIO_PERSISTENCE_SIZE: "40Gi"
+        ONLYOFFICE_DOMAIN: strings.TrimPrefix(strings.TrimPrefix(parameter.ONLYOFFICE_URI, "https://"), "http://")
         INGRESS_ENABLED: false
         INGRESS_CLASS_NAME: "nginx"
         INGRESS_PROXY_BODY_SIZE: "1024m"

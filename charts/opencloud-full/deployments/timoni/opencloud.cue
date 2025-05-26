@@ -38,11 +38,13 @@ bundle: {
                     minio: {
                         enabled: bool @timoni(runtime:bool:MINIO_ENABLED)
                         domain: string @timoni(runtime:string:MINIO_DOMAIN)
+                        persistenceSize: string @timoni(runtime:string:MINIO_PERSISTENCE_SIZE)
                         config: {
                             rootPassword: string @timoni(runtime:string:MINIO_ROOT_PASSWORD)
                         }
                     }
                     onlyoffice: {
+                        domain: string @timoni(runtime:string:ONLYOFFICE_DOMAIN)
                         config: {
                             coAuthoring: {
                                 secret: {

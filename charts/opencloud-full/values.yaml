@@ -6348,7 +6348,7 @@ minio:
       # required: true
       # @schema
       # -- Size of the persistent volume
-      size: 5Gi
+      size: 40Gi
     # @schema
     # type: object
     # required: true
