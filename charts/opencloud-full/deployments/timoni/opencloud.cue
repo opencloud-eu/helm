@@ -14,7 +14,7 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "2.0.3"
+                    version: "2.0.3 "
                 }
                 sync: {
                     timeout: 5
@@ -45,6 +45,9 @@ bundle: {
                     }
                     onlyoffice: {
                         domain: string @timoni(runtime:string:ONLYOFFICE_DOMAIN)
+                        persistence: {
+                            size: string @timoni(runtime:string:ONLYOFFICE_PERSISTENCE_SIZE)
+                        }
                         config: {
                             coAuthoring: {
                                 secret: {
@@ -152,11 +155,13 @@ bundle: {
                         nats: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:NATS_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:NATS_PERSISTENCE_SIZE)
                             }
                         }
                         search: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:SEARCH_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:SEARCH_PERSISTENCE_SIZE)
                             }
                             extractor: {
                                 type: string @timoni(runtime:string:SEARCH_EXTRACTOR_TYPE)
@@ -165,11 +170,13 @@ bundle: {
                         storagesystem: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_SYSTEM_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:STORAGE_SYSTEM_PERSISTENCE_SIZE)
                             }
                         }
                         storageusers: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_USERS_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:STORAGE_USERS_PERSISTENCE_SIZE)
                             }
                             storageBackend: {
                                 driver: string @timoni(runtime:string:STORAGE_USERS_BACKEND_DRIVER)
@@ -178,11 +185,13 @@ bundle: {
                         thumbnails: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:THUMBNAILS_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:THUMBNAILS_PERSISTENCE_SIZE)
                             }
                         }
                         web: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:WEB_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:WEB_PERSISTENCE_SIZE)
                             }
                             config: {
                                 oidc: {
@@ -301,6 +310,13 @@ bundle: {
                         idm: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:IDM_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:IDM_PERSISTENCE_SIZE)
+                            }
+                        }
+                        ocm: {
+                            persistence: {
+                                enabled: bool @timoni(runtime:bool:OCM_PERSISTENCE_ENABLED)
+                                size: string @timoni(runtime:string:OCM_PERSISTENCE_SIZE)
                             }
                         }
                     }
