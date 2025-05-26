@@ -135,8 +135,8 @@ helmfile sync
 ```
 You can also install it with timoni instead of helm:
 ```bash
-kubectl apply -f ./charts/opencloud-full/deployment/timoni/ && \
-timoni bundle apply -f ./charts/opencloud-full/deployment/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployment/timoni/runtime.cue
+kubectl apply -f ./charts/opencloud-full/deployments/timoni/ && \
+timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployments/timoni/runtime.cue
 ```
 
 ```bash
@@ -169,8 +169,8 @@ helmfile sync
 ```
 You can also install it with timoni instead of helm:
 ```bash
-kubectl apply -f ./charts/opencloud-full/deployment/timoni/ && \
-timoni bundle apply -f ./charts/opencloud-full/deployment/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployment/timoni/runtime.cue
+kubectl apply -f ./charts/opencloud-full/deployments/timoni/ && \
+timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployments/timoni/runtime.cue
 ```
 
 ```bash

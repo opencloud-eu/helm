@@ -28,10 +28,33 @@ bundle: {
                     keycloak: {
                         enabled: true
                         domain: string @timoni(runtime:string:KEYCLOAK_DOMAIN)
+                        postgresql: {
+                            password: "keycloak"
+                        }
+                        config: {
+                            adminPassword: "admin"
+                        }
                     }
                     minio: {
                         enabled: true
                         domain: string @timoni(runtime:string:MINIO_DOMAIN)
+                        config: {
+                            rootPassword: "opencloud-secret-key"
+                        }
+                    }
+                    onlyoffice: {
+                        config: {
+                            coAuthoring: {
+                                secret: {
+                                    inbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+                                    outbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+                                    session: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+                                }
+                            }
+                            rabbitmq: {
+                                url: "amqp://guest:Dd0SXIe1k9osdfjkmA0TK1bb1B1d38OFSb@localhost"
+                            }
+                        }
                     }
                     ingress: {
                         enabled: false
@@ -85,6 +108,7 @@ bundle: {
                                 }
                             }
                         }
+                        
                         appsIntegration: {
                             enabled: true
                             wopiIntegration: {
