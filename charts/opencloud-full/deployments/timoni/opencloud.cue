@@ -14,7 +14,7 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "2.0.2"
+                    version: "2.0.3"
                 }
                 sync: {
                     timeout: 5
@@ -22,50 +22,50 @@ bundle: {
                 }
                 helmValues: {
                     logging: {
-                        level: "debug"
+                        level: string @timoni(runtime:string:OPENCLOUD_LOGGING_LEVEL)
                     }
                     externalDomain: string @timoni(runtime:string:EXTERNAL_DOMAIN)
                     keycloak: {
-                        enabled: true
+                        enabled: bool @timoni(runtime:bool:KEYCLOAK_ENABLED)
                         domain: string @timoni(runtime:string:KEYCLOAK_DOMAIN)
                         postgresql: {
-                            password: "keycloak"
+                            password: string @timoni(runtime:string:KEYCLOAK_POSTGRESQL_PASSWORD)
                         }
                         config: {
-                            adminPassword: "admin"
+                            adminPassword: string @timoni(runtime:string:KEYCLOAK_ADMIN_PASSWORD)
                         }
                     }
                     minio: {
-                        enabled: true
+                        enabled: bool @timoni(runtime:bool:MINIO_ENABLED)
                         domain: string @timoni(runtime:string:MINIO_DOMAIN)
                         config: {
-                            rootPassword: "opencloud-secret-key"
+                            rootPassword: string @timoni(runtime:string:MINIO_ROOT_PASSWORD)
                         }
                     }
                     onlyoffice: {
                         config: {
                             coAuthoring: {
                                 secret: {
-                                    inbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-                                    outbox: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-                                    session: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+                                    inbox: string @timoni(runtime:string:ONLYOFFICE_INBOX)
+                                    outbox: string @timoni(runtime:string:ONLYOFFICE_OUTBOX)
+                                    session: string @timoni(runtime:string:ONLYOFFICE_SESSION)
                                 }
                             }
                             rabbitmq: {
-                                url: "amqp://guest:Dd0SXIe1k9osdfjkmA0TK1bb1B1d38OFSb@localhost"
+                                url: string @timoni(runtime:string:AMQP_URL)
                             }
                         }
                     }
                     ingress: {
-                        enabled: false
-                        ingressClassName: "nginx"
+                        enabled: bool @timoni(runtime:bool:INGRESS_ENABLED)
+                        ingressClassName: string @timoni(runtime:string:INGRESS_CLASS_NAME)
                         annotations: {
-                            "nginx.ingress.kubernetes.io/proxy-body-size": "1024m"
+                            "nginx.ingress.kubernetes.io/proxy-body-size": string @timoni(runtime:string:INGRESS_PROXY_BODY_SIZE)
                         }
                     }
                     insecure: {
-                        oidcIdpInsecure: true
-                        ocHttpApiInsecure: true
+                        oidcIdpInsecure: bool @timoni(runtime:bool:OIDC_IDP_INSECURE)
+                        ocHttpApiInsecure: bool @timoni(runtime:bool:OC_HTTP_API_INSECURE)
                     }
                     secretRefs: {
                         ldapSecretRef: "ldap-bind-secrets"
@@ -73,73 +73,73 @@ bundle: {
                     }
                     gateway: {
                         httproute: {
-                            enabled: true
+                            enabled: bool @timoni(runtime:bool:GATEWAY_HTTPROUTE_ENABLED)
                         }
                     }
                     features: {
                         externalUserManagement: {
-                            enabled: true
-                            adminUUID: "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53"
+                            enabled: bool @timoni(runtime:bool:EXTERNAL_USER_MANAGEMENT_ENABLED)
+                            adminUUID: string @timoni(runtime:string:EXTERNAL_USER_MANAGEMENT_ADMIN_UUID)
                             autoprovisionAccounts: {
-                                enabled: true
-                                claimUserName: "sub"
+                                enabled: bool @timoni(runtime:bool:AUTOPROVISION_ACCOUNTS_ENABLED)
+                                claimUserName: string @timoni(runtime:string:AUTOPROVISION_ACCOUNTS_CLAIM_USER_NAME)
                             }
                             oidc: {
                                 domain: string @timoni(runtime:string:KEYCLOAK_DOMAIN)
                                 issuerURI: string @timoni(runtime:string:OIDC_ISSUER_URI)
-                                userIDClaim: "sub"
-                                userIDClaimAttributeMapping: "username"
+                                userIDClaim: string @timoni(runtime:string:OIDC_USER_ID_CLAIM)
+                                userIDClaimAttributeMapping: string @timoni(runtime:string:OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING)
                             }
                             ldap: {
-                                writeable: true
+                                writeable: bool @timoni(runtime:bool:LDAP_WRITEABLE)
                                 uri: string @timoni(runtime:string:LDAP_URI)
-                                insecure: true
-                                bindDN: "cn=admin,dc=opencloud,dc=eu"
+                                insecure: bool @timoni(runtime:bool:LDAP_INSECURE)
+                                bindDN: string @timoni(runtime:string:LDAP_BIND_DN)
                                 user: {
-                                    userNameMatch: "none"
+                                    userNameMatch: string @timoni(runtime:string:LDAP_USER_NAME_MATCH)
                                     schema: {
-                                        id: "openCloudUUID"
+                                        id: string @timoni(runtime:string:LDAP_USER_SCHEMA_ID)
                                     }
                                 }
                                 group: {
                                     schema: {
-                                        id: "openCloudUUID"
+                                        id: string @timoni(runtime:string:LDAP_GROUP_SCHEMA_ID)
                                     }
                                 }
                             }
                         }
                         
                         appsIntegration: {
-                            enabled: true
+                            enabled: bool @timoni(runtime:bool:APPS_INTEGRATION_ENABLED)
                             wopiIntegration: {
                                 officeSuites: [
                                     {
                                         name: "Collabora",
                                         product: "Collabora",
-                                        enabled: false,
+                                        enabled: bool @timoni(runtime:bool:COLLABORA_ENABLED),
                                         uri: string @timoni(runtime:string:COLLABORA_URI),
-                                        insecure: true,
-                                        disableProof: false,
+                                        insecure: bool @timoni(runtime:bool:COLLABORA_INSECURE),
+                                        disableProof: bool @timoni(runtime:bool:COLLABORA_DISABLE_PROOF),
                                         iconURI: string @timoni(runtime:string:COLLABORA_ICON_URI),
                                         ingress: {
-                                            enabled: false
+                                            enabled: bool @timoni(runtime:bool:COLLABORA_INGRESS_ENABLED)
                                             domain: string @timoni(runtime:string:WOPI_INGRESS_DOMAIN)
-                                            ingressClassName: "nginx"
+                                            ingressClassName: string @timoni(runtime:string:COLLABORA_INGRESS_CLASS_NAME)
                                             annotations: {
-                                                "nginx.ingress.kubernetes.io/proxy-body-size": "1024m"
+                                                "nginx.ingress.kubernetes.io/proxy-body-size": string @timoni(runtime:string:COLLABORA_INGRESS_PROXY_BODY_SIZE)
                                             }                                         
                                         }
                                     },
                                     {
                                         name: "OnlyOffice",
                                         product: "OnlyOffice",
-                                        enabled: true,
+                                        enabled: bool @timoni(runtime:bool:ONLYOFFICE_ENABLED),
                                         uri: string @timoni(runtime:string:ONLYOFFICE_URI),
-                                        insecure: true,
-                                        disableProof: false,
+                                        insecure: bool @timoni(runtime:bool:ONLYOFFICE_INSECURE),
+                                        disableProof: bool @timoni(runtime:bool:ONLYOFFICE_DISABLE_PROOF),
                                         iconURI: string @timoni(runtime:string:ONLYOFFICE_ICON_URI),
                                         ingress: {
-                                            enabled: false
+                                            enabled: bool @timoni(runtime:bool:ONLYOFFICE_INGRESS_ENABLED)
                                         }
                                     }
                                 ]
@@ -149,42 +149,42 @@ bundle: {
                     services: {
                         nats: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:NATS_PERSISTENCE_ENABLED)
                             }
                         }
                         search: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:SEARCH_PERSISTENCE_ENABLED)
                             }
                             extractor: {
-                                type: "tika"
+                                type: string @timoni(runtime:string:SEARCH_EXTRACTOR_TYPE)
                             }
                         }
                         storagesystem: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:STORAGE_SYSTEM_PERSISTENCE_ENABLED)
                             }
                         }
                         storageusers: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:STORAGE_USERS_PERSISTENCE_ENABLED)
                             }
                             storageBackend: {
-                                driver: "decomposeds3"
+                                driver: string @timoni(runtime:string:STORAGE_USERS_BACKEND_DRIVER)
                             }
                         }
                         thumbnails: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:THUMBNAILS_PERSISTENCE_ENABLED)
                             }
                         }
                         web: {
                             persistence: {
-                                enabled: true
+                                enabled: bool @timoni(runtime:bool:WEB_PERSISTENCE_ENABLED)
                             }
                             config: {
                                 oidc: {
-                                    webClientID: "web"
+                                    webClientID: string @timoni(runtime:string:WEB_OIDC_WEB_CLIENT_ID)
                                 }
                                 externalApps: {
                                     "external-sites": {
@@ -298,7 +298,7 @@ bundle: {
                         }
                         idm: {
                             persistence: {
-                                enabled: false
+                                enabled: bool @timoni(runtime:bool:IDM_PERSISTENCE_ENABLED)
                             }
                         }
                     }
@@ -325,15 +325,15 @@ bundle: {
                 }
                 helmValues: {
                     "ltb-passwd": {
-                        enabled: false
+                        enabled: bool @timoni(runtime:bool:OPENLDAP_LTB_PASSWD_ENABLED)
                     }
                     replication: {
-                        enabled: true
+                        enabled: bool @timoni(runtime:bool:OPENLDAP_REPLICATION_ENABLED)
                     }
                     global: {
                         ldapDomain: string @timoni(runtime:string:LDAP_GLOBAL_DOMAIN)
-                        adminPassword: "admin" 
-                        configPassword: "config"
+                        adminPassword: string @timoni(runtime:string:LDAP_ADMIN_PASSWORD)
+                        configPassword: string @timoni(runtime:string:LDAP_CONFIG_PASSWORD)
                     }
                     customLdifFiles: {
                         "opencloud_root.ldif": """
