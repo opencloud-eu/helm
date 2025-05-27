@@ -10,7 +10,7 @@ bundle: {
             namespace: "opencloud"
             values: {
                 repository: {
-                    url: "oci://ghcr.io/suse-coder/helm-charts" 
+                    url: "oci://ghcr.io/suse-coder/helm-charts"
                 }
                 chart: {
                     name:    "opencloud-full"
@@ -38,9 +38,11 @@ bundle: {
                     minio: {
                         enabled: bool @timoni(runtime:bool:MINIO_ENABLED)
                         domain: string @timoni(runtime:string:MINIO_DOMAIN)
-                        persistenceSize: string @timoni(runtime:string:MINIO_PERSISTENCE_SIZE)
                         config: {
                             rootPassword: string @timoni(runtime:string:MINIO_ROOT_PASSWORD)
+                            persistence: {
+                                size: string @timoni(runtime:string:MINIO_PERSISTENCE_SIZE)
+                            }
                         }
                     }
                     onlyoffice: {
@@ -113,7 +115,7 @@ bundle: {
                                 }
                             }
                         }
-                        
+
                         appsIntegration: {
                             enabled: bool @timoni(runtime:bool:APPS_INTEGRATION_ENABLED)
                             wopiIntegration: {
@@ -132,7 +134,7 @@ bundle: {
                                             ingressClassName: string @timoni(runtime:string:COLLABORA_INGRESS_CLASS_NAME)
                                             annotations: {
                                                 "nginx.ingress.kubernetes.io/proxy-body-size": string @timoni(runtime:string:COLLABORA_INGRESS_PROXY_BODY_SIZE)
-                                            }                                         
+                                            }
                                         }
                                     },
                                     {

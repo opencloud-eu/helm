@@ -85,6 +85,7 @@ runtime: {
                 "COLLABORA_INGRESS_CLASS_NAME": "obj.data.COLLABORA_INGRESS_CLASS_NAME"
                 "COLLABORA_INGRESS_PROXY_BODY_SIZE": "obj.data.COLLABORA_INGRESS_PROXY_BODY_SIZE"
                 "ONLYOFFICE_ENABLED": "obj.data.ONLYOFFICE_ENABLED"
+                "ONLYOFFICE_DOMAIN": "obj.data.ONLYOFFICE_DOMAIN"
                 "ONLYOFFICE_INSECURE": "obj.data.ONLYOFFICE_INSECURE"
                 "ONLYOFFICE_DISABLE_PROOF": "obj.data.ONLYOFFICE_DISABLE_PROOF"
                 "ONLYOFFICE_INGRESS_ENABLED": "obj.data.ONLYOFFICE_INGRESS_ENABLED"
@@ -144,7 +145,7 @@ runtime: {
         KEYCLOAK_ENABLED: true
         MINIO_ENABLED: true
         MINIO_PERSISTENCE_SIZE: "40Gi"
-        ONLYOFFICE_DOMAIN: strings.TrimPrefix(strings.TrimPrefix(parameter.ONLYOFFICE_URI, "https://"), "http://")
+        ONLYOFFICE_DOMAIN: ""
         INGRESS_ENABLED: false
         INGRESS_CLASS_NAME: "nginx"
         INGRESS_PROXY_BODY_SIZE: "1024m"
