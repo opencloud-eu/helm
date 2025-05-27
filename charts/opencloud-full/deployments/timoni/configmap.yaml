@@ -65,7 +65,8 @@ data:
   LDAP_USER_SCHEMA_ID: "openCloudUUID"
   LDAP_GROUP_SCHEMA_ID: "openCloudUUID"
   OPENLDAP_LTB_PASSWD_ENABLED: "false"
-  OPENLDAP_REPLICATION_ENABLED: "true"
+  OPENLDAP_REPLICATION_ENABLED: "false"
+  OPENLDAP_REPLICA_COUNT: "1"
 
   ###############################################################################
   # OIDC Configuration

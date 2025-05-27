@@ -98,6 +98,7 @@ runtime: {
                 "OCM_PERSISTENCE_SIZE": "obj.data.OCM_PERSISTENCE_SIZE"
                 "OPENLDAP_LTB_PASSWD_ENABLED": "obj.data.OPENLDAP_LTB_PASSWD_ENABLED"
                 "OPENLDAP_REPLICATION_ENABLED": "obj.data.OPENLDAP_REPLICATION_ENABLED"
+                "OPENLDAP_REPLICA_COUNT": "obj.data.OPENLDAP_REPLICA_COUNT"
                 "OIDC_IDP_INSECURE": "obj.data.OIDC_IDP_INSECURE"
                 "OC_HTTP_API_INSECURE": "obj.data.OC_HTTP_API_INSECURE"
                 "NATS_PERSISTENCE_ENABLED": "obj.data.NATS_PERSISTENCE_ENABLED"
@@ -178,7 +179,8 @@ runtime: {
         WEB_OIDC_WEB_CLIENT_ID: "web"
         IDM_PERSISTENCE_ENABLED: false
         OPENLDAP_LTB_PASSWD_ENABLED: false
-        OPENLDAP_REPLICATION_ENABLED: true
+        OPENLDAP_REPLICATION_ENABLED: false
+        OPENLDAP_REPLICA_COUNT: 1
 
         OIDC_IDP_INSECURE: true
         OC_HTTP_API_INSECURE: true
@@ -207,6 +209,7 @@ runtime: {
         OIDC_INSECURE: true
         OC_HTTP_INSECURE: true
         REPLICAS: 1
+        REPLICATION_ENABLED: false
         RESOURCES_CPU_REQUEST: "100m"
         RESOURCES_MEM_REQUEST: "128Mi"
         RESOURCES_CPU_LIMIT: "500m"

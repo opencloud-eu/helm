@@ -242,13 +242,19 @@ releases:
       - ltb-passwd:
           enabled: false # Disable password management tool if not needed.
       - replication:
-          enabled: true # Enable replication for high availability.
+          enabled: false # Enable replication for high availability.
+      - replicaCount: 1 
       - global:
           ldapDomain: "opencloud.eu" # Set the base LDAP domain.
           # TODO: Change both adminPassword and configPassword to strong, secure values.
           adminPassword: admin
           configPassword: config
       - customLdifFiles:
+          set_logging.ldif: |-
+            dn: cn=config
+            changetype: modify
+            replace: olcLogLevel
+            olcLogLevel: stats sync
           opencloud_root.ldif: |-
             dn: dc=opencloud,dc=eu
             objectClass: organization
@@ -265,6 +271,7 @@ releases:
             objectClass: person
             cn: admin
             sn: admin
+            uid: ldapadmin
 
             dn: ou=groups,dc=opencloud,dc=eu
             objectClass: organizationalUnit
