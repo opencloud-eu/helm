@@ -17,7 +17,7 @@ bundle: {
                     version: "2.0.6"
                 }
                 sync: {
-                    timeout: 5
+                    timeout: 10
                     createNamespace: true
                 }
                 helmValues: {
@@ -350,7 +350,7 @@ bundle: {
                     replication: {
                         enabled: bool @timoni(runtime:bool:OPENLDAP_REPLICATION_ENABLED)
                     }
-                    replicas: string @timoni(runtime:string:OPENLDAP_REPLICA_COUNT)
+                    replicaCount: string @timoni(runtime:string:OPENLDAP_REPLICA_COUNT)
                     global: {
                         ldapDomain: string @timoni(runtime:string:LDAP_GLOBAL_DOMAIN)
                         adminPassword: string @timoni(runtime:string:LDAP_ADMIN_PASSWORD)
