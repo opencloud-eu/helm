@@ -4559,7 +4559,7 @@ services:
           # required: true
           # @schema
           # -- Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system.
-          maxConcurrency: 100
+          maxConcurrency: 500
           # The DECOMPOSEDS3 driver needs an existing S3 bucket with following permissions:
           # {
           #     "Version": "2012-10-17",
@@ -4637,14 +4637,14 @@ services:
             # required: true
             # @schema
             # -- Number of concurrent uploads to use when copying objects to S3.
-            numThreads: 4
+            numThreads: 50
             # @schema
             # type: integer
             # minimum: 0
             # required: true
             # @schema
             # -- Part size for concurrent uploads to S3.
-            partSize: 0
+            partSize: 134217728 
 
     maintenance:
       # Expired uploads can be cleaned up automatically by enabling the clean up job.

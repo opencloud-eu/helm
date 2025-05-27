@@ -77,6 +77,7 @@ Adds the app names to the scope and set the name of the app based on the input p
   {{- $_ := set .scope "appNameAppRegistry" "appregistry" -}}
   {{- $_ := set .scope "appNameAudit" "audit" -}}
   {{- $_ := set .scope "appNameAuthMachine" "authmachine" -}}
+  {{- $_ := set .scope "appNameAuthApp" "authapp" -}}
   {{- $_ := set .scope "appNameAuthService" "authservice" -}}
   {{- $_ := set .scope "appNameAntivirus" "antivirus" -}}
   {{- $_ := set .scope "appNameClientlog" "clientlog" -}}
