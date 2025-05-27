@@ -1,3 +1,4 @@
+{{- /*
 {{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthApp" "appNameSuffix" "") -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -85,3 +86,4 @@ spec:
         - name: tmp-volume
           emptyDir: {}
         {{- include "oc.caVolume" $ | nindent 8}}
+*/ -}}
