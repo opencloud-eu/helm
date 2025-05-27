@@ -14,7 +14,7 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "2.0.3 "
+                    version: "2.0.4"
                 }
                 sync: {
                     timeout: 5
