@@ -345,6 +345,8 @@ metadata:
     {{- range $key, $value := .labels }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+  annotations:
+    helm.sh/resource-policy: keep
 data:
   {{- $secretObj := (lookup "v1" "Secret" .scope.Release.Namespace .name) | default dict }}
   {{- $secretData := (get $secretObj "data") | default dict }}

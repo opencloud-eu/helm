@@ -313,7 +313,7 @@ deploymentStrategy:
   # required: true
   # @schema
   # -- deployment strategy type to use. Can be "RollingUpdate" or "Recreate"
-  type: RollingUpdate
+  type: Recreate
   rollingUpdate:
     # @schema
     # oneOf:
@@ -3226,7 +3226,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -3557,7 +3558,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep     
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -3953,7 +3955,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -4434,7 +4437,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -4829,7 +4833,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -5014,7 +5019,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
@@ -5566,7 +5572,8 @@ services:
       # $ref: schema/templates.json#/annotationsTemplate
       # @schema
       # -- Persistent volume annotations.
-      annotations: {}
+      annotations: 
+        helm.sh/resource-policy: keep
       # @schema
       # $ref: schema/templates.json#/finalizersTemplate
       # @schema
