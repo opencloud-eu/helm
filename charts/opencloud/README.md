@@ -202,6 +202,7 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.domain.collabora` | Domain for Collabora | `collabora.opencloud.test` |
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
+| `global.domain.wopi` | Domain for WOPI server | `collaboration.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | secretName for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
