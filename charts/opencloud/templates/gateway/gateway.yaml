@@ -24,7 +24,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
@@ -40,7 +40,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
@@ -57,7 +57,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
@@ -74,7 +74,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
@@ -91,7 +91,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
@@ -108,7 +108,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: opencloud-wildcard-tls
+          - name: {{ .Values.global.tls.secretName }}
             namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
       allowedRoutes:
         namespaces:
