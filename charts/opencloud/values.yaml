@@ -585,5 +585,6 @@ ingress:
 
   # Custom annotations applied to all ingress resources.
   # These are merged with any annotations from 'annotationsPreset' (if set).
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
+  annotations: {}
+    # Example:
+    # cert-manager.io/cluster-issuer: letsencrypt
