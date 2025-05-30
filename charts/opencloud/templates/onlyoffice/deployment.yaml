@@ -39,7 +39,14 @@ spec:
             - name: DB_USER
               value: "{{ .Values.onlyoffice.config.coAuthoring.sql.dbUser | default "onlyoffice" }}"
             - name: JWT_SECRET
-              value: "{{ .Values.onlyoffice.config.coAuthoring.secret.session.string | default "B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu" }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.onlyoffice.config.coAuthoring.secret.existingsecret }}
+                          {{ .Values.onlyoffice.config.coAuthoring.secret.existingsecret }}
+                        {{- else }}
+                          onlyoffice
+                        {{- end }}
+                  key: sessionSecret
             - name: JWT_HEADER
               value: "Authorization"
             - name: AMQP_URI
