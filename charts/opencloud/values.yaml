@@ -13,8 +13,7 @@
 # 2. OpenCloud Admin: adminPassword: admin
 # 3. PostgreSQL: user: keycloak, password: keycloak
 # 4. MinIO: rootUser: opencloud, rootPassword: opencloud-secret-key
-# 5. OnlyOffice Secret Keys: secret.inbox/outbox/session.string: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
-# 6. RabbitMQ: url: amqp://guest:guest@localhost
+# 5. RabbitMQ: url: amqp://guest:guest@localhost
 
 
 # =====================================================================
@@ -336,29 +335,11 @@ onlyoffice:
         dbPort: "5432"
         dbName: "onlyoffice"
         dbUser: "onlyoffice"
-      # Token settings
-      token:
-        enable:
-          request:
-            inbox: true
-            outbox: true
-          browser: true
-        inbox:
-          header: "Authorization"
-        outbox:
-          header: "Authorization"
+      
       # Secret settings
       secret:
-        # Use existing secret for onlyoffice credentials (Note: secretKeyName must be inboxSecret, outboxSecret and sessionSecret)
+        # Use existing secret for onlyoffice credentials (Note: secretKeyName must be sessionSecret)
         existingSecret: ""
-
-        # ignored if onlyoffice.config.coAuthoring.secret.existingSecret is not empty string
-        inbox:
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-        
-        # ignored if onlyoffice.config.coAuthoring.secret.existingSecret is not empty string
-        outbox:
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
         
         # ignored if onlyoffice.config.coAuthoring.secret.existingSecret is not empty string
         session:

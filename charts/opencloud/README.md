@@ -309,9 +309,6 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `onlyoffice.persistence.enabled` | Enable persistence | `true` |
 | `onlyoffice.persistence.size` | Size of the persistent volume | `2Gi` |
 | `onlyoffice.resources` | CPU/Memory resource requests/limits | `{}` |
-| `onlyoffice.config.coAuthoring.token.enable.request.inbox` | Enable token for incoming requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.request.outbox` | Enable token for outgoing requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
 | `onlyoffice.config.coAuthoring.secret.existingSecret` | Name of the existing secret | `` |
 | `onlyoffice.config.coAuthoring.secret.session.string` | Session string for onlyoffice | `` |
 | `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
