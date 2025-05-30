@@ -49,8 +49,8 @@ spec:
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.opencloud.storage.s3.internal.existingsecret }}
-                          {{ .Values.opencloud.storage.s3.internal.existingsecret }}
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.internal.existingSecret }}
                         {{- else }}
                           minio
                         {{- end }}
@@ -58,8 +58,8 @@ spec:
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.opencloud.storage.s3.internal.existingsecret }}
-                          {{ .Values.opencloud.storage.s3.internal.existingsecret }}
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.internal.existingSecret }}
                         {{- else }}
                           minio
                         {{- end }}

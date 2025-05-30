@@ -190,8 +190,8 @@ spec:
             - name: NOTIFICATIONS_SMTP_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.opencloud.smtp.existingsecret }}
-                          {{ .Values.opencloud.smtp.existingsecret }}
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
                         {{- else }}
                           opencloud-smtp
                         {{- end }}
@@ -199,8 +199,8 @@ spec:
             - name: NOTIFICATIONS_SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.opencloud.smtp.existingsecret }}
-                          {{ .Values.opencloud.smtp.existingsecret }}
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
                         {{- else }}
                           opencloud-smtp
                         {{- end }}
@@ -248,8 +248,8 @@ spec:
             - name: IDM_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.opencloud.existingsecret }}
-                          {{ .Values.opencloud.existingsecret }}
+                  name: {{- if .Values.opencloud.existingSecret }}
+                          {{ .Values.opencloud.existingSecret }}
                         {{- else }}
                           opencloud
                         {{- end }}
@@ -283,8 +283,8 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{- if .Values.opencloud.storage.s3.external.enabled }}
-                          {{- if .Values.opencloud.storage.s3.external.existingsecret }}
-                            {{ .Values.opencloud.storage.s3.external.existingsecret }}
+                          {{- if .Values.opencloud.storage.s3.external.existingSecret }}
+                            {{ .Values.opencloud.storage.s3.external.existingSecret }}
                           {{- else }}
                             opencloud-s3
                           {{- end }}
@@ -300,8 +300,8 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{- if .Values.opencloud.storage.s3.external.enabled }}
-                          {{- if .Values.opencloud.storage.s3.external.existingsecret }}
-                            {{ .Values.opencloud.storage.s3.external.existingsecret }}
+                          {{- if .Values.opencloud.storage.s3.external.existingSecret }}
+                            {{ .Values.opencloud.storage.s3.external.existingSecret }}
                           {{- else }}
                             opencloud-s3
                           {{- end }}

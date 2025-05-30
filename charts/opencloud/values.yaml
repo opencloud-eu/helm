@@ -365,6 +365,10 @@ onlyoffice:
           string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
     # RabbitMQ settings
     rabbitmq:
+      # Use existing secret for onlyoffice rabbitmq credentials (Note: secretKeyName must be url)
+      existingSecret: ""
+
+      # ignored if onlyoffice.config.rabbitmq.existingSecret is not empty string
       url: "amqp://guest:Dd0SXIe1k9osdfjkmA0TK1bb1B1d38OFSb@localhost"
     # File converter settings
     fileConverter:
