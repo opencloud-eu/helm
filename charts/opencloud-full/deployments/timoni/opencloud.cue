@@ -14,11 +14,12 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "2.0.8"
+                    version: "2.0.x"
                 }
                 sync: {
                     timeout: 10
                     createNamespace: true
+                    interval: 1
                 }
                 helmValues: {
                     logging: {
