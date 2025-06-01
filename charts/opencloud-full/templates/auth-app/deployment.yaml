@@ -1,4 +1,3 @@
-{{- /*
 {{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthApp" "appNameSuffix" "") -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -46,19 +45,37 @@ spec:
               value: {{ .Values.debug.profiling | quote }}
 
             - name: AUTH_APP_GRPC_ADDR
-              value: 127.0.0.1:9246
+              value: 0.0.0.0:9246
             - name: AUTH_APP_DEBUG_ADDR
-              value: 127.0.0.1:9245
+              value: 0.0.0.0:9245
             - name: AUTH_APP_HTTP_ADDR
-              value: 127.0.0.1:9247
+              value: 0.0.0.0:9247
             - name: AUTH_APP_HTTP_ROOT
               value: /
+
+            - name: AUTH_MACHINE_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.jwtSecret" . }}
+                  key: jwt-secret
 
             - name: AUTH_APP_JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ include "secrets.jwtSecret" . }}
                   key: jwt-secret
+
+            - name: OC_SYSTEM_USER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.storageSystemSecret" . }}
+                  key: api-key
+
+            - name: OC_SYSTEM_USER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.storageSystemSecret" . }}
+                  key: user-id
 
 
 
@@ -86,4 +103,3 @@ spec:
         - name: tmp-volume
           emptyDir: {}
         {{- include "oc.caVolume" $ | nindent 8}}
-*/ -}}
