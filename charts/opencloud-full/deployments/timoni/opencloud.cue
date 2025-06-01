@@ -19,7 +19,6 @@ bundle: {
                 sync: {
                     timeout: 10
                     createNamespace: true
-                    interval: 1
                 }
                 helmValues: {
                     logging: {
