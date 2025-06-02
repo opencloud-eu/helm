@@ -65,6 +65,8 @@ releases:
               issuerURI: https://keycloak.opencloud.test/realms/openCloud
               userIDClaim: sub
               userIDClaimAttributeMapping: username
+              roleAssignment:
+                claim: roles
             ldap:
               writeable: true
               uri: ldaps://openldap.openldap.svc.cluster.local:636

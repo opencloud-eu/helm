@@ -71,6 +71,7 @@ runtime: {
                 "AUTOPROVISION_ACCOUNTS_CLAIM_USER_NAME": "obj.data.AUTOPROVISION_ACCOUNTS_CLAIM_USER_NAME"
                 "OIDC_USER_ID_CLAIM": "obj.data.OIDC_USER_ID_CLAIM"
                 "OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING": "obj.data.OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING"
+                "OIDC_ROLE_ASSIGNMENT_CLAIM": "obj.data.OIDC_ROLE_ASSIGNMENT_CLAIM"
                 "LDAP_WRITEABLE": "obj.data.LDAP_WRITEABLE"
                 "LDAP_INSECURE": "obj.data.LDAP_INSECURE"
                 "LDAP_BIND_DN": "obj.data.LDAP_BIND_DN"
@@ -157,6 +158,7 @@ runtime: {
         AUTOPROVISION_ACCOUNTS_CLAIM_USER_NAME: "sub"
         OIDC_USER_ID_CLAIM: "sub"
         OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING: "username"
+        OIDC_ROLE_ASSIGNMENT_CLAIM: "roles"
         LDAP_WRITEABLE: true
         LDAP_INSECURE: true
         LDAP_BIND_DN: "cn=admin,dc=opencloud,dc=eu"

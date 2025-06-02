@@ -40,14 +40,12 @@ data:
   OC_HTTP_API_INSECURE: "true"
 
   ###############################################################################
-  # Keycloak Configuration
+  # Internal Keycloak (for testing only)
   ###############################################################################
-  KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
   KEYCLOAK_ENABLED: "true"
 
-
   ###############################################################################
-  # Minio Configuration
+  # Internal Minio (for testing only)
   ###############################################################################
   MINIO_DOMAIN: "minio.opencloud.test"
   MINIO_ENABLED: "true"
@@ -71,6 +69,7 @@ data:
   ###############################################################################
   # OIDC Configuration
   ###############################################################################
+  KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
   OIDC_ISSUER_URI: "https://keycloak.opencloud.test/realms/openCloud"
   EXTERNAL_USER_MANAGEMENT_ENABLED: "true"
   EXTERNAL_USER_MANAGEMENT_ADMIN_UUID: "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53"
@@ -78,6 +77,7 @@ data:
   AUTOPROVISION_ACCOUNTS_CLAIM_USER_NAME: "sub"
   OIDC_USER_ID_CLAIM: "sub"
   OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING: "username"
+  OIDC_ROLE_ASSIGNMENT_CLAIM: "roles"
 
   ###############################################################################
   # Collabora Configuration
