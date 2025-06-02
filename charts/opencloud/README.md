@@ -491,7 +491,7 @@ Create a Gateway resource to expose your services:
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
-  name: cilium-gateway
+  name: opencloud-gateway
   namespace: kube-system
 spec:
   gatewayClassName: cilium
