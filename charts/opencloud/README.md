@@ -481,125 +481,7 @@ Apply the certificate:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 4: Create the Gateway
-
-Create a Gateway resource to expose your services:
-
-
-```yaml
-# gateway.yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: Gateway
-metadata:
-  name: cilium-gateway
-  namespace: kube-system
-spec:
-  gatewayClassName: cilium
-  infrastructure:
-    annotations:
-      io.cilium/lb-ipam-ips: "192.168.178.77"  # Replace with your desired IP
-      cilium.io/hubble-visibility: "flow"
-      cilium.io/preserve-client-cookies: "true"
-      cilium.io/preserve-csrf-token: "true"
-      io.cilium/websocket: "true"
-      io.cilium/websocket-timeout: "3600"
-  addresses:
-    - type: IPAddress
-      value: 192.168.178.77  # Replace with your desired IP
-  listeners:
-    - name: opencloud-https
-      protocol: HTTPS
-      port: 443
-      hostname: "cloud.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: keycloak-https
-      protocol: HTTPS
-      port: 443
-      hostname: "keycloak.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: minio-https
-      protocol: HTTPS
-      port: 443
-      hostname: "minio.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: onlyoffice-https
-      protocol: HTTPS
-      port: 443
-      hostname: "onlyoffice.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: collabora-https
-      protocol: HTTPS
-      port: 443
-      hostname: "collabora.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: collaboration-https
-      protocol: HTTPS
-      port: 443
-      hostname: "collaboration.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: wopi-https
-      protocol: HTTPS
-      port: 443
-      hostname: "wopiserver.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-```
-
-Apply the Gateway:
-
-```bash
-kubectl apply -f gateway.yaml
-```
-
-### Step 5: Configure DNS
+### Step 4: Configure DNS
 
 Configure your DNS to point to the Gateway IP address. You can use a wildcard DNS record or individual records for each service:
 
@@ -619,22 +501,20 @@ Alternatively, for local testing, you can add entries to your `/etc/hosts` file:
 192.168.178.77  wopiserver.opencloud.test
 ```
 
-### Step 6: Install OpenCloud
+### Step 5: Install OpenCloud
 
-Finally, install OpenCloud using Helm:
+Finally, install OpenCloud using Helm. This will create the necessary HTTPRoute
+and Gateway resources:
 
 ```bash
-# Clone the repository
-git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd opencloud-helm
-
-# Install OpenCloud
-helm install opencloud ./charts/opencloud \
+helm install opencloud oci://ghcr.io/opencloud-eu/helm-charts/opencloud \
+  --version 0.1.5 \
   --namespace opencloud \
   --create-namespace \
   --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
+  --set httpRoute.gateway.create=true \
+  --set httpRoute.gateway.className=cilium \
+  --set httpRoute.gateway.annotations."io\.cilium/lb-ipam-ips"="192.168.178.77"
 ```
 
 ### Troubleshooting
