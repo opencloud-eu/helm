@@ -310,9 +310,9 @@ The following sections outline the main configuration parameters for the product
 | `opencloud.smtp.existingSecret` | Name of the existing secret | `` |
 | `opencloud.smtp.username` | SMTP username | `` |
 | `opencloud.smtp.password` | SMTP password | `` |
-| `opencloud.smtp.insecure` | SMTP password | `false` |
-| `opencloud.smtp.authentication` | SMTP password | `plain` |
-| `opencloud.smtp.encryption` | SMTP password | `starttls` |
+| `opencloud.smtp.insecure` | SMTP insecure | `false` |
+| `opencloud.smtp.authentication` | SMTP authentication | `plain` |
+| `opencloud.smtp.encryption` | SMTP encryption | `starttls` |
 | `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
 | `opencloud.storage.s3.internal.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
