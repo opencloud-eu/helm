@@ -42,6 +42,7 @@ data:
   ###############################################################################
   # Internal Keycloak (for testing only)
   ###############################################################################
+  KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
   KEYCLOAK_ENABLED: "true"
 
   ###############################################################################
@@ -69,7 +70,6 @@ data:
   ###############################################################################
   # OIDC Configuration
   ###############################################################################
-  KEYCLOAK_DOMAIN: "keycloak.opencloud.test"
   OIDC_ISSUER_URI: "https://keycloak.opencloud.test/realms/openCloud"
   EXTERNAL_USER_MANAGEMENT_ENABLED: "true"
   EXTERNAL_USER_MANAGEMENT_ADMIN_UUID: "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53"
