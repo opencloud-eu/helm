@@ -202,6 +202,7 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.domain.collabora` | Domain for Collabora | `collabora.opencloud.test` |
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
+| `global.domain.wopi` | Domain for WOPI server | `wopiserver.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | secretName for TLS certificate | `""` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
@@ -325,7 +326,6 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `collaboration.enabled` | Enable collaboration service | `true` |
-| `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
 ## Gateway API Configuration
@@ -384,7 +384,7 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 7. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
-   - Hostname: `collaboration.wopiDomain`
+   - Hostname: `global.domain.wopi`
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
