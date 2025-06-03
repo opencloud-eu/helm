@@ -204,6 +204,7 @@ spec:
               value: "true"
             - name: PROXY_ROLE_ASSIGNMENT_DRIVER
               value: "oidc"
+            {{- if not .Values.opencloud.enableBasicAuth }}
             - name: OC_OIDC_ISSUER
               value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}"
             - name: PROXY_OIDC_REWRITE_WELLKNOWN
@@ -229,6 +230,7 @@ spec:
               value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}/.well-known/openid-configuration"
             - name: WEB_OIDC_SCOPE
               value: "openid profile email groups"
+            {{- end }}
             {{- end }}
             # Admin user password
             - name: IDM_ADMIN_PASSWORD
