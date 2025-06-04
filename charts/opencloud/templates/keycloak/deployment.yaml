@@ -83,7 +83,7 @@ spec:
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{- if .Values.keycloak.existingSecret }}w
+                  name: {{- if .Values.keycloak.existingSecret }}
                           {{ .Values.keycloak.existingSecret }}
                         {{- else }}
                           keycloak
