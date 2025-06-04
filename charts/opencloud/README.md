@@ -253,18 +253,49 @@ The following table lists the configurable parameters of the OpenCloud chart and
 
 ### Keycloak Settings
 
+Keycloak configuration follows the standardized internal/external pattern (see issue #64).
+
+#### Internal Keycloak
+
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `keycloak.enabled` | Enable Keycloak | `true` |
-| `keycloak.replicas` | Number of replicas | `1` |
-| `keycloak.adminUser` | Admin user | `admin` |
-| `keycloak.adminPassword` | Admin password | `admin` |
-| `keycloak.resources` | CPU/Memory resource requests/limits | `{}` |
-| `keycloak.realm` | Realm name | `openCloud` |
-| `keycloak.persistence.enabled` | Enable persistence | `true` |
-| `keycloak.persistence.size` | Size of the persistent volume | `1Gi` |
-| `keycloak.persistence.storageClass` | Storage class | `""` |
-| `keycloak.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `keycloak.internal.enabled` | Enable internal Keycloak deployment | `true` |
+| `keycloak.internal.image.repository` | Keycloak image repository | `quay.io/keycloak/keycloak` |
+| `keycloak.internal.image.tag` | Keycloak image tag | `26.1.4` |
+| `keycloak.internal.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `keycloak.internal.replicas` | Number of replicas | `1` |
+| `keycloak.internal.adminUser` | Admin user | `admin` |
+| `keycloak.internal.adminPassword` | Admin password | `admin` |
+| `keycloak.internal.realm` | Realm name | `openCloud` |
+| `keycloak.internal.resources` | CPU/Memory resource requests/limits | `{}` |
+| `keycloak.internal.cors.enabled` | Enable CORS | `true` |
+| `keycloak.internal.cors.allowAllOrigins` | Allow all origins | `true` |
+
+> **Note**: When using internal Keycloak with multiple OpenCloud replicas (`opencloud.replicas > 1`), you must use an external shared database or LDAP. The embedded IDM does not support replication. See [issue #53](https://github.com/opencloud-eu/helm/issues/53) for details.
+
+#### External Keycloak
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `keycloak.external.enabled` | Enable external Keycloak | `false` |
+| `keycloak.external.url` | External Keycloak URL (without /realms/...) | `""` |
+| `keycloak.external.realm` | External Keycloak realm | `openCloud` |
+| `keycloak.external.clientId` | External Keycloak client ID | `web` |
+
+#### Example: Using External Keycloak
+
+```yaml
+keycloak:
+  internal:
+    enabled: false
+  external:
+    enabled: true
+    url: "https://keycloak.example.com"
+    realm: "my-realm"
+    clientId: "opencloud-web"
+```
+
+**Note**: Only one of `keycloak.internal.enabled` or `keycloak.external.enabled` should be set to `true`.
 
 ### PostgreSQL Settings
 

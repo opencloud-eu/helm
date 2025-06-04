@@ -198,18 +198,26 @@ spec:
             - name: NOTIFICATIONS_SMTP_ENCRYPTION
               value: "{{ .Values.opencloud.smtp.encryption }}"
             {{- end }}
-            {{- if .Values.keycloak.enabled }}
+            {{- if or .Values.keycloak.internal.enabled .Values.keycloak.external.enabled }}
             # Keycloak IDP specific configuration
             - name: PROXY_AUTOPROVISION_ACCOUNTS
               value: "true"
             - name: PROXY_ROLE_ASSIGNMENT_DRIVER
               value: "oidc"
             - name: OC_OIDC_ISSUER
-              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}"
+              {{- if .Values.keycloak.external.enabled }}
+              value: "{{ .Values.keycloak.external.url }}/realms/{{ .Values.keycloak.external.realm }}"
+              {{- else }}
+              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.internal.realm }}"
+              {{- end }}
             - name: PROXY_OIDC_REWRITE_WELLKNOWN
               value: "true"
             - name: WEB_OIDC_CLIENT_ID
+              {{- if .Values.keycloak.external.enabled }}
+              value: "{{ .Values.keycloak.external.clientId }}"
+              {{- else }}
               value: "web"
+              {{- end }}
             - name: PROXY_USER_OIDC_CLAIM
               value: "preferred_username"
             - name: PROXY_USER_CS3_CLAIM
@@ -226,9 +234,13 @@ spec:
             - name: PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD
               value: "jwt"
             - name: WEB_OIDC_METADATA_URL
-              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}/.well-known/openid-configuration"
+              {{- if .Values.keycloak.external.enabled }}
+              value: "{{ .Values.keycloak.external.url }}/realms/{{ .Values.keycloak.external.realm }}/.well-known/openid-configuration"
+              {{- else }}
+              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.internal.realm }}/.well-known/openid-configuration"
+              {{- end }}
             - name: WEB_OIDC_SCOPE
-              value: "openid profile email groups"
+              value: "openid profile email groups roles"
             {{- end }}
             # Admin user password
             - name: IDM_ADMIN_PASSWORD
