@@ -28,7 +28,7 @@ spec:
         - name: wait-for-opencloud
           image: busybox
           command: ['sh', '-c', 'until wget -q -O- http://{{ include "opencloud.opencloud.fullname" . }}:9200/health; do echo waiting for opencloud; sleep 5; done;']
-        
+
         {{- if not .Values.opencloud.persistence.enabled }}
         # Copy config from OpenCloud API if persistence is disabled
         - name: copy-config
@@ -38,7 +38,7 @@ spec:
             - name: etc-opencloud
               mountPath: /etc/opencloud
         {{- end }}
-        
+
         {{- if .Values.onlyoffice.enabled }}
         # Wait for OnlyOffice to be ready
         - name: wait-for-onlyoffice
@@ -95,9 +95,9 @@ spec:
             - name: COLLABORATION_APP_PROOF_DISABLE
               value: "true"
             - name: COLLABORATION_APP_INSECURE
-              value: "{{ .Values.opencloud.insecure }}"
+              value: {{ tpl (toString .Values.opencloud.insecure) . | quote }}
             - name: COLLABORATION_CS3API_DATAGATEWAY_INSECURE
-              value: "{{ .Values.opencloud.insecure }}"
+              value: {{ tpl (toString .Values.opencloud.insecure) . | quote }}
             - name: COLLABORATION_LOG_LEVEL
               value: "{{ .Values.opencloud.logLevel }}"
             - name: OC_URL

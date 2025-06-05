@@ -25,9 +25,9 @@ spec:
           command: ["/bin/sh", "/entrypoint-override.sh"]
           env:
             - name: WOPI_ENABLED
-              value: "{{ .Values.onlyoffice.wopi.enabled }}"
+              value: {{ tpl (toString .Values.onlyoffice.wopi.enabled) . | quote }}
             - name: USE_UNAUTHORIZED_STORAGE
-              value: "{{ .Values.onlyoffice.useUnauthorizedStorage }}"
+              value: {{ tpl (toString .Values.onlyoffice.useUnauthorizedStorage) . | quote }}
             - name: DB_TYPE
               value: "{{ .Values.onlyoffice.config.coAuthoring.sql.type | default "postgres" }}"
             - name: DB_HOST

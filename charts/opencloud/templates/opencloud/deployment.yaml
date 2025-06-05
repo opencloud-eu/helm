@@ -157,7 +157,7 @@ spec:
               value: "0.0.0.0:9142"
             # INSECURE: needed if OpenCloud is using self generated certificates
             - name: OC_INSECURE
-              value: "{{ .Values.opencloud.insecure }}"
+              value: {{ tpl (toString .Values.opencloud.insecure) . | quote }}
             # Basic auth (only needed when not using Keycloak)
             - name: PROXY_ENABLE_BASIC_AUTH
               value: {{ tpl (toString .Values.opencloud.enableBasicAuth) . | quote }}
@@ -192,7 +192,7 @@ spec:
             - name: NOTIFICATIONS_SMTP_PASSWORD
               value: "{{ .Values.opencloud.smtp.password }}"
             - name: NOTIFICATIONS_SMTP_INSECURE
-              value: "{{ .Values.opencloud.smtp.insecure }}"
+              value: {{ tpl (toString .Values.opencloud.smtp.insecure) . | quote }}
             - name: NOTIFICATIONS_SMTP_AUTHENTICATION
               value: "{{ .Values.opencloud.smtp.authentication }}"
             - name: NOTIFICATIONS_SMTP_ENCRYPTION
