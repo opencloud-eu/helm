@@ -149,6 +149,32 @@ Create a fully qualified Tika name.
 {{/* namespace helper removed - use .Release.Namespace directly */}}
 
 {{/*
+Return the image registry, using global override if set
+*/}}
+{{- define "opencloud.image.registry" -}}
+{{- coalesce .global.image.registry .registry -}}
+{{- end -}}
+
+{{/*
+Return the image pull policy, using global override if set
+*/}}
+{{- define "opencloud.image.pullPolicy" -}}
+{{- coalesce .global.image.pullPolicy .pullPolicy -}}
+{{- end -}}
+
+{{/*
+Return the full image name with registry
+*/}}
+{{- define "opencloud.image" -}}
+{{- $registry := include "opencloud.image.registry" (dict "registry" .imageValues.registry "global" .global) -}}
+{{- if $registry -}}
+{{- printf "%s/%s:%s" $registry .imageValues.repository .imageValues.tag -}}
+{{- else -}}
+{{- printf "%s:%s" .imageValues.repository .imageValues.tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return the appropriate apiVersion for ingress
 */}}
 {{- define "opencloud.ingress.apiVersion" -}}

@@ -13,24 +13,6 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
 - [Available Charts](#-available-charts)
   - [Production Chart](#production-chart-chartsopencloud)
   - [Development Chart](#development-chart-chartsopencloud-dev)
-- [Installation](#-installation)
-  - [Installing from Git Repository](#installing-from-git-repository)
-  - [Installing from OCI Registry](#installing-from-oci-registry)
-- [Architecture](#architecture)
-  - [Component Interaction Diagram](#component-interaction-diagram)
-- [Configuration](#configuration)
-  - [Global Settings](#global-settings)
-  - [Image Settings](#image-settings)
-  - [OpenCloud Settings](#opencloud-settings)
-  - [Keycloak Settings](#keycloak-settings)
-  - [PostgreSQL Settings](#postgresql-settings)
-  - [OnlyOffice Settings](#onlyoffice-settings)
-  - [Collabora Settings](#collabora-settings)
-  - [Collaboration Service Settings](#collaboration-service-settings)
-- [Gateway API Configuration](#gateway-api-configuration)
-  - [HTTPRoute Settings](#httproute-settings)
-- [Setting Up Gateway API with Talos, Cilium, and cert-manager](#setting-up-gateway-api-with-talos-cilium-and-cert-manager)
-- [Setting up Ingress](#setting-up-ingress)
 - [License](#-license)
 - [Community Maintained](#community-maintained)
 
@@ -944,6 +926,7 @@ ingress.annotations:
 Then you are responsible for creating the referenced Middleware yourself.
 
 
+=======
 ## 📜 License
 
 This project is licensed under the **AGPLv3** licence. See the [LICENSE](LICENSE) file for more details.

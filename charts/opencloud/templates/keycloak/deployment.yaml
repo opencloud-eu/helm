@@ -24,8 +24,8 @@ spec:
         fsGroup: 1000
       containers:
         - name: keycloak
-          image: {{ .Values.keycloak.image.repository }}:{{ .Values.keycloak.image.tag }}
-          imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.keycloak.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.keycloak.image.pullPolicy "global" .Values.global) }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
