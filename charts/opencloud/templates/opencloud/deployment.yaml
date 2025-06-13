@@ -162,7 +162,7 @@ spec:
               value: {{ tpl (toString .Values.opencloud.insecure) . | quote }}
             # Basic auth (only needed when not using Keycloak)
             - name: PROXY_ENABLE_BASIC_AUTH
-              value: {{ tpl (toString .Values.opencloud.enableBasicAuth) . | quote }}
+              value: false
             # These vars are needed to the csp config file to include the web office apps and the importer
             - name: ONLYOFFICE_DOMAIN
               value: "{{ .Values.global.domain.onlyoffice }}"

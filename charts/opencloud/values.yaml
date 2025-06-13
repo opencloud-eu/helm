@@ -434,8 +434,6 @@ opencloud:
   logPretty: false
   # Insecure mode (for self-signed certificates)
   insecure: true
-  # Enable basic auth (set to false to use Keycloak only)
-  enableBasicAuth: "{{ not .Values.keycloak.enabled }}"
   # Admin password
   adminPassword: admin
   # Create demo users

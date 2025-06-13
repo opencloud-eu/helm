@@ -248,7 +248,6 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.logColor` | Enable log color | `false` |
 | `opencloud.logPretty` | Enable pretty logging | `false` |
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
-| `opencloud.enableBasicAuth` | Enable basic auth | `false` |
 | `opencloud.adminPassword` | Admin password | `admin` |
 | `opencloud.createDemoUsers` | Create demo users | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
