@@ -43,7 +43,7 @@ spec:
                   name: {{- if .Values.collabora.existingSecret }}
                           {{ .Values.collabora.existingSecret }}
                         {{- else }}
-                          collabora
+                          {{ include "opencloud.fullname" . }}-collabora
                         {{- end }}
                   key: username
             - name: password
@@ -52,7 +52,7 @@ spec:
                   name: {{- if .Values.collabora.existingSecret }}
                           {{ .Values.collabora.existingSecret }}
                         {{- else }}
-                          collabora
+                          {{ include "opencloud.fullname" . }}-collabora
                         {{- end }}
                   key: password
           ports:

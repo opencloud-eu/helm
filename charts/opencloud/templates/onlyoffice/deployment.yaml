@@ -44,7 +44,7 @@ spec:
                   name: {{- if .Values.onlyoffice.config.coAuthoring.secret.existingSecret }}
                           {{ .Values.onlyoffice.config.coAuthoring.secret.existingSecret }}
                         {{- else }}
-                          onlyoffice
+                          {{ include "opencloud.fullname" . }}-onlyoffice
                         {{- end }}
                   key: sessionSecret
             - name: JWT_HEADER
@@ -55,7 +55,7 @@ spec:
                   name: {{- if .Values.onlyoffice.config.rabbitmq.existingSecret }}
                           {{ .Values.onlyoffice.config.rabbitmq.existingSecret }}
                         {{- else }}
-                          rabbitmq
+                          {{ include "opencloud.fullname" . }}-rabbitmq
                         {{- end }}
                   key: url
           ports:

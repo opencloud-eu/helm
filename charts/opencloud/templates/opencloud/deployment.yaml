@@ -251,7 +251,7 @@ spec:
                   name: {{- if .Values.opencloud.existingSecret }}
                           {{ .Values.opencloud.existingSecret }}
                         {{- else }}
-                          opencloud
+                          {{ include "opencloud.opencloud.fullname" . }}
                         {{- end }}
                   key: adminPassword
             # Demo users
@@ -286,7 +286,7 @@ spec:
                           {{- if .Values.opencloud.storage.s3.external.existingSecret }}
                             {{ .Values.opencloud.storage.s3.external.existingSecret }}
                           {{- else }}
-                            opencloud-s3
+                            {{ include "opencloud.opencloud.fullname" . }}-s3
                           {{- end }}
                         {{- else }}
                           minio
@@ -303,7 +303,7 @@ spec:
                           {{- if .Values.opencloud.storage.s3.external.existingSecret }}
                             {{ .Values.opencloud.storage.s3.external.existingSecret }}
                           {{- else }}
-                            opencloud-s3
+                            {{ include "opencloud.opencloud.fullname" . }}-s3
                           {{- end }}
                         {{- else }}
                           minio

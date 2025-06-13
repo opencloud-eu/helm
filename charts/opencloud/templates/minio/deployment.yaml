@@ -52,7 +52,7 @@ spec:
                   name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
                           {{ .Values.opencloud.storage.s3.internal.existingSecret }}
                         {{- else }}
-                          minio
+                          {{ include "opencloud.minio.fullname" . }}
                         {{- end }}
                   key: rootUser
             - name: MINIO_ROOT_PASSWORD
@@ -61,7 +61,7 @@ spec:
                   name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
                           {{ .Values.opencloud.storage.s3.internal.existingSecret }}
                         {{- else }}
-                          minio
+                          {{ include "opencloud.minio.fullname" . }}
                         {{- end }}
                   key: rootPassword
           ports:

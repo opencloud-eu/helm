@@ -57,7 +57,7 @@ spec:
                   name: {{- if .Values.postgres.existingSecret }}
                           {{ .Values.postgres.existingSecret }}
                         {{- else }}
-                          postgres
+                          {{ include "opencloud.postgres.fullname" . }}
                         {{- end }}
                   key: username
             - name: KC_DB_PASSWORD
@@ -66,7 +66,7 @@ spec:
                   name: {{- if .Values.postgres.existingSecret }}
                           {{ .Values.postgres.existingSecret }}
                         {{- else }}
-                          postgres
+                          {{ include "opencloud.postgres.fullname" . }}
                         {{- end }}
                   key: password
             - name: KC_FEATURES
@@ -77,7 +77,7 @@ spec:
                   name: {{- if .Values.keycloak.existingSecret }}
                           {{ .Values.keycloak.existingSecret }}
                         {{- else }}
-                          keycloak
+                          {{ include "opencloud.keycloak.fullname" . }}
                         {{- end }}
                   key: adminUser
             - name: KEYCLOAK_ADMIN_PASSWORD
@@ -86,7 +86,7 @@ spec:
                   name: {{- if .Values.keycloak.existingSecret }}
                           {{ .Values.keycloak.existingSecret }}
                         {{- else }}
-                          keycloak
+                          {{ include "opencloud.keycloak.fullname" . }}
                         {{- end }}
                   key: adminPassword
             {{- if .Values.keycloak.cors.enabled }}
