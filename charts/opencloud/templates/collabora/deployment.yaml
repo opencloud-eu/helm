@@ -38,9 +38,23 @@ spec:
                 --o:welcome.enable=false \
                 --o:net.frame_ancestors={{ include "opencloud.domain" . }}
             - name: username
-              value: "{{ .Values.collabora.admin.user | default "admin" }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.collabora.existingSecret }}
+                          {{ .Values.collabora.existingSecret }}
+                        {{- else }}
+                          collabora
+                        {{- end }}
+                  key: username
             - name: password
-              value: "{{ .Values.collabora.admin.password | default "admin" }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.collabora.existingSecret }}
+                          {{ .Values.collabora.existingSecret }}
+                        {{- else }}
+                          collabora
+                        {{- end }}
+                  key: password
           ports:
             - containerPort: 9980
               name: http

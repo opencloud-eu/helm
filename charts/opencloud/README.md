@@ -249,6 +249,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.logPretty` | Enable pretty logging | `false` |
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
 | `opencloud.enableBasicAuth` | Enable basic auth | `false` |
+| `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
 | `opencloud.createDemoUsers` | Create demo users | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -256,7 +257,18 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
 | `opencloud.persistence.storageClass` | Storage class | `""` |
 | `opencloud.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `opencloud.smtp.enabled` | Enable smtp for opencloud | `false` |
+| `opencloud.smtp.host` | SMTP host | `` |
+| `opencloud.smtp.port` | SMTP port | `587` |
+| `opencloud.smtp.sender` | SMTP sender | `` |
+| `opencloud.smtp.existingSecret` | Name of the existing secret | `` |
+| `opencloud.smtp.username` | SMTP username | `` |
+| `opencloud.smtp.password` | SMTP password | `` |
+| `opencloud.smtp.insecure` | SMTP insecure | `false` |
+| `opencloud.smtp.authentication` | SMTP authentication | `plain` |
+| `opencloud.smtp.encryption` | SMTP encryption | `starttls` |
 | `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
+| `opencloud.storage.s3.internal.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
 | `opencloud.storage.s3.internal.rootPassword` | MinIO root password | `opencloud-secret-key` |
 | `opencloud.storage.s3.internal.bucketName` | MinIO bucket name | `opencloud-bucket` |
@@ -269,6 +281,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.storage.s3.external.enabled` | Enable external S3 | `false` |
 | `opencloud.storage.s3.external.endpoint` | External S3 endpoint URL | `""` |
 | `opencloud.storage.s3.external.region` | External S3 region | `default` |
+| `opencloud.storage.s3.external.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.external.accessKey` | External S3 access key | `""` |
 | `opencloud.storage.s3.external.secretKey` | External S3 secret key | `""` |
 | `opencloud.storage.s3.external.bucket` | External S3 bucket | `""` |
@@ -280,6 +293,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | --------- | ----------- | ------- |
 | `keycloak.enabled` | Enable Keycloak | `true` |
 | `keycloak.replicas` | Number of replicas | `1` |
+| `keycloak.existingSecret` | Name of the existing secret | `` |
 | `keycloak.adminUser` | Admin user | `admin` |
 | `keycloak.adminPassword` | Admin password | `admin` |
 | `keycloak.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -295,6 +309,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | --------- | ----------- | ------- |
 | `postgres.enabled` | Enable PostgreSQL | `true` |
 | `postgres.database` | Database name | `keycloak` |
+| `postgres.existingSecret` | Name of the existing secret | `` |
 | `postgres.user` | Database user | `keycloak` |
 | `postgres.password` | Database password | `keycloak` |
 | `postgres.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -317,9 +332,8 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `onlyoffice.persistence.enabled` | Enable persistence | `true` |
 | `onlyoffice.persistence.size` | Size of the persistent volume | `2Gi` |
 | `onlyoffice.resources` | CPU/Memory resource requests/limits | `{}` |
-| `onlyoffice.config.coAuthoring.token.enable.request.inbox` | Enable token for incoming requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.request.outbox` | Enable token for outgoing requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
+| `onlyoffice.config.coAuthoring.secret.existingSecret` | Name of the existing secret | `` |
+| `onlyoffice.config.coAuthoring.secret.session.string` | Session string for onlyoffice | `` |
 | `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
 
 If you use Traefik and enable OnlyOffice, this chart will automatically create a `Middleware`
@@ -337,6 +351,7 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collabora.image.repository` | Collabora image repository | `collabora/code` |
 | `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
 | `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.existingSecret` | Name of the existing secret | `` |
 | `collabora.adminUser` | Admin user | `admin` |
 | `collabora.adminPassword` | Admin password | `admin` |
 | `collabora.ssl.enabled` | Enable SSL | `true` |
