@@ -305,6 +305,9 @@ spec:
             - name: config-json
               mountPath: /var/lib/opencloud/config.json
               subPath: config.json
+            - name: proxy-config
+              mountPath: /var/lib/opencloud/proxy.yaml
+              subPath: proxy.yaml
             - name: config-files
               mountPath: /etc/opencloud/search.yaml
               subPath: search.yaml

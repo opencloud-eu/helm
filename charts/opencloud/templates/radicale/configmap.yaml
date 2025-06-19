@@ -1,0 +1,12 @@
+{{- if .Values.radicale.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.fullname" . }}-radicale-config
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: radicale
+data:
+  config: |
+{{- tpl (.Files.Get "files/radicale/config.gotmpl") . | nindent 4 }}
+{{- end }}
