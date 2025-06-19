@@ -407,7 +407,7 @@ onlyoffice:
 # =====================================================================
 
 radicale:
-  enabled: true
+  enabled: false
   image:
     registry: docker.io
     repository: opencloudeu/radicale

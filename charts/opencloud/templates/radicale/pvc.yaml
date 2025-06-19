@@ -13,7 +13,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.radicale.persistence.size | default "2Gi" }}
+      storage: {{ .Values.radicale.persistence.size | default "1Gi" }}
   {{- if .Values.global.storage.storageClass }}
   storageClassName: {{ .Values.global.storage.storageClass }}
   {{- end }}
