@@ -9,7 +9,7 @@ metadata:
 data:
   proxy.yaml: |-
     additional_policies:
-{{- if .Values.opencloud.enabled }}
+{{- if .Values.radicale.enabled }}
 {{- (tpl (.Files.Get "files/radicale/proxy.config.gotml") . ) | nindent 4 }}
 {{- end }}
 {{- end }}
