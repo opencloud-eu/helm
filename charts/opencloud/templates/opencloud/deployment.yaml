@@ -162,7 +162,7 @@ spec:
               value: {{ tpl (toString .Values.opencloud.insecure) . | quote }}
             # Basic auth (only needed when not using Keycloak)
             - name: PROXY_ENABLE_BASIC_AUTH
-              value: false
+              value: "false"
             # These vars are needed to the csp config file to include the web office apps and the importer
             - name: ONLYOFFICE_DOMAIN
               value: "{{ .Values.global.domain.onlyoffice }}"
@@ -305,6 +305,9 @@ spec:
             - name: config-json
               mountPath: /var/lib/opencloud/config.json
               subPath: config.json
+            - name: proxy-config
+              mountPath: /var/lib/opencloud/proxy.yaml
+              subPath: proxy.yaml
             - name: config-files
               mountPath: /etc/opencloud/search.yaml
               subPath: search.yaml

@@ -1,0 +1,63 @@
+{{- if .Values.radicale.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}-radicale
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: radicale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: radicale
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: radicale
+    spec:
+      containers:
+        - name: radicale
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.radicale.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.radicale.image.pullPolicy "global" .Values.global) }}
+          env:
+            - name: RADICALE_CONFIG
+              value: "/etc/radicale/config"
+          ports:
+            - containerPort: 5232
+              name: http
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.radicale.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: radicale-config
+              mountPath: /etc/radicale/config
+              subPath: config
+            {{- if .Values.radicale.persistence.enabled }}
+            - name: radicale-data
+              mountPath: /var/lib/radicale
+            {{- end }}
+      volumes:
+        - name: radicale-config
+          configMap:
+            name: {{ include "opencloud.fullname" . }}-radicale-config
+        {{- if .Values.radicale.persistence.enabled }}
+        - name: radicale-data
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.fullname" . }}-radicale-data
+        {{- end }}
+{{- end }}

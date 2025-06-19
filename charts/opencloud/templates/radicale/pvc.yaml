@@ -1,0 +1,20 @@
+{{- if and .Values.radicale.enabled .Values.radicale.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.fullname" . }}-radicale-data
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: radicale
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.radicale.persistence.size | default "2Gi" }}
+  {{- if .Values.global.storage.storageClass }}
+  storageClassName: {{ .Values.global.storage.storageClass }}
+  {{- end }}
+{{- end }}

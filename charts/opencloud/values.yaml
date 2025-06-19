@@ -403,6 +403,30 @@ onlyoffice:
         memory: 10Gi
 
 # =====================================================================
+# CalDAV and CardDAV (Radicale)
+# =====================================================================
+
+radicale:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: opencloudeu/radicale
+    pullPolicy: IfNotPresent
+    tag: 3.5.4
+  persistence:
+    # Enable persistence
+    enabled: true
+    # Size of the persistent volume
+    size: 1Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+
+# =====================================================================
 # OPENCLOUD CORE
 # =====================================================================
 
