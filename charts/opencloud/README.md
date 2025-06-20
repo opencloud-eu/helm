@@ -224,6 +224,8 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `global.domain.wopi` | Domain for WOPI server | `wopiserver.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | secretName for TLS certificate | `""` |
+| `global.oidc.issuer` | OpenID Connect Issuer URL | `""` generated to use the internal keycloak|
+| `global.oidc.clientId` | OpenID Connect Client ID used by OpenCloud | `"web"` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
 | `global.image.registry` | Global registry override for all images (e.g., `my-registry.com`) | `""` |
 | `global.image.pullPolicy` | Global pull policy override for all images (`Always`, `IfNotPresent`, `Never`) | `""` |
@@ -275,18 +277,40 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 
 ### Keycloak Settings
 
+By default the chart deploys an internal keycloak. It can be disabled and replaced with an external IdP.
+
+#### Internal Keycloak
+
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `keycloak.enabled` | Enable Keycloak | `true` |
-| `keycloak.replicas` | Number of replicas | `1` |
-| `keycloak.adminUser` | Admin user | `admin` |
-| `keycloak.adminPassword` | Admin password | `admin` |
-| `keycloak.resources` | CPU/Memory resource requests/limits | `{}` |
-| `keycloak.realm` | Realm name | `openCloud` |
-| `keycloak.persistence.enabled` | Enable persistence | `true` |
-| `keycloak.persistence.size` | Size of the persistent volume | `1Gi` |
-| `keycloak.persistence.storageClass` | Storage class | `""` |
-| `keycloak.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `keycloak.internal.enabled` | Enable internal Keycloak deployment | `true` |
+| `keycloak.internal.image.repository` | Keycloak image repository | `quay.io/keycloak/keycloak` |
+| `keycloak.internal.image.tag` | Keycloak image tag | `26.1.4` |
+| `keycloak.internal.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `keycloak.internal.replicas` | Number of replicas | `1` |
+| `keycloak.internal.adminUser` | Admin user | `admin` |
+| `keycloak.internal.adminPassword` | Admin password | `admin` |
+| `keycloak.internal.realm` | Realm name | `openCloud` |
+| `keycloak.internal.resources` | CPU/Memory resource requests/limits | `{}` |
+| `keycloak.internal.cors.enabled` | Enable CORS | `true` |
+| `keycloak.internal.cors.allowAllOrigins` | Allow all origins | `true` |
+
+> **Note**: When using internal Keycloak with multiple OpenCloud replicas (`opencloud.replicas > 1`), you must use an external shared database or LDAP. The embedded IDM does not support replication. See [issue #53](https://github.com/opencloud-eu/helm/issues/53) for details.
+
+#### Example: Using External IDP
+
+```yaml
+global:
+  oidc:
+    issuer: "https://idp.example.com/realms/openCloud"
+    clientId: "opencloud-web"
+
+keycloak:
+  internal:
+    enabled: false
+```
+
+**Note**: If `keycloak.internal.enabled` is `true`, the `global.oidc.issuer` should be left empty to not override the generated issuer URL.
 
 ### PostgreSQL Settings
 

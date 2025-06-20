@@ -47,11 +47,19 @@ global:
     # secretName for TLS certificate
     secretName: ""
 
+  oidc:
+    # OpenID Connect issuer URL. If set, overrides the default Keycloak internal issuer URL.
+    # This is useful for external OIDC providers or custom Keycloak configurations.
+    # Example: https://keycloak.opencloud.test/realms/openCloud
+    issuer: ""
+    # OIDC client ID for OpenCloud
+    clientId: "web"
+
   # Global storage settings
   storage:
     # Storage class for persistent volumes
     storageClass: ""
-  
+
   # Global image settings
   image:
     # Global registry override - if set, it will override all image registries
@@ -82,89 +90,50 @@ busybox:
 # =====================================================================
 
 # Keycloak settings for identity and access management
+# Structure follows issue #64 - standardized internal/external pattern
 keycloak:
-  # Enable Keycloak
-  enabled: true
-  
-  # Keycloak image settings
-  image:
-    # Keycloak image registry
-    registry: quay.io
-    # Keycloak image repository
-    repository: keycloak/keycloak
-    # Keycloak image tag
-    tag: "26.1.4"
-    # Image pull policy
-    pullPolicy: IfNotPresent
-  
-  # Internal test Keycloak instance
+  # Internal Keycloak deployment
   internal:
-    # Enable internal test Keycloak (default: true)
+    # Enable internal Keycloak instance
     enabled: true
-  
-  # Use external Keycloak
-  external:
-    # Enable external Keycloak
-    enabled: false
-    # External Keycloak URL
-    url: ""
-    # External Keycloak realm
+    # Keycloak image settings
+    image:
+      # Keycloak image registry
+      registry: quay.io
+      # Keycloak image repository
+      repository: keycloak/keycloak
+      # Keycloak image tag
+      tag: "26.1.4"
+      # Image pull policy
+      pullPolicy: IfNotPresent
+    # Number of Keycloak replicas
+    replicas: 1
+    # Admin user
+    adminUser: admin
+    # Admin password
+    adminPassword: admin
+    # Keycloak realm
     realm: "openCloud"
-    # External Keycloak client ID
-    clientId: "web"
-  
-  # Number of Keycloak replicas
-  replicas: 1
-  # Admin user
-  adminUser: admin
-  # Admin password
-  adminPassword: admin
-  
-  # CORS settings for cross-origin requests
-  cors:
-    # Enable CORS
-    enabled: true
-    # Allow all origins
-    allowAllOrigins: true
-    # Allowed origins (used if allowAllOrigins is false)
-    origins: []
-    # Allowed methods
-    methods: "GET,HEAD,OPTIONS,POST,PUT,DELETE"
-    # Allowed headers
-    headers: "Authorization,Content-Type,Accept,Origin,X-Requested-With"
-    # Exposed headers
-    exposedHeaders: "Content-Disposition,Content-Length,Content-Type"
-    # Allow credentials
-    allowCredentials: true
-    # Max age
-    maxAge: 3600
-  
-  # Token settings
-  token:
-    # Access token lifespan in seconds
-    accessTokenLifespan: 3600
-  
-  # Resources allocation
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-  
-  # Realm name
-  realm: openCloud
-  
-  # Persistence configuration
-  persistence:
-    enabled: true
-    # Size of the persistent volume
-    size: 1Gi
-    # Storage class
-    storageClass: ""
-    # Access mode
-    accessMode: ReadWriteOnce
+    # CORS settings for cross-origin requests
+    cors:
+      # Enable CORS
+      enabled: true
+      # Allow all origins
+      allowAllOrigins: true
+      # Allowed origins (used if allowAllOrigins is false)
+      origins: []
+      # Allowed methods
+      methods: "GET,POST,PUT,DELETE,OPTIONS"
+      # Allowed headers
+      headers: "Origin,Accept,Authorization,Content-Type,Cache-Control"
+      # Exposed headers
+      exposedHeaders: "Access-Control-Allow-Origin,Access-Control-Allow-Credentials"
+      # Allow credentials
+      allowCredentials: "true"
+      # Max age in seconds
+      maxAge: "3600"
+    # Resources
+    resources: {}
 
 # PostgreSQL settings for Keycloak
 postgres:

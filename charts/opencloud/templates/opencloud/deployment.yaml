@@ -200,18 +200,25 @@ spec:
             - name: NOTIFICATIONS_SMTP_ENCRYPTION
               value: "{{ .Values.opencloud.smtp.encryption }}"
             {{- end }}
-            {{- if .Values.keycloak.enabled }}
-            # Keycloak IDP specific configuration
+            {{- if or .Values.keycloak.internal.enabled .Values.global.oidc.issuer }}
+            # IDP specific configuration
             - name: PROXY_AUTOPROVISION_ACCOUNTS
               value: "true"
+            # user properties are edited in the idp, so we hate to make them readonly
+            - name: FRONTEND_READONLY_USER_ATTRIBUTES
+              value: "user.onPremisesSamAccountName,user.displayName,user.mail,user.passwordProfile,user.accountEnabled,user.appRoleAssignments"
             - name: PROXY_ROLE_ASSIGNMENT_DRIVER
               value: "oidc"
             - name: OC_OIDC_ISSUER
-              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}"
+              {{- if .Values.global.oidc.issuer }}
+              value: {{ .Values.global.oidc.issuer | quote }}
+              {{- else }}
+              value: {{ printf "https://%s/realms/%s" (include "opencloud.keycloak.domain" .) .Values.keycloak.internal.realm | quote }}
+              {{- end }}
             - name: PROXY_OIDC_REWRITE_WELLKNOWN
               value: "true"
             - name: WEB_OIDC_CLIENT_ID
-              value: "web"
+              value: {{ .Values.global.oidc.clientId | quote}}
             - name: PROXY_USER_OIDC_CLAIM
               value: "preferred_username"
             - name: PROXY_USER_CS3_CLAIM
@@ -222,15 +229,18 @@ spec:
               value: "false"
             - name: GRAPH_USERNAME_MATCH
               value: "none"
-            # Additional OIDC settings from docker-compose
             - name: PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM
               value: "roles"
             - name: PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD
               value: "jwt"
             - name: WEB_OIDC_METADATA_URL
-              value: "https://{{ include "opencloud.keycloak.domain" . }}/realms/{{ .Values.keycloak.realm }}/.well-known/openid-configuration"
+              {{- if .Values.global.oidc.issuer }}
+              value: {{ printf "%s/.well-known/openid-configuration" .Values.global.oidc.issuer | quote }}
+              {{- else }}
+              value: {{ printf "https://%s/realms/%s/.well-known/openid-configuration" (include "opencloud.keycloak.domain" .) .Values.keycloak.internal.realm | quote }}
+              {{- end }}
             - name: WEB_OIDC_SCOPE
-              value: "openid profile email groups"
+              value: "openid profile email groups roles"
             {{- end }}
             # Admin user password
             - name: IDM_ADMIN_PASSWORD

@@ -1,4 +1,4 @@
-{{- if and .Values.keycloak.enabled .Values.keycloak.internal.enabled }}
+{{- if .Values.keycloak.internal.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +7,7 @@ metadata:
     {{- include "opencloud.labels" . | nindent 4 }}
     app.kubernetes.io/component: keycloak
 spec:
-  replicas: {{ .Values.keycloak.replicas }}
+  replicas: {{ .Values.keycloak.internal.replicas }}
   selector:
     matchLabels:
       {{- include "opencloud.selectorLabels" . | nindent 6 }}
@@ -24,8 +24,8 @@ spec:
         fsGroup: 1000
       containers:
         - name: keycloak
-          image: {{ include "opencloud.image" (dict "imageValues" .Values.keycloak.image "global" .Values.global) | quote }}
-          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.keycloak.image.pullPolicy "global" .Values.global) }}
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.keycloak.internal.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.keycloak.internal.image.pullPolicy "global" .Values.global) }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -58,29 +58,29 @@ spec:
             - name: KC_FEATURES
               value: impersonation
             - name: KEYCLOAK_ADMIN
-              value: {{ .Values.keycloak.adminUser }}
+              value: {{ .Values.keycloak.internal.adminUser }}
             - name: KEYCLOAK_ADMIN_PASSWORD
-              value: {{ .Values.keycloak.adminPassword }}
-            {{- if .Values.keycloak.cors.enabled }}
+              value: {{ .Values.keycloak.internal.adminPassword }}
+            {{- if .Values.keycloak.internal.cors.enabled }}
             - name: KC_SPI_CORS_ENABLED
               value: "true"
-            {{- if .Values.keycloak.cors.allowAllOrigins }}
+            {{- if .Values.keycloak.internal.cors.allowAllOrigins }}
             - name: KC_SPI_CORS_ORIGINS
               value: "*"
             {{- else }}
             - name: KC_SPI_CORS_ORIGINS
-              value: {{ join "," .Values.keycloak.cors.origins | quote }}
+              value: {{ join "," .Values.keycloak.internal.cors.origins | quote }}
             {{- end }}
             - name: KC_SPI_CORS_METHODS
-              value: {{ .Values.keycloak.cors.methods | quote }}
+              value: {{ .Values.keycloak.internal.cors.methods | quote }}
             - name: KC_SPI_CORS_HEADERS
-              value: {{ .Values.keycloak.cors.headers | quote }}
+              value: {{ .Values.keycloak.internal.cors.headers | quote }}
             - name: KC_SPI_CORS_EXPOSED_HEADERS
-              value: {{ .Values.keycloak.cors.exposedHeaders | quote }}
+              value: {{ .Values.keycloak.internal.cors.exposedHeaders | quote }}
             - name: KC_SPI_CORS_ALLOW_CREDENTIALS
-              value: {{ .Values.keycloak.cors.allowCredentials | quote }}
+              value: {{ .Values.keycloak.internal.cors.allowCredentials | quote }}
             - name: KC_SPI_CORS_MAX_AGE
-              value: {{ .Values.keycloak.cors.maxAge | quote }}
+              value: {{ .Values.keycloak.internal.cors.maxAge | quote }}
             {{- end }}
           ports:
             - name: http
@@ -93,7 +93,7 @@ spec:
               mountPath: /opt/keycloak/data/import-dist/opencloud-realm.json
               subPath: opencloud-realm.json
           resources:
-            {{- toYaml .Values.keycloak.resources | nindent 12 }}
+            {{- toYaml .Values.keycloak.internal.resources | nindent 12 }}
       volumes:
         - name: script
           configMap:
