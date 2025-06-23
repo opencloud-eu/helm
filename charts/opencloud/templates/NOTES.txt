@@ -52,7 +52,11 @@ The following services have been deployed:
    - HTTP Port: 9300
    - gRPC Port: 9301
 {{- end }}
-
+{{- if .Values.radicale.enabled }}
+5. Radicale (CalDav & CardDav):
+   - Service: {{ include "opencloud.fullname" . }}-radicale
+   - Port: 5232
+{{- end }}
 
 {{- if .Values.httpRoute.enabled }}
 IMPORTANT: This chart includes HTTPRoute resources that route traffic to the OpenCloud, Keycloak, and MinIO services.
@@ -85,6 +89,11 @@ Example domains for your ingress configuration:
 {{- end }}
 {{- if and .Values.onlyoffice.collaboration.enabled .Values.onlyoffice.enabled }}
 - OnlyOffice Collaboration: {{ .Values.global.domain.wopi }} (Service: {{ include "opencloud.fullname" . }}-collaboration, Port: 9300)
+{{- end }}
+{{- if and .Values.radicale.enabled }}
+- Radicale:
+   CalDav:  {{ include "opencloud.domain" . }}/caldav (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)
+   CardDav:  {{ include "opencloud.domain" . }}/carddav (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)
 {{- end }}
 {{- end }}
 
