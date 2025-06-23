@@ -303,7 +303,7 @@ collabora:
 # OnlyOffice settings for document collaboration
 onlyoffice:
   # Enable OnlyOffice
-  enabled: false
+  enabled: true
   # OnlyOffice image settings
   image:
     # OnlyOffice image registry
@@ -408,6 +408,8 @@ onlyoffice:
 
 radicale:
   enabled: true
+  radicale:
+    webui: false
   image:
     registry: docker.io
     repository: opencloudeu/radicale
@@ -635,11 +637,11 @@ httpRoute:
 # Ingress configuration
 ingress:
   # Whether to enable ingress resources for components
-  enabled: true
+  enabled: false
 
   # The ingress class name to use (e.g., nginx, traefik). Leave empty to use the cluster default.
   # Note: This sets the Kubernetes `spec.ingressClassName` field.
-  ingressClassName: "nginx"
+  ingressClassName: ""
 
   # Some components (e.g., OnlyOffice) require the X-Forwarded-Proto header to be set.
   #
