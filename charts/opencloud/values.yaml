@@ -452,6 +452,34 @@ opencloud:
     # For very long lists override the file 'files/opencloud/banned-password-list.txt'
     bannedPasswordList: |-
 
+  nats:
+    external:
+      # -- Use an external NATS messaging system instead of the internal one.
+      # Recommended for all production instances.
+      # Needs to be used if HighAvailability is needed.
+      # Needs to be used if OpenCloud shall be used by more than a 2-digit user count.
+      enabled: false
+
+      # -- Endpoint of the messaging system.
+      endpoint: nats.opencloud-nats.svc.cluster.local:4222
+
+      # -- Cluster name to use with the messaging system.
+      cluster: opencloud-cluster
+
+      tls:
+        # -- Enables TLS encrypted communication with the messaging system.
+        # Recommended for production installations.
+        enabled: false
+        
+        # -- Set only to false, if the certificate of your messaging system service is not trusted.
+        # If set to false, you need to put the CA cert of the messaging system server into the secret referenced by "messagingSystemCaRef"
+        certTrusted: true
+
+        # -- Disables SSL certificate checking for connections to the messaging system server.
+        # -- For self signed certificates, consider to put the CA cert of the messaging system secure server into the secret referenced by "messagingSystemCaRef"
+        # Not recommended for production installations.
+        insecure: false
+
   # =====================================================================
   # EMAIL (SMTP)
   # =====================================================================

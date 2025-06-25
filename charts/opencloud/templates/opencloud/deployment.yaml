@@ -147,9 +147,13 @@ spec:
             - name: OC_ADD_RUN_SERVICES
               value: {{ join "," . | quote }}
             {{- end }}
-            {{- with .Values.opencloud.excludeServices }}
+            {{- $exclude := .Values.opencloud.excludeServices | default (list) }}
+            {{- if .Values.opencloud.nats.external.enabled }}
+              {{- $exclude = append $exclude "nats" }}
+            {{- end }}
+            {{- if gt (len $exclude) 0 }}
             - name: OC_EXCLUDE_RUN_SERVICES
-              value: {{ join "," . | quote }}
+              value: {{ join "," $exclude | quote }}
             {{- end }}
             # Do not use SSL between proxy and OpenCloud
             - name: PROXY_TLS
@@ -248,13 +252,39 @@ spec:
             # Demo users
             - name: IDM_CREATE_DEMO_USERS
               value: {{ .Values.opencloud.createDemoUsers | quote }}
-            # Make the registry available to the app provider containers
+            {{- if .Values.opencloud.nats.external.enabled }}
+            # Use the external nats as the service registry
+            - name: MICRO_REGISTRY_ADDRESS
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            # Use the external nats as the cache and persistent store
+            - name: OC_CACHE_STORE_NODES
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            - name: OC_PERSISTENT_STORE_NODES
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            # Use the external nats as the messaging system
+            - name: OC_EVENTS_ENDPOINT
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            - name: OC_EVENTS_CLUSTER
+              value: {{ .Values.opencloud.nats.external.cluster | quote }}
+            - name: OC_EVENTS_ENABLE_TLS
+              value: {{ .Values.opencloud.nats.external.tls.enabled | quote }}
+            - name: OC_EVENTS_TLS_INSECURE
+              value: {{ .Values.opencloud.nats.external.tls.insecure | quote }}
+            - name: OC_EVENTS_TLS_ROOT_CA_CERTIFICATE
+              {{- if not .Values.opencloud.nats.external.tls.certTrusted }}
+              value: /etc/opencloud/messaging-system-ca/messaging-system-ca.crt
+              {{- else }}
+              value: "" # no cert needed
+              {{- end }}
+            {{- else }}
             - name: MICRO_REGISTRY_ADDRESS
               value: "127.0.0.1:9233"
+            # Make the registry available to the app provider containers
             - name: NATS_NATS_HOST
               value: "0.0.0.0"
             - name: NATS_NATS_PORT
               value: "9233"
+            {{- end }}
             # CSP configuration
             - name: PROXY_CSP_CONFIG_FILE_LOCATION
               value: "/etc/opencloud/csp.yaml"
