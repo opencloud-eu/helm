@@ -52,15 +52,43 @@ spec:
             - name: KC_DB_URL
               value: jdbc:postgresql://{{ include "opencloud.postgres.fullname" . }}:5432/{{ .Values.postgres.database }}
             - name: KC_DB_USERNAME
-              value: {{ .Values.postgres.user }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.postgres.existingSecret }}
+                          {{ .Values.postgres.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.postgres.fullname" . }}
+                        {{- end }}
+                  key: username
             - name: KC_DB_PASSWORD
-              value: {{ .Values.postgres.password }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.postgres.existingSecret }}
+                          {{ .Values.postgres.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.postgres.fullname" . }}
+                        {{- end }}
+                  key: password
             - name: KC_FEATURES
               value: impersonation
             - name: KEYCLOAK_ADMIN
-              value: {{ .Values.keycloak.internal.adminUser }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.keycloak.internal.existingSecret }}
+                          {{ .Values.keycloak.internal.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.keycloak.fullname" . }}
+                        {{- end }}
+                  key: adminUser
             - name: KEYCLOAK_ADMIN_PASSWORD
-              value: {{ .Values.keycloak.internal.adminPassword }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.keycloak.internal.existingSecret }}
+                          {{ .Values.keycloak.internal.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.keycloak.fullname" . }}
+                        {{- end }}
+                  key: adminPassword
             {{- if .Values.keycloak.internal.cors.enabled }}
             - name: KC_SPI_CORS_ENABLED
               value: "true"

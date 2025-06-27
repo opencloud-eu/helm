@@ -190,9 +190,23 @@ spec:
             - name: NOTIFICATIONS_SMTP_SENDER
               value: "{{ .Values.opencloud.smtp.sender | default (printf "OpenCloud notifications <notifications@%s>" (include "opencloud.domain" .)) }}"
             - name: NOTIFICATIONS_SMTP_USERNAME
-              value: "{{ .Values.opencloud.smtp.username }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
+                        {{- else }}
+                          opencloud-smtp
+                        {{- end }}
+                  key: smtpUser
             - name: NOTIFICATIONS_SMTP_PASSWORD
-              value: "{{ .Values.opencloud.smtp.password }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
+                        {{- else }}
+                          opencloud-smtp
+                        {{- end }}
+                  key: smtpPassword
             - name: NOTIFICATIONS_SMTP_INSECURE
               value: {{ tpl (toString .Values.opencloud.smtp.insecure) . | quote }}
             - name: NOTIFICATIONS_SMTP_AUTHENTICATION
@@ -244,7 +258,14 @@ spec:
             {{- end }}
             # Admin user password
             - name: IDM_ADMIN_PASSWORD
-              value: {{ .Values.opencloud.adminPassword | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.existingSecret }}
+                          {{ .Values.opencloud.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.opencloud.fullname" . }}
+                        {{- end }}
+                  key: adminPassword
             # Demo users
             - name: IDM_CREATE_DEMO_USERS
               value: {{ .Values.opencloud.createDemoUsers | quote }}
@@ -271,9 +292,44 @@ spec:
             - name: STORAGE_USERS_DECOMPOSEDS3_REGION
               value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.region | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.region | default "default" | quote }}{{ end }}
             - name: STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.accessKey | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.rootUser | quote }}{{ end }}
+              valueFrom:
+                {{- if .Values.opencloud.storage.s3.external.enabled }}
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.external.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.external.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.opencloud.fullname" . }}-s3
+                        {{- end }}
+                  key: accessKey
+                {{- else }}
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.internal.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.minio.fullname" . }}
+                        {{- end }}
+                  key: rootUser
+                {{- end }}
+
             - name: STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.secretKey | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.rootPassword | quote }}{{ end }}
+              valueFrom:
+                {{- if .Values.opencloud.storage.s3.external.enabled }}
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.external.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.external.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.opencloud.fullname" . }}-s3
+                        {{- end }}
+                  key: secretKey
+                {{- else }}
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{- .Values.opencloud.storage.s3.internal.existingSecret }}
+                        {{- else}}
+                          {{ include "opencloud.minio.fullname" . }}
+                        {{- end }}
+                  key: rootPassword
+                {{- end }}
             - name: STORAGE_USERS_DECOMPOSEDS3_BUCKET
               value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.bucket | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.bucketName | quote }}{{ end }}
             - name: STORAGE_USERS_DECOMPOSEDS3_CREATE_BUCKET

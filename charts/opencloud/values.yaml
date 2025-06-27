@@ -13,8 +13,7 @@
 # 2. OpenCloud Admin: adminPassword: admin
 # 3. PostgreSQL: user: keycloak, password: keycloak
 # 4. MinIO: rootUser: opencloud, rootPassword: opencloud-secret-key
-# 5. OnlyOffice Secret Keys: secret.inbox/outbox/session.string: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
-# 6. RabbitMQ: url: amqp://guest:guest@localhost
+# 5. RabbitMQ: url: amqp://guest:guest@localhost
 
 
 # =====================================================================
@@ -108,12 +107,21 @@ keycloak:
       pullPolicy: IfNotPresent
     # Number of Keycloak replicas
     replicas: 1
+
+    # Use existing secret for keycloak credentials (Note: secretKeyName must be adminUser and adminPassword)
+    existingSecret: ""
+
     # Admin user
+    # ignored if keycloak.internal.existingSecret is set
     adminUser: admin
+
     # Admin password
+    # ignored if keycloak.internal.existingSecret is set
     adminPassword: admin
+
     # Keycloak realm
     realm: "openCloud"
+
     # CORS settings for cross-origin requests
     cors:
       # Enable CORS
@@ -149,12 +157,21 @@ postgres:
     tag: "alpine"
     # Image pull policy
     pullPolicy: IfNotPresent
+
   # Database name
   database: keycloak
+
+  # Use existing secret for postgres credentials (Note: secretKeyName must be username and password)
+  existingSecret: ""
+
   # Database user
+  # ignored if postgres.existingSecret is set
   user: keycloak
+
   # Database password
+  # ignored if postgres.existingSecret is set
   password: keycloak
+
   # Resources allocation
   resources:
     requests:
@@ -254,9 +271,17 @@ collabora:
   ssl:
     enabled: true
     verification: true
+
+  # Use existing secret for collabora credentials (Note: secretKeyName must be username and password)
+  existingSecret: ""
+
   admin:
+    # ignored if collabora.existingSecret is set
     user: admin
+
+    # ignored if collabora.existingSecret is set
     password: admin
+
   resources:
     requests:
       cpu: 100m
@@ -320,27 +345,21 @@ onlyoffice:
         dbPort: "5432"
         dbName: "onlyoffice"
         dbUser: "onlyoffice"
-      # Token settings
-      token:
-        enable:
-          request:
-            inbox: true
-            outbox: true
-          browser: true
-        inbox:
-          header: "Authorization"
-        outbox:
-          header: "Authorization"
+      
       # Secret settings
       secret:
-        inbox:
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
-        outbox:
-          string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
+        # Use existing secret for onlyoffice credentials (Note: secretKeyName must be sessionSecret)
+        existingSecret: ""
+        
+        # ignored if onlyoffice.config.coAuthoring.secret.existingSecret is set
         session:
           string: "Dd0SXIe1k9oCfdffgrfNmA0TK1bb1B1d38OFSb"
     # RabbitMQ settings
     rabbitmq:
+      # Use existing secret for onlyoffice rabbitmq credentials (Note: secretKeyName must be url)
+      existingSecret: ""
+
+      # ignored if onlyoffice.config.rabbitmq.existingSecret is set
       url: "amqp://guest:Dd0SXIe1k9osdfjkmA0TK1bb1B1d38OFSb@localhost"
     # File converter settings
     fileConverter:
@@ -403,8 +422,14 @@ opencloud:
   logPretty: false
   # Insecure mode (for self-signed certificates)
   insecure: true
+  
+  # Use existing secret for opencloud admin credentials (Note: secretKeyName must be adminPassword)
+  existingSecret: ""
+  
   # Admin password
+  # ignored if opencloud.existingSecret is set
   adminPassword: admin
+  
   # Create demo users
   createDemoUsers: false
   # Additional services to start
@@ -466,10 +491,18 @@ opencloud:
     port: "587"
     # SMTP sender
     sender: ""
+    
+    # Use existing secret for opencloud smtp credentials (Note: secretKeyName must be smtpUser and smtpPassword)
+    existingSecret: ""
+    
     # SMTP username
+    # ignored if opencloud.smtp.existingSecret is set
     username: ""
+
     # SMTP password
+    # ignored if opencloud.smtp.existingSecret is set
     password: ""
+
     # SMTP insecure (allow self-signed certificates)
     insecure: "false"
     # SMTP authentication method
@@ -503,10 +536,18 @@ opencloud:
         httpRoute:
           # Enable HTTPRoute for MinIO (default: false)
           enabled: false
+        
+        # Use existing secret for minio credentials (Note: secretKeyName must be rootUser and rootPassword)
+        existingSecret: ""
+        
         # Minio Root user
+        # ignored if opencloud.storage.s3.internal.existingSecret is set
         rootUser: opencloud
+
         # Minio Root password
+        # ignored if opencloud.storage.s3.internal.existingSecret is set
         rootPassword: opencloud-secret-key
+        
         # Bucket name
         bucketName: opencloud-bucket
         # Region (optional)
@@ -536,10 +577,18 @@ opencloud:
         endpoint: ""
         # External S3 region
         region: "default"
+        
+        # Use existing secret for external s3 credentials (Note: secretKeyName must be accessKey and secretKey)
+        existingSecret: ""
+        
         # External S3 access key
+        # ignored if opencloud.storage.s3.external.existingSecret is set
         accessKey: ""
+
         # External S3 secret key
+        # ignored if opencloud.storage.s3.external.existingSecret is set
         secretKey: ""
+
         # External S3 bucket
         bucket: ""
         # Create bucket if it doesn't exist
