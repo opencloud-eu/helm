@@ -97,27 +97,7 @@ The complete OpenCloud deployment with all components for production use:
 
 [View Full Chart Documentation](./charts/opencloud-full/README.md)
 
-### Production Chart (`charts/opencloud`)
-
-The complete OpenCloud deployment with all components for production use:
-
-- Full microservices architecture
-- Keycloak for authentication
-- MinIO for object storage
-- Document editing with Collabora and/or OnlyOffice
-- Full Gateway API integration
-
-[View Production Chart Documentation](./charts/opencloud/README.md)
-
-### Development Chart (`charts/opencloud-dev`)
-
-A lightweight single-container deployment for development and testing:
-
-- Simplified deployment (single Docker container)
-- Minimal resource requirements
-- Quick setup for testing
-
-[View Development Chart Documentation](./charts/opencloud-dev/README.md)
+#
 
 ## 🚀 Installation
 
@@ -139,24 +119,6 @@ kubectl apply -f ./charts/opencloud-full/deployments/timoni/ && \
 timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployments/timoni/runtime.cue
 ```
 
-```bash
-# Install Production Chart
-cd helm
-helm install opencloud ./charts/opencloud \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
-
-
-
-# Or install Development Chart
-cd helm
-helm install opencloud ./charts/opencloud-dev \
-  --namespace opencloud \
-  --create-namespace
-```
 
 ### Installing from OCI Registry
 
