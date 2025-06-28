@@ -88,6 +88,18 @@ A lightweight single-container deployment for development and testing:
 
 [View Development Chart Documentation](./charts/opencloud-dev/README.md)
 
+### Full OpenCloud Chart (`charts/opencloud-full`)
+
+A comprehensive OpenCloud deployment with all components:
+- Full microservices architecture with LDAP integration
+- NATS for distributed messaging
+- Keycloak identity and access management
+- MinIO for S3-compatible object storage
+- API Gateway for routing and security
+- OnlyOffice for document editing
+
+[View Full OpenCloud Chart Documentation](./charts/opencloud-full/README.md)
+
 ## 📜 License
 
 This project is licensed under the **AGPLv3** licence. See the [LICENSE](LICENSE) file for more details.
