@@ -16,6 +16,8 @@ Reviewers have the ability to review PRs and approve them, but do not have merge
 - @WrenIX
 - @ferenc-hechler
 - @suse-coder
+- @johanneskastl / @kastl-ars
+- @Tim-herbie
 
 ## Becoming a Maintainer or Reviewer
 

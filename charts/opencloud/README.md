@@ -191,6 +191,25 @@ Key interactions:
 
 The following table lists the configurable parameters of the OpenCloud chart and their default values.
 
+### Using Private Registries
+
+The chart supports using private container registries through global overrides. This is useful for:
+- Air-gapped environments
+- Corporate registry mirrors
+- Pull-through caches
+
+To use a private registry for all images:
+
+```bash
+helm install opencloud ./charts/opencloud \
+  --set global.image.registry=my-registry.com \
+  --set global.image.pullPolicy=Always
+```
+
+This will prepend `my-registry.com/` to all image references in the chart. For example:
+- `keycloak/keycloak:26.1.4` becomes `my-registry.com/keycloak/keycloak:26.1.4`
+- `opencloudeu/opencloud-rolling:latest` becomes `my-registry.com/opencloudeu/opencloud-rolling:latest`
+
 ### Global Settings
 
 | Parameter | Description | Default |
@@ -202,14 +221,20 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `global.domain.collabora` | Domain for Collabora | `collabora.opencloud.test` |
 | `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
 | `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
+| `global.domain.wopi` | Domain for WOPI server | `wopiserver.opencloud.test` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | secretName for TLS certificate | `""` |
+| `global.oidc.issuer` | OpenID Connect Issuer URL | `""` generated to use the internal keycloak|
+| `global.oidc.clientId` | OpenID Connect Client ID used by OpenCloud | `"web"` |
 | `global.storage.storageClass` | Storage class for persistent volumes | `""` |
+| `global.image.registry` | Global registry override for all images (e.g., `my-registry.com`) | `""` |
+| `global.image.pullPolicy` | Global pull policy override for all images (`Always`, `IfNotPresent`, `Never`) | `""` |
 
 ### Image Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
+| `image.registry` | OpenCloud image registry | `docker.io` |
 | `image.repository` | OpenCloud image repository | `opencloudeu/opencloud-rolling` |
 | `image.tag` | OpenCloud image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
@@ -225,7 +250,6 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `opencloud.logColor` | Enable log color | `false` |
 | `opencloud.logPretty` | Enable pretty logging | `false` |
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
-| `opencloud.enableBasicAuth` | Enable basic auth | `false` |
 | `opencloud.adminPassword` | Admin password | `admin` |
 | `opencloud.createDemoUsers` | Create demo users | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -233,6 +257,15 @@ The following table lists the configurable parameters of the OpenCloud chart and
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
 | `opencloud.persistence.storageClass` | Storage class | `""` |
 | `opencloud.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `opencloud.smtp.enabled` | Enable smtp for opencloud | `false` |
+| `opencloud.smtp.host` | SMTP host | `` |
+| `opencloud.smtp.port` | SMTP port | `587` |
+| `opencloud.smtp.sender` | SMTP sender | `` |
+| `opencloud.smtp.username` | SMTP username | `` |
+| `opencloud.smtp.password` | SMTP password | `` |
+| `opencloud.smtp.insecure` | SMTP insecure | `false` |
+| `opencloud.smtp.authentication` | SMTP authentication | `plain` |
+| `opencloud.smtp.encryption` | SMTP encryption | `starttls` |
 | `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
 | `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
 | `opencloud.storage.s3.internal.rootPassword` | MinIO root password | `opencloud-secret-key` |
@@ -253,18 +286,40 @@ The following table lists the configurable parameters of the OpenCloud chart and
 
 ### Keycloak Settings
 
+By default the chart deploys an internal keycloak. It can be disabled and replaced with an external IdP.
+
+#### Internal Keycloak
+
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `keycloak.enabled` | Enable Keycloak | `true` |
-| `keycloak.replicas` | Number of replicas | `1` |
-| `keycloak.adminUser` | Admin user | `admin` |
-| `keycloak.adminPassword` | Admin password | `admin` |
-| `keycloak.resources` | CPU/Memory resource requests/limits | `{}` |
-| `keycloak.realm` | Realm name | `openCloud` |
-| `keycloak.persistence.enabled` | Enable persistence | `true` |
-| `keycloak.persistence.size` | Size of the persistent volume | `1Gi` |
-| `keycloak.persistence.storageClass` | Storage class | `""` |
-| `keycloak.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `keycloak.internal.enabled` | Enable internal Keycloak deployment | `true` |
+| `keycloak.internal.image.repository` | Keycloak image repository | `quay.io/keycloak/keycloak` |
+| `keycloak.internal.image.tag` | Keycloak image tag | `26.1.4` |
+| `keycloak.internal.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `keycloak.internal.replicas` | Number of replicas | `1` |
+| `keycloak.internal.adminUser` | Admin user | `admin` |
+| `keycloak.internal.adminPassword` | Admin password | `admin` |
+| `keycloak.internal.realm` | Realm name | `openCloud` |
+| `keycloak.internal.resources` | CPU/Memory resource requests/limits | `{}` |
+| `keycloak.internal.cors.enabled` | Enable CORS | `true` |
+| `keycloak.internal.cors.allowAllOrigins` | Allow all origins | `true` |
+
+> **Note**: When using internal Keycloak with multiple OpenCloud replicas (`opencloud.replicas > 1`), you must use an external shared database or LDAP. The embedded IDM does not support replication. See [issue #53](https://github.com/opencloud-eu/helm/issues/53) for details.
+
+#### Example: Using External IDP
+
+```yaml
+global:
+  oidc:
+    issuer: "https://idp.example.com/realms/openCloud"
+    clientId: "opencloud-web"
+
+keycloak:
+  internal:
+    enabled: false
+```
+
+**Note**: If `keycloak.internal.enabled` is `true`, the `global.oidc.issuer` should be left empty to not override the generated issuer URL.
 
 ### PostgreSQL Settings
 
@@ -325,7 +380,6 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `collaboration.enabled` | Enable collaboration service | `true` |
-| `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
 ## Gateway API Configuration
@@ -384,7 +438,7 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 7. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
-   - Hostname: `collaboration.wopiDomain`
+   - Hostname: `global.domain.wopi`
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
@@ -447,19 +501,12 @@ Apply the ClusterIssuer:
 kubectl apply -f cluster-issuer.yaml
 ```
 
-### Step 3: Create a Wildcard Certificate for OpenCloud Domains
+### Step 4: Create a Wildcard Certificate for OpenCloud Domains
 
 Create a wildcard certificate for all OpenCloud subdomains:
 
 ```yaml
-# cluster-issuer.yaml
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: selfsigned-issuer
-spec:
-  selfSigned: {}
----
+# certificate.yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -478,128 +525,10 @@ spec:
 Apply the certificate:
 
 ```bash
-kubectl apply -f cluster-issuer.yaml
+kubectl apply -f certificate.yaml
 ```
 
-### Step 4: Create the Gateway
-
-Create a Gateway resource to expose your services:
-
-
-```yaml
-# gateway.yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: Gateway
-metadata:
-  name: cilium-gateway
-  namespace: kube-system
-spec:
-  gatewayClassName: cilium
-  infrastructure:
-    annotations:
-      io.cilium/lb-ipam-ips: "192.168.178.77"  # Replace with your desired IP
-      cilium.io/hubble-visibility: "flow"
-      cilium.io/preserve-client-cookies: "true"
-      cilium.io/preserve-csrf-token: "true"
-      io.cilium/websocket: "true"
-      io.cilium/websocket-timeout: "3600"
-  addresses:
-    - type: IPAddress
-      value: 192.168.178.77  # Replace with your desired IP
-  listeners:
-    - name: opencloud-https
-      protocol: HTTPS
-      port: 443
-      hostname: "cloud.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: keycloak-https
-      protocol: HTTPS
-      port: 443
-      hostname: "keycloak.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: minio-https
-      protocol: HTTPS
-      port: 443
-      hostname: "minio.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: onlyoffice-https
-      protocol: HTTPS
-      port: 443
-      hostname: "onlyoffice.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: collabora-https
-      protocol: HTTPS
-      port: 443
-      hostname: "collabora.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: collaboration-https
-      protocol: HTTPS
-      port: 443
-      hostname: "collaboration.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: wopi-https
-      protocol: HTTPS
-      port: 443
-      hostname: "wopiserver.opencloud.test"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: opencloud-wildcard-tls
-            namespace: kube-system
-      allowedRoutes:
-        namespaces:
-          from: All
-```
-
-Apply the Gateway:
-
-```bash
-kubectl apply -f gateway.yaml
-```
-
-### Step 5: Configure DNS
+### Step 4: Configure DNS
 
 Configure your DNS to point to the Gateway IP address. You can use a wildcard DNS record or individual records for each service:
 
@@ -619,22 +548,20 @@ Alternatively, for local testing, you can add entries to your `/etc/hosts` file:
 192.168.178.77  wopiserver.opencloud.test
 ```
 
-### Step 6: Install OpenCloud
+### Step 5: Install OpenCloud
 
-Finally, install OpenCloud using Helm:
+Finally, install OpenCloud using Helm. This will create the necessary HTTPRoute
+and Gateway resources:
 
 ```bash
-# Clone the repository
-git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd opencloud-helm
-
-# Install OpenCloud
-helm install opencloud ./charts/opencloud \
+helm install opencloud oci://ghcr.io/opencloud-eu/helm-charts/opencloud \
+  --version 0.1.5 \
   --namespace opencloud \
   --create-namespace \
   --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
+  --set httpRoute.gateway.create=true \
+  --set httpRoute.gateway.className=cilium \
+  --set httpRoute.gateway.annotations."io\.cilium/lb-ipam-ips"="192.168.178.77"
 ```
 
 ### Troubleshooting

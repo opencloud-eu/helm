@@ -1,4 +1,4 @@
-{{- if and .Values.keycloak.enabled .Values.keycloak.internal.enabled }}
+{{- if .Values.keycloak.internal.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
