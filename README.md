@@ -96,7 +96,7 @@ A comprehensive OpenCloud deployment with all components:
 - Keycloak identity and access management
 - MinIO for S3-compatible object storage
 - API Gateway for routing and security
-- OnlyOffice for document editing
+- Collabora, OnlyOffice for document editing
 
 [View Full OpenCloud Chart Documentation](./charts/opencloud-full/README.md)
 
