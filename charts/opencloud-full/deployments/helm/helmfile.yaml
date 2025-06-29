@@ -33,10 +33,14 @@ releases:
             persistence:
               size: "40Gi"
       - onlyoffice:
-          enabled: true
+          enabled: false
           domain: onlyoffice.opencloud.test # Domain for OnlyOffice.
           persistence:
             size: "2Gi" # Added
+
+      - collabora:
+          enabled: true
+          domain: collabora.opencloud.test # Domain for Collabora.
 
       # --- Networking Configuration ---
       - ingress:
@@ -85,7 +89,7 @@ releases:
               officeSuites:
                 - name: Collabora
                   product: Collabora
-                  enabled: false
+                  enabled: true
                   uri: "https://collabora.opencloud.test"
                   insecure: true
                   disableProof: false
@@ -102,7 +106,7 @@ releases:
                           - wopi-collabora.kube.opencloud.test
                 - name: OnlyOffice
                   product: OnlyOffice
-                  enabled: true
+                  enabled: false
                   uri: "https://onlyoffice.opencloud.test"
                   insecure: true
                   disableProof: false

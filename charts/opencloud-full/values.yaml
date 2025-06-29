@@ -217,6 +217,7 @@ http:
       # -- frame-ancestors directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors
       frameAncestors:
         - "'self'"
+
       # @schema
       # type: array
       # items:
@@ -5865,7 +5866,7 @@ onlyoffice:
   # required: true
   # @schema
   # -- Enable OnlyOffice
-  enabled: true
+  enabled: false
   # @schema
   # type: string
   # required: true
@@ -6106,6 +6107,93 @@ onlyoffice:
               # @schema
               # -- Template
               template: "*.xml"
+              
+# Collabora configuration
+collabora:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Enable Collabora
+  enabled: true
+
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Domain for Collabora
+  domain: collabora.opencloud.test
+
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Collabora image repository
+  repository: collabora/code
+
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Collabora image tag
+  tag: latest
+
+  # SSL
+  ssl:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enable SSL for Collabora
+    enabled: false
+
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enable SSL certificate verification
+    verification: false
+
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+  # @schema
+  # type: object
+  # required: true
+  # @schema
+  # -- Resources allocation
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+  # @schema
+  # type: object
+  # required: true
+  # @schema
+  # -- Collabora admin credentials
+  admin:
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- Admin username
+    user: admin
+
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- Admin password
+    password: admin
+
 # Tika Search
 tika:
   # @schema

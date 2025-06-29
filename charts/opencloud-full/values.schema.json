@@ -12645,87 +12645,81 @@
     },
     "onlyoffice": {
       "additionalProperties": false,
+      "description": "OnlyOffice configuration",
       "properties": {
         "enabled": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false,
+          "description": "Enable OnlyOffice service"
         },
         "domain": {
-          "type": "string"
+          "type": "string",
+          "description": "Domain for OnlyOffice service"
         },
         "repository": {
-          "type": "string"
+          "type": "string",
+          "description": "Docker image repository"
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "description": "Docker image tag"
         },
         "pullPolicy": {
-          "type": "string"
+          "type": "string",
+          "description": "Image pull policy"
         },
         "wopi": {
+          "type": "object",
           "additionalProperties": false,
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true,
+              "description": "Enable WOPI integration"
             }
           },
-          "type": "object"
+          "required": []
         },
         "useUnauthorizedStorage": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true,
+          "description": "Use unauthorized storage"
         },
         "db": {
+          "type": "object",
           "additionalProperties": false,
           "properties": {
             "existingSecret": {
-              "type": "string"
+              "type": "string",
+              "description": "Existing secret for database credentials"
             },
             "secretKeyName": {
-              "type": "string"
+              "type": "string",
+              "description": "Secret key name for database password"
             }
           },
-          "type": "object"
+          "required": []
         },
         "persistence": {
+          "type": "object",
           "additionalProperties": false,
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true,
+              "description": "Enable persistence"
             },
             "size": {
-              "type": "string"
+              "type": "string",
+              "description": "Storage size"
             }
           },
-          "type": "object"
+          "required": []
         },
         "resources": {
-          "additionalProperties": false,
-          "properties": {
-            "requests": {
-              "additionalProperties": false,
-              "properties": {
-                "cpu": {
-                  "type": "string"
-                },
-                "memory": {
-                  "type": "string"
-                }
-              },
-              "type": "object"
-            },
-            "limits": {
-              "additionalProperties": false,
-              "properties": {
-                "cpu": {
-                  "type": "string"
-                },
-                "memory": {
-                  "type": "string"
-                }
-              },
-              "type": "object"
-            }
-          },
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Resource limits and requests"
         },
         "config": {
           "additionalProperties": false,
@@ -12752,6 +12746,7 @@
                       "type": "string"
                     }
                   },
+                  "required": [],
                   "type": "object"
                 },
                 "token": {
@@ -12770,12 +12765,14 @@
                               "type": "boolean"
                             }
                           },
+                          "required": [],
                           "type": "object"
                         },
                         "browser": {
                           "type": "boolean"
                         }
                       },
+                      "required": [],
                       "type": "object"
                     },
                     "inbox": {
@@ -12785,6 +12782,7 @@
                           "type": "string"
                         }
                       },
+                      "required": [],
                       "type": "object"
                     },
                     "outbox": {
@@ -12794,13 +12792,14 @@
                           "type": "string"
                         }
                       },
+                      "required": [],
                       "type": "object"
                     }
                   },
+                  "required": [],
                   "type": "object"
                 },
-                
-                 "secret": {
+                "secret": {
                   "additionalProperties": false,
                   "properties": {
                     "inbox": {
@@ -12813,9 +12812,11 @@
                       "type": "string"
                     }
                   },
+                  "required": [],
                   "type": "object"
                 }
               },
+              "required": [],
               "type": "object"
             },
             "rabbitmq": {
@@ -12825,6 +12826,7 @@
                   "type": "string"
                 }
               },
+              "required": [],
               "type": "object"
             },
             "fileConverter": {
@@ -12850,25 +12852,129 @@
                                 "type": "string"
                               }
                             },
+                            "required": [],
                             "type": "object"
                           }
                         },
+                        "required": [],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
+                  "required": [],
                   "type": "object"
                 }
               },
+              "required": [],
               "type": "object"
             }
           },
+          "required": [],
           "type": "object"
         }
       },
+      "required": [],
+      "title": "onlyoffice",
       "type": "object"
     },
+    "collabora": {
+        "additionalProperties": false,
+        "description": "Collabora configuration",
+        "title": "collabora",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable Collabora service"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Domain for Collabora service"
+          },
+          "repository": {
+            "type": "string",
+            "description": "Docker image repository"
+          },
+          "tag": {
+            "type": "string",
+            "description": "Docker image tag"
+          },
+          "pullPolicy": {
+            "type": "string",
+            "description": "Image pull policy"
+          },
+          "ssl": {
+            "type": "object",
+            "description": "SSL configuration for Collabora",
+            "additionalProperties": false,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Enable SSL for Collabora"
+              },
+              "verification": {
+                "type": "boolean",
+                "description": "Enable verification of SSL certificate"
+              }
+            },
+            "required": []
+          },
+          "admin": {
+            "type": "object",
+            "description": "Collabora admin credentials",
+            "additionalProperties": false,
+            "properties": {
+              "user": {
+                "type": "string",
+                "description": "Admin username"
+              },
+              "password": {
+                "type": "string",
+                "description": "Admin password"
+              }
+            },
+            "required": []
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Resources allocation",
+            "properties": {
+              "requests": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "cpu": {
+                    "type": "string"
+                  },
+                  "memory": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "cpu": {
+                    "type": "string"
+                  },
+                  "memory": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      },
+
     "tika": {
       "additionalProperties": false,
       "properties": {

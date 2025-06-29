@@ -98,6 +98,7 @@ Adds the app names to the scope and set the name of the app based on the input p
   {{- $_ := set .scope "appNameOcm" "ocm" -}}
   {{- $_ := set .scope "appNameOcs" "ocs" -}}
   {{- $_ := set .scope "appNameOnlyOffice" "onlyoffice" -}}
+  {{- $_ := set .scope "appNameCollabora" "collabora" -}}
   {{- $_ := set .scope "appNamePolicies" "policies" -}}
   {{- $_ := set .scope "appNamePostprocessing" "postprocessing" -}}
   {{- $_ := set .scope "appNameProxy" "proxy" -}}

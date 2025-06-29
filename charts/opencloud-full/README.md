@@ -110,7 +110,7 @@ You can install the Helm charts either directly from this Git repository or from
 git clone https://github.com/opencloud-eu/helm.git
 
 # Install Full Chart
-cd charts/opencloud-full/deployments
+cd charts/opencloud-full/deployments/helm
 helmfile sync
 ```
 You can also install it with timoni instead of helm:
