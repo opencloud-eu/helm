@@ -1,0 +1,3 @@
+{{- include "oc.basicServiceTemplates" (dict "scope" . "appName" "appNameProxy" "appNameSuffix" "") -}}
+{{- $_ := set . "autoscaling" (default (default (dict) .Values.autoscaling) .Values.services.proxy.autoscaling) -}}
+{{ include "oc.hpa" . }}
