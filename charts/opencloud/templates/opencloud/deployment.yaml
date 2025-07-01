@@ -151,6 +151,9 @@ spec:
             {{- if .Values.opencloud.nats.external.enabled }}
               {{- $exclude = append $exclude "nats" }}
             {{- end }}
+            {{- if .Values.ldap.internal.enabled }}
+              {{- $exclude = append $exclude "idm" }}
+            {{- end }}
             {{- if gt (len $exclude) 0 }}
             - name: OC_EXCLUDE_RUN_SERVICES
               value: {{ join "," $exclude | quote }}
@@ -237,6 +240,8 @@ spec:
               value: "true"
             - name: WEB_OIDC_CLIENT_ID
               value: {{ .Values.global.oidc.clientId | quote}}
+            # this is different from the compose setup, where the sub claim is used
+            # users must not change their username in the idp or they will no longer be able to access their data
             - name: PROXY_USER_OIDC_CLAIM
               value: "preferred_username"
             - name: PROXY_USER_CS3_CLAIM
@@ -260,6 +265,36 @@ spec:
             - name: WEB_OIDC_SCOPE
               value: "openid profile email groups roles"
             {{- end }}
+
+            {{- if .Values.ldap.internal.enabled }}
+            # opencloud manages the ldap server, it is considered writable
+            - name: OC_LDAP_URI
+              value: "ldap://{{ include "opencloud.openldap.fullname" . }}:1389"
+            - name: OC_LDAP_INSECURE
+              value: "true"
+            - name: OC_LDAP_BIND_DN
+              value: "cn=admin,dc=opencloud,dc=eu"
+
+            - name: OC_LDAP_BIND_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencloud.openldap.fullname" . }}
+                  key: adminPassword
+
+            - name: OC_LDAP_GROUP_BASE_DN
+              value: "ou=groups,dc=opencloud,dc=eu"
+            - name: OC_LDAP_USER_BASE_DN
+              value: "ou=users,dc=opencloud,dc=eu"
+            - name: OC_LDAP_USER_FILTER
+              value: "(objectclass=inetOrgPerson)"
+            # opencloud will roll an opencloudUUID for users and groups
+            - name: GRAPH_LDAP_SERVER_UUID
+              value: "false"
+            # usermanagement is done in keycloak, so we disable editing user properties in opencloud
+            - name: FRONTEND_READONLY_USER_ATTRIBUTES
+              value: "user.onPremisesSamAccountName,user.displayName,user.mail,user.passwordProfile,user.accountEnabled,user.appRoleAssignments"
+            {{- end }}
+
             # Admin user password
             - name: IDM_ADMIN_PASSWORD
               valueFrom:

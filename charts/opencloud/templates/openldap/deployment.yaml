@@ -1,0 +1,81 @@
+{{- if .Values.ldap.internal.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.openldap.fullname" . }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: openldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: openldap
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: openldap
+    spec:
+      containers:
+        - name: openldap
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.ldap.internal.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.ldap.internal.image.pullPolicy "global" .Values.global) }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE # see https://github.com/bitnami/containers/issues/40841
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: LDAP_ROOT
+              value: "dc=opencloud,dc=eu"
+            - name: LDAP_ADMIN_DN
+              value: "cn=admin,dc=opencloud,dc=eu"
+            - name: LDAP_ADMIN_USERNAME
+              value: "admin"
+            - name: LDAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ldap.internal.existingSecret | default (include "opencloud.openldap.fullname" .) }}
+                  key: adminPassword
+            - name: LDAP_CUSTOM_LDIF_DIR
+              value: "/custom-ldifs"
+          ports:
+            - name: ldap
+              containerPort: 1389
+            - name: ldaps
+              containerPort: 1636
+          volumeMounts:
+            - name: custom-ldif
+              mountPath: /schemas/10_opencloud_schema.ldif
+              subPath: 10_opencloud_schema.ldif
+            - name: custom-ldif
+              mountPath: /custom-ldifs/10_base.ldif
+              subPath: 10_base.ldif
+            #- name: custom-ldif
+            #  mountPath: /ldifs/20_admin.ldif
+            #  subPath: 20_admin.ldif
+            {{- if .Values.ldap.internal.persistence.enabled }}
+            - name: data
+              mountPath: /bitnami/openldap
+            {{- end }}
+          resources:
+            {{- toYaml .Values.ldap.internal.resources | nindent 12 }}
+      volumes:
+        - name: custom-ldif
+          configMap:
+            name: {{ include "opencloud.openldap.fullname" . }}-config
+        {{- if .Values.ldap.internal.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.openldap.fullname" . }}-data
+        {{- end }}
+{{- end }}

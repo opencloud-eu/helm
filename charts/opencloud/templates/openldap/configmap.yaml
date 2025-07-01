@@ -1,0 +1,14 @@
+{{- if .Values.ldap.internal.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.openldap.fullname" . }}-config
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: openldap
+data:
+  10_opencloud_schema.ldif: |-
+{{- .Files.Get "files/openldap/schemas/10_opencloud_schema.ldif" | nindent 4 }}
+  10_base.ldif: |-
+{{- .Files.Get "files/openldap/ldif/10_base.ldif" | nindent 4 }}
+{{- end }}

@@ -190,6 +190,50 @@ postgres:
     # Access mode
     accessMode: ReadWriteOnce
 
+# =====================================================================
+# IDENTITY MANAGEMENT (LDAP)
+# =====================================================================
+
+ldap:
+  internal:
+    # Enable OpenLDAP
+    enabled: false
+    # OpenLDAP image settings
+    image:
+      # OpenLDAP image registry
+      registry: docker.io
+      # OpenLDAP image repository
+      repository: bitnami/openldap
+      # OpenLDAP image tag
+      tag: "2.6"
+      # Image pull policy
+      pullPolicy: IfNotPresent
+
+    # Use existing secret for OpenLDAP credentials (Note: secretKeyName must be adminPassword)
+    existingSecret: ""
+
+    # Admin password
+    # ignored if ldap.internal.existingSecret is set
+    adminPassword: adminpass
+
+    # Persistence configuration
+    persistence:
+      enabled: true
+      # Size of the persistent volume
+      size: 1Gi
+      # Storage class
+      storageClass: ""
+      # Access mode
+      accessMode: ReadWriteOnce
+
+    # Resources allocation
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
 
 # =====================================================================
 # EXTENSIONS
