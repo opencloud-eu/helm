@@ -83,6 +83,13 @@ Create a fully qualified PostgreSQL name.
 {{- end }}
 
 {{/*
+Create a fully qualified OpenLDAP name.
+*/}}
+{{- define "opencloud.openldap.fullname" -}}
+{{- printf "%s-openldap" (include "opencloud.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
 Create a fully qualified MinIO name.
 */}}
 {{- define "opencloud.minio.fullname" -}}

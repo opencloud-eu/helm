@@ -362,6 +362,27 @@ keycloak:
 | `postgres.persistence.storageClass` | Storage class | `""` |
 | `postgres.persistence.accessMode` | Access mode | `ReadWriteOnce` |
 
+### LDAP Settings
+
+This chart optionally deploys an internal OpenLDAP server for identity management. When enabled it replaces the built in idm.
+
+| Parameter                                | Description                                                           | Default            |
+| ---------------------------------------- | --------------------------------------------------------------------- | ------------------ |
+| `ldap.internal.enabled`                  | Enable internal OpenLDAP server                                       | `false`            |
+| `ldap.internal.image.registry`           | OpenLDAP image registry                                               | `docker.io`        |
+| `ldap.internal.image.repository`         | OpenLDAP image repository                                             | `bitnami/openldap` |
+| `ldap.internal.image.tag`                | OpenLDAP image tag                                                    | `"2.6"`            |
+| `ldap.internal.image.pullPolicy`         | Image pull policy                                                     | `IfNotPresent`     |
+| `ldap.internal.existingSecret`           | Name of existing Kubernetes Secret (must contain key `adminPassword`) | `""`               |
+| `ldap.internal.adminPassword`            | Admin password (ignored if `existingSecret` is set)                   | `adminpass`        |
+| `ldap.internal.resources`                | CPU/Memory resource requests/limits                                   | See values.yaml    |
+| `ldap.internal.persistence.enabled`      | Enable persistence for OpenLDAP                                       | `true`             |
+| `ldap.internal.persistence.size`         | Size of the persistent volume                                         | `1Gi`              |
+| `ldap.internal.persistence.storageClass` | Storage class                                                         | `""`               |
+| `ldap.internal.persistence.accessMode`   | Access mode                                                           | `ReadWriteOnce`    |
+
+> 💡 If `ldap.internal.existingSecret` is set, it must contain a key named `adminPassword`.
+> If not set, a random password is generated during installation and stored in a Helm-managed secret. This secret uses the annotation `helm.sh/resource-policy: keep` to prevent it from being overwritten on upgrade.
 
 ### OnlyOffice Settings
 

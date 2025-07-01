@@ -1,0 +1,24 @@
+{{- if .Values.ldap.internal.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opencloud.openldap.fullname" . }}-data
+  annotations:
+    "helm.sh/resource-policy": "keep"
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: openldap
+spec:
+  accessModes:
+    - {{ .Values.ldap.internal.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.ldap.internal.persistence.size | quote }}
+  {{- if .Values.ldap.internal.persistence.storageClass }}
+  {{- if (eq "-" .Values.ldap.internal.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.ldap.internal.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}
