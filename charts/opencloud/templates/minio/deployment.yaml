@@ -49,9 +49,23 @@ spec:
           args: ["server", "--console-address", ":9001", "/data"]
           env:
             - name: MINIO_ROOT_USER
-              value: {{ .Values.opencloud.storage.s3.internal.rootUser | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.internal.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.minio.fullname" . }}
+                        {{- end }}
+                  key: rootUser
             - name: MINIO_ROOT_PASSWORD
-              value: {{ .Values.opencloud.storage.s3.internal.rootPassword | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.storage.s3.internal.existingSecret }}
+                          {{ .Values.opencloud.storage.s3.internal.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.minio.fullname" . }}
+                        {{- end }}
+                  key: rootPassword
           ports:
             - name: api
               containerPort: 9000

@@ -147,9 +147,13 @@ spec:
             - name: OC_ADD_RUN_SERVICES
               value: {{ join "," . | quote }}
             {{- end }}
-            {{- with .Values.opencloud.excludeServices }}
+            {{- $exclude := .Values.opencloud.excludeServices | default (list) }}
+            {{- if .Values.opencloud.nats.external.enabled }}
+              {{- $exclude = append $exclude "nats" }}
+            {{- end }}
+            {{- if gt (len $exclude) 0 }}
             - name: OC_EXCLUDE_RUN_SERVICES
-              value: {{ join "," . | quote }}
+              value: {{ join "," $exclude | quote }}
             {{- end }}
             # Do not use SSL between proxy and OpenCloud
             - name: PROXY_TLS
@@ -190,9 +194,23 @@ spec:
             - name: NOTIFICATIONS_SMTP_SENDER
               value: "{{ .Values.opencloud.smtp.sender | default (printf "OpenCloud notifications <notifications@%s>" (include "opencloud.domain" .)) }}"
             - name: NOTIFICATIONS_SMTP_USERNAME
-              value: "{{ .Values.opencloud.smtp.username }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
+                        {{- else }}
+                          opencloud-smtp
+                        {{- end }}
+                  key: smtpUser
             - name: NOTIFICATIONS_SMTP_PASSWORD
-              value: "{{ .Values.opencloud.smtp.password }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.smtp.existingSecret }}
+                          {{ .Values.opencloud.smtp.existingSecret }}
+                        {{- else }}
+                          opencloud-smtp
+                        {{- end }}
+                  key: smtpPassword
             - name: NOTIFICATIONS_SMTP_INSECURE
               value: {{ tpl (toString .Values.opencloud.smtp.insecure) . | quote }}
             - name: NOTIFICATIONS_SMTP_AUTHENTICATION
@@ -244,17 +262,48 @@ spec:
             {{- end }}
             # Admin user password
             - name: IDM_ADMIN_PASSWORD
-              value: {{ .Values.opencloud.adminPassword | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.opencloud.existingSecret }}
+                          {{ .Values.opencloud.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.opencloud.fullname" . }}
+                        {{- end }}
+                  key: adminPassword
             # Demo users
             - name: IDM_CREATE_DEMO_USERS
               value: {{ .Values.opencloud.createDemoUsers | quote }}
-            # Make the registry available to the app provider containers
+            {{- if .Values.opencloud.nats.external.enabled }}
+            # Use the external nats as the service registry
+            - name: MICRO_REGISTRY_ADDRESS
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            # Use the external nats as the cache and persistent store
+            - name: OC_CACHE_STORE_NODES
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            - name: OC_PERSISTENT_STORE_NODES
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            # Use the external nats as the messaging system
+            - name: OC_EVENTS_ENDPOINT
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            - name: OC_EVENTS_CLUSTER
+              value: {{ .Values.opencloud.nats.external.cluster | quote }}
+            - name: OC_EVENTS_ENABLE_TLS
+              value: {{ .Values.opencloud.nats.external.tls.enabled | quote }}
+            - name: OC_EVENTS_TLS_INSECURE
+              value: {{ .Values.opencloud.nats.external.tls.insecure | quote }}
+            {{- if not .Values.opencloud.nats.external.tls.certTrusted }}
+            - name: OC_EVENTS_TLS_ROOT_CA_CERTIFICATE
+              value: /etc/opencloud/nats-ca/ca.crt
+            {{- end }}
+            {{- else }}
             - name: MICRO_REGISTRY_ADDRESS
               value: "127.0.0.1:9233"
+            # Make the registry available to the app provider containers
             - name: NATS_NATS_HOST
               value: "0.0.0.0"
             - name: NATS_NATS_PORT
               value: "9233"
+            {{- end }}
             # CSP configuration
             - name: PROXY_CSP_CONFIG_FILE_LOCATION
               value: "/etc/opencloud/csp.yaml"
@@ -266,18 +315,47 @@ spec:
               value: "decomposed"
             
             # S3 storage configuration
+            {{- if .Values.opencloud.storage.s3.external.enabled }}
+            # External S3 storage
             - name: STORAGE_USERS_DECOMPOSEDS3_ENDPOINT
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.endpoint | quote }}{{ else }}"http://{{ include "opencloud.minio.fullname" . }}:9000"{{ end }}
+              value: {{ .Values.opencloud.storage.s3.external.endpoint | quote }}
             - name: STORAGE_USERS_DECOMPOSEDS3_REGION
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.region | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.region | default "default" | quote }}{{ end }}
-            - name: STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.accessKey | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.rootUser | quote }}{{ end }}
-            - name: STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.secretKey | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.rootPassword | quote }}{{ end }}
+              value: {{ .Values.opencloud.storage.s3.external.region | quote }}
             - name: STORAGE_USERS_DECOMPOSEDS3_BUCKET
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.bucket | quote }}{{ else }}{{ .Values.opencloud.storage.s3.internal.bucketName | quote }}{{ end }}
+              value: {{ .Values.opencloud.storage.s3.external.bucket | quote }}
             - name: STORAGE_USERS_DECOMPOSEDS3_CREATE_BUCKET
-              value: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.createBucket | default true | quote }}{{ else }}"true"{{ end }}
+              value: {{ .Values.opencloud.storage.s3.external.createBucket | default true | quote }}
+            - name: STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.storage.s3.external.existingSecret | default (printf "%s-s3" (include "opencloud.opencloud.fullname" .)) }}
+                  key: accessKey
+            - name: STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.storage.s3.external.existingSecret | default (printf "%s-s3" (include "opencloud.opencloud.fullname" .)) }}
+                  key: secretKey
+            {{- else }}
+            # Internal S3 (MinIO) storage
+            - name: STORAGE_USERS_DECOMPOSEDS3_ENDPOINT
+              value: {{ printf "http://%s:9000" (include "opencloud.minio.fullname" .) | quote }}
+            - name: STORAGE_USERS_DECOMPOSEDS3_REGION
+              value: {{ .Values.opencloud.storage.s3.internal.region | default "default" | quote }}
+            - name: STORAGE_USERS_DECOMPOSEDS3_BUCKET
+              value: {{ .Values.opencloud.storage.s3.internal.bucketName | quote }}
+            - name: STORAGE_USERS_DECOMPOSEDS3_CREATE_BUCKET
+              value: "true"
+            - name: STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.storage.s3.internal.existingSecret | default (include "opencloud.minio.fullname" .) }}
+                  key: rootUser
+            - name: STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.storage.s3.internal.existingSecret | default (include "opencloud.minio.fullname" .) }}
+                  key: rootPassword
+            {{- end }}
             {{- with .Values.opencloud.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -324,6 +402,11 @@ spec:
             - name: config-files
               mountPath: /etc/opencloud/banned-password-list.txt
               subPath: banned-password-list.txt
+            {{- if and (.Values.opencloud.nats.external.enabled) (not .Values.opencloud.nats.external.tls.certTrusted) }}
+            - name: nats-ca
+              mountPath: /etc/opencloud/nats-ca
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.opencloud.resources | nindent 12 }}
       volumes:
@@ -350,6 +433,11 @@ spec:
         - name: proxy-config
           configMap:
             name: {{ include "opencloud.opencloud.fullname" . }}-proxy-config
+        {{ if and (.Values.opencloud.nats.external.enabled) (not .Values.opencloud.nats.external.tls.certTrusted) }}
+        - name: nats-ca
+          secret:
+            secretName: {{ .Values.opencloud.nats.external.tls.caSecretName }}
+        {{ end }}
         {{- if .Values.webExtensions.enabled }}
         - name: extensions
           emptyDir: {}

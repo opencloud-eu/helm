@@ -39,11 +39,25 @@ spec:
             - name: DB_USER
               value: "{{ .Values.onlyoffice.config.coAuthoring.sql.dbUser | default "onlyoffice" }}"
             - name: JWT_SECRET
-              value: "{{ .Values.onlyoffice.config.coAuthoring.secret.session.string | default "B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu" }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.onlyoffice.config.coAuthoring.secret.existingSecret }}
+                          {{ .Values.onlyoffice.config.coAuthoring.secret.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.fullname" . }}-onlyoffice
+                        {{- end }}
+                  key: sessionSecret
             - name: JWT_HEADER
               value: "Authorization"
             - name: AMQP_URI
-              value: "{{ .Values.onlyoffice.config.rabbitmq.url | default "amqp://guest:guest@localhost" }}"
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.onlyoffice.config.rabbitmq.existingSecret }}
+                          {{ .Values.onlyoffice.config.rabbitmq.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.fullname" . }}-rabbitmq
+                        {{- end }}
+                  key: url
           ports:
             - containerPort: 80
               name: http

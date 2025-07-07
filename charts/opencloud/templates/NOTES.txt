@@ -14,8 +14,7 @@ IMPORTANT: This is a development deployment. For production use, you MUST change
 3. PostgreSQL: user: keycloak, password: keycloak
 4. MinIO: rootUser: opencloud, rootPassword: opencloud-secret-key
 5. OnlyOffice Database: sql.dbUser: onlyoffice, sql.dbPass: onlyoffice
-6. OnlyOffice Secret Keys: secret.inbox/outbox/session.string: B8LjkNqGxn6gf8bkuBUiMwyuCFwFddnu
-7. RabbitMQ: url: amqp://guest:guest@localhost
+6. RabbitMQ: url: amqp://guest:guest@localhost
 
 Using default credentials in production environments poses significant security risks.
 
@@ -29,12 +28,12 @@ The following services have been deployed:
    - S3 Storage: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.endpoint }}{{ else if .Values.opencloud.storage.s3.internal.enabled }}MinIO ({{ include "opencloud.minio.fullname" . }}){{ else }}Not configured{{ end }}
    - S3 Bucket: {{ if .Values.opencloud.storage.s3.external.enabled }}{{ .Values.opencloud.storage.s3.external.bucket }}{{ else if .Values.opencloud.storage.s3.internal.enabled }}{{ .Values.opencloud.storage.s3.internal.bucketName }}{{ else }}Not configured{{ end }}
 
-{{- if .Values.keycloak.enabled }}
+{{- if .Values.keycloak.internal.enabled }}
 2. Keycloak (Authentication):
    - Service: {{ include "opencloud.keycloak.fullname" . }}
    - Port: 8080
-   - Username: {{ .Values.keycloak.adminUser }}
-   - Password: {{ .Values.keycloak.adminPassword }}
+   - Username: {{ .Values.keycloak.internal.adminUser }}
+   - Password: {{ .Values.keycloak.internal.adminPassword }}
 {{- end }}
 
 {{- if .Values.opencloud.storage.s3.internal.enabled }}
@@ -61,7 +60,7 @@ All HTTPRoutes are configured to use the Gateway named "{{ .Values.httpRoute.gat
 
 Make sure the Gateway exists and is properly configured to accept traffic for the following domains:
 - OpenCloud: {{ include "opencloud.domain" . }} (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)
-{{- if .Values.keycloak.enabled }}
+{{- if .Values.keycloak.internal.enabled }}
 - Keycloak: {{ include "opencloud.keycloak.domain" . }} (Service: {{ include "opencloud.keycloak.fullname" . }}, Port: 8080)
 {{- end }}
 {{- if .Values.opencloud.storage.s3.internal.enabled }}
@@ -77,7 +76,7 @@ to expose these services externally.
 
 Example domains for your ingress configuration:
 - OpenCloud: {{ include "opencloud.domain" . }} (Service: {{ include "opencloud.opencloud.fullname" . }}, Port: 9200)
-{{- if .Values.keycloak.enabled }}
+{{- if .Values.keycloak.internal.enabled }}
 - Keycloak: {{ include "opencloud.keycloak.domain" . }} (Service: {{ include "opencloud.keycloak.fullname" . }}, Port: 8080)
 {{- end }}
 {{- if .Values.opencloud.storage.s3.internal.enabled }}

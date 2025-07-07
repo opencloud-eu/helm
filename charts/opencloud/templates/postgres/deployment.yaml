@@ -30,9 +30,23 @@ spec:
             - name: POSTGRES_DB
               value: {{ .Values.postgres.database | quote }}
             - name: POSTGRES_USER
-              value: {{ .Values.postgres.user | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.postgres.existingSecret }}
+                          {{ .Values.postgres.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.postgres.fullname" . }}
+                        {{- end }}
+                  key: username
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.postgres.password | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.postgres.existingSecret }}
+                          {{ .Values.postgres.existingSecret }}
+                        {{- else }}
+                          {{ include "opencloud.postgres.fullname" . }}
+                        {{- end }}
+                  key: password
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           ports:

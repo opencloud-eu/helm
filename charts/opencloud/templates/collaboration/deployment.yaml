@@ -68,8 +68,15 @@ spec:
               value: "0.0.0.0:9300"
             - name: MICRO_REGISTRY
               value: "nats-js-kv"
+            {{- if .Values.opencloud.nats.external.enabled }}
+            - name: OC_PERSISTENT_STORE_NODES
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            - name: MICRO_REGISTRY_ADDRESS
+              value: {{ .Values.opencloud.nats.external.endpoint | quote }}
+            {{- else }}
             - name: MICRO_REGISTRY_ADDRESS
               value: "{{ include "opencloud.opencloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:9233"
+            {{- end }}
             {{- if .Values.onlyoffice.enabled }}
             - name: COLLABORATION_WOPI_SRC
               # onlyoffice has to connect to the wopi server from the web

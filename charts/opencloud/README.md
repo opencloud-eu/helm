@@ -250,6 +250,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.logColor` | Enable log color | `false` |
 | `opencloud.logPretty` | Enable pretty logging | `false` |
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
+| `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
 | `opencloud.createDemoUsers` | Create demo users | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -261,12 +262,14 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.smtp.host` | SMTP host | `` |
 | `opencloud.smtp.port` | SMTP port | `587` |
 | `opencloud.smtp.sender` | SMTP sender | `` |
+| `opencloud.smtp.existingSecret` | Name of the existing secret | `` |
 | `opencloud.smtp.username` | SMTP username | `` |
 | `opencloud.smtp.password` | SMTP password | `` |
 | `opencloud.smtp.insecure` | SMTP insecure | `false` |
 | `opencloud.smtp.authentication` | SMTP authentication | `plain` |
 | `opencloud.smtp.encryption` | SMTP encryption | `starttls` |
 | `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
+| `opencloud.storage.s3.internal.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
 | `opencloud.storage.s3.internal.rootPassword` | MinIO root password | `opencloud-secret-key` |
 | `opencloud.storage.s3.internal.bucketName` | MinIO bucket name | `opencloud-bucket` |
@@ -279,10 +282,32 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.storage.s3.external.enabled` | Enable external S3 | `false` |
 | `opencloud.storage.s3.external.endpoint` | External S3 endpoint URL | `""` |
 | `opencloud.storage.s3.external.region` | External S3 region | `default` |
+| `opencloud.storage.s3.external.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.external.accessKey` | External S3 access key | `""` |
 | `opencloud.storage.s3.external.secretKey` | External S3 secret key | `""` |
 | `opencloud.storage.s3.external.bucket` | External S3 bucket | `""` |
 | `opencloud.storage.s3.external.createBucket` | Create bucket if it doesn't exist | `true` |
+
+### NATS Messaging Configuration
+
+| Parameter  | Description | Default |
+| ---------- | ----------- | ------- |
+| `opencloud.nats.external.enabled` | Use an external NATS server (required for high availability) | `false` |
+| `opencloud.nats.external.endpoint` | Endpoint of the external NATS server | `nats.opencloud-nats.svc.cluster.local:4222` |
+| `opencloud.nats.external.cluster` | NATS cluster name | `opencloud-cluster` |
+| `opencloud.nats.external.tls.enabled` | Enable TLS for communication with NATS | `false` |
+| `opencloud.nats.external.tls.certTrusted` | Set to `false` if the external NATS server's certificate is not trusted by default (e.g. self-signed) | `true` |
+| `opencloud.nats.external.tls.insecure` | Disable certificate validation (not recommended for production) | `false` |
+| `opencloud.nats.external.tls.caSecretName` | Name of the Kubernetes Secret containing the CA certificate (only required if `certTrusted` is `false`) | `opencloud-nats-ca` |
+
+> 💡 The secret referenced by `caSecretName` **must contain a key named `ca.crt`** with the root CA certificate used to verify the external NATS server.
+> Example:
+>
+> ```bash
+> kubectl create secret generic opencloud-nats-ca \
+>   --from-file=ca.crt=./path/to/nats-ca.pem \
+>   --namespace your-namespace
+> ```
 
 ### Keycloak Settings
 
@@ -297,6 +322,7 @@ By default the chart deploys an internal keycloak. It can be disabled and replac
 | `keycloak.internal.image.tag` | Keycloak image tag | `26.1.4` |
 | `keycloak.internal.image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `keycloak.internal.replicas` | Number of replicas | `1` |
+| `keycloak.internal.existingSecret` | Name of the existing secret | `` |
 | `keycloak.internal.adminUser` | Admin user | `admin` |
 | `keycloak.internal.adminPassword` | Admin password | `admin` |
 | `keycloak.internal.realm` | Realm name | `openCloud` |
@@ -327,6 +353,7 @@ keycloak:
 | --------- | ----------- | ------- |
 | `postgres.enabled` | Enable PostgreSQL | `true` |
 | `postgres.database` | Database name | `keycloak` |
+| `postgres.existingSecret` | Name of the existing secret | `` |
 | `postgres.user` | Database user | `keycloak` |
 | `postgres.password` | Database password | `keycloak` |
 | `postgres.resources` | CPU/Memory resource requests/limits | `{}` |
@@ -349,9 +376,8 @@ keycloak:
 | `onlyoffice.persistence.enabled` | Enable persistence | `true` |
 | `onlyoffice.persistence.size` | Size of the persistent volume | `2Gi` |
 | `onlyoffice.resources` | CPU/Memory resource requests/limits | `{}` |
-| `onlyoffice.config.coAuthoring.token.enable.request.inbox` | Enable token for incoming requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.request.outbox` | Enable token for outgoing requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
+| `onlyoffice.config.coAuthoring.secret.existingSecret` | Name of the existing secret | `` |
+| `onlyoffice.config.coAuthoring.secret.session.string` | Session string for onlyoffice | `` |
 | `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
 
 If you use Traefik and enable OnlyOffice, this chart will automatically create a `Middleware`
@@ -369,6 +395,7 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collabora.image.repository` | Collabora image repository | `collabora/code` |
 | `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
 | `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.existingSecret` | Name of the existing secret | `` |
 | `collabora.adminUser` | Admin user | `admin` |
 | `collabora.adminPassword` | Admin password | `admin` |
 | `collabora.ssl.enabled` | Enable SSL | `true` |
@@ -402,7 +429,7 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    - Port: 9200
    - Headers: Removes Permissions-Policy header to prevent browser console errors
 
-2. **Keycloak HTTPRoute** (when `keycloak.enabled` is `true`):
+2. **Keycloak HTTPRoute** (when `keycloak.internal.enabled` is `true`):
    - Hostname: `global.domain.keycloak`
    - Service: `{{ release-name }}-keycloak`
    - Port: 8080

@@ -13,10 +13,12 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if not .Values.opencloud.nats.external.enabled }}
     - port: 9233
       targetPort: 9233
       protocol: TCP
       name: nats
+    {{- end }}
   selector:
     {{- include "opencloud.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: opencloud
