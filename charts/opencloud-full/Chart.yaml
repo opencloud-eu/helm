@@ -14,6 +14,6 @@ version: 3.0.0
 appVersion: 3.0.0
 kubeVersion: ""
 sources:
+  - https://github.com/opencloud-eu/helm
   - https://github.com/opencloud-eu/opencloud
-  - https://github.com/owncloud/ocis
   - https://github.com/cs3org/reva
