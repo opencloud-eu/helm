@@ -2,13 +2,17 @@ name: Publish Helm charts to OCI Registry
 
 on:
   push:
-    branches:
-      - main
-    # Publish when a new tag is pushed
+    # Publish ONLY when a new tag is pushed (not on every main push)
     tags:
       - 'v*'
-  # Allow manual trigger
+  # Allow manual trigger with test suffix
   workflow_dispatch:
+    inputs:
+      version_suffix:
+        description: 'Version suffix for test builds (default: test)'
+        required: false
+        default: 'test'
+        type: string
 
 jobs:
   publish:
@@ -21,6 +25,49 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Check chart versions
+        run: |
+          echo "## Checking Chart Versions"
+          
+          # Get versions
+          PROD_VERSION=$(grep "^version:" charts/opencloud/Chart.yaml | awk '{print $2}')
+          DEV_VERSION=$(grep "^version:" charts/opencloud-dev/Chart.yaml | awk '{print $2}')
+          
+          echo "- opencloud: $PROD_VERSION"
+          echo "- opencloud-dev: $DEV_VERSION"
+          
+          # Basic semver check (x.y.z or x.y.z-prerelease format)
+          for version in "$PROD_VERSION" "$DEV_VERSION"; do
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+)?$ ]]; then
+              echo "❌ ERROR: Version '$version' is not valid semver"
+              exit 1
+            fi
+          done
+          
+          # Check tag consistency if this is a tag push
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            echo ""
+            echo "## Publishing for tag: v$TAG_VERSION"
+            
+            # Strict version check - at least one chart must match the tag
+            if [ "$PROD_VERSION" != "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
+              echo "❌ ERROR: Neither chart version matches the tag version"
+              echo "  - opencloud chart: $PROD_VERSION"
+              echo "  - opencloud-dev chart: $DEV_VERSION"
+              echo "  - Git tag: v$TAG_VERSION"
+              echo ""
+              echo "Please update Chart.yaml files to match the tag version before creating the release."
+              exit 1
+            elif [ "$PROD_VERSION" = "$TAG_VERSION" ] && [ "$DEV_VERSION" != "$TAG_VERSION" ]; then
+              echo "⚠️ Dev chart will be updated from $DEV_VERSION to $TAG_VERSION"
+            elif [ "$DEV_VERSION" = "$TAG_VERSION" ] && [ "$PROD_VERSION" != "$TAG_VERSION" ]; then
+              echo "⚠️ Production chart will be updated from $PROD_VERSION to $TAG_VERSION"
+            else
+              echo "✅ Both charts already at version $TAG_VERSION"
+            fi
+          fi
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
@@ -43,47 +90,65 @@ jobs:
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          # Default version for non-tag builds
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "CHARTS_VERSION=0.0.0-${GITHUB_SHA::8}" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          
+          # Version handling based on trigger type
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            # Tag push: use tag version for official releases
             echo "CHARTS_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+            echo "REGISTRY_NAMESPACE=helm-charts" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual trigger: use test version with separate namespace
+            CHART_VERSION=$(grep "^version:" charts/opencloud/Chart.yaml | awk '{print $2}')
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            echo "CHARTS_VERSION=${CHART_VERSION}-${{ inputs.version_suffix }}.${TIMESTAMP}" >> $GITHUB_ENV
+            echo "REGISTRY_NAMESPACE=helm-charts-test" >> $GITHUB_ENV
+            echo "⚠️ Manual build: Creating test version ${CHART_VERSION}-${{ inputs.version_suffix }}.${TIMESTAMP}"
           else
+            # Fallback (should not happen with current triggers)
             echo "CHARTS_VERSION=0.0.0-dev" >> $GITHUB_ENV
+            echo "REGISTRY_NAMESPACE=helm-charts-test" >> $GITHUB_ENV
           fi
 
       - name: Package and push OpenCloud chart
         run: |
-          # Update Chart.yaml version if we have a tag
+          # Update Chart.yaml version based on trigger type
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "Updating chart version to ${{ env.CHARTS_VERSION }}"
+            sed -i "s/^version:.*/version: ${{ env.CHARTS_VERSION }}/" charts/opencloud/Chart.yaml
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Updating chart version to ${{ env.CHARTS_VERSION }} for test build"
             sed -i "s/^version:.*/version: ${{ env.CHARTS_VERSION }}/" charts/opencloud/Chart.yaml
           fi
           
           # Package Helm chart
           helm package charts/opencloud
           
-          # Push to GHCR
-          helm push opencloud-*.tgz oci://ghcr.io/${{ github.repository_owner }}/helm-charts/
+          # Push to GHCR with appropriate namespace
+          echo "Pushing to oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/"
+          helm push opencloud-*.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/
           
           # Verify the pushed chart
           echo "Verifying the pushed chart..."
-          helm pull oci://ghcr.io/${{ github.repository_owner }}/helm-charts/opencloud --version $(helm show chart charts/opencloud | grep version | awk '{print $2}')
+          helm pull oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/opencloud --version $(helm show chart charts/opencloud | grep version | awk '{print $2}')
 
       - name: Package and push OpenCloud Dev chart
         run: |
-          # Update Chart.yaml version if we have a tag
+          # Update Chart.yaml version based on trigger type
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "Updating chart version to ${{ env.CHARTS_VERSION }}"
+            sed -i "s/^version:.*/version: ${{ env.CHARTS_VERSION }}/" charts/opencloud-dev/Chart.yaml
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Updating chart version to ${{ env.CHARTS_VERSION }} for test build"
             sed -i "s/^version:.*/version: ${{ env.CHARTS_VERSION }}/" charts/opencloud-dev/Chart.yaml
           fi
           
           # Package Helm chart
           helm package charts/opencloud-dev
           
-          # Push to GHCR
-          helm push opencloud-dev-*.tgz oci://ghcr.io/${{ github.repository_owner }}/helm-charts/
+          # Push to GHCR with appropriate namespace
+          echo "Pushing to oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/"
+          helm push opencloud-dev-*.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/
           
           # Verify the pushed chart
           echo "Verifying the pushed chart..."
-          helm pull oci://ghcr.io/${{ github.repository_owner }}/helm-charts/opencloud-dev --version $(helm show chart charts/opencloud-dev | grep version | awk '{print $2}')
+          helm pull oci://ghcr.io/${{ github.repository_owner }}/${{ env.REGISTRY_NAMESPACE }}/opencloud-dev --version $(helm show chart charts/opencloud-dev | grep version | awk '{print $2}')
