@@ -84,7 +84,7 @@ data:
   ###############################################################################
   COLLABORA_URI: "https://collabora.opencloud.test"
   COLLABORA_ICON_URI: "https://collabora.opencloud.test/favicon.ico"
-  COLLABORA_ENABLED: "false"
+  COLLABORA_ENABLED: "true"
   COLLABORA_INSECURE: "true"
   COLLABORA_DISABLE_PROOF: "false"
   COLLABORA_INGRESS_ENABLED: "false"
@@ -97,7 +97,7 @@ data:
   ONLYOFFICE_URI: "https://onlyoffice.opencloud.test"
   ONLYOFFICE_DOMAIN: "onlyoffice.opencloud.test"
   ONLYOFFICE_ICON_URI: "https://onlyoffice.opencloud.test/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
-  ONLYOFFICE_ENABLED: "true"
+  ONLYOFFICE_ENABLED: "false"
   ONLYOFFICE_INSECURE: "true"
   ONLYOFFICE_DISABLE_PROOF: "false"
   ONLYOFFICE_INGRESS_ENABLED: "false"
