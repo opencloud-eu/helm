@@ -9,9 +9,9 @@ maintainers:
     email: info@opencloud.eu
     url: https://opencloud.eu
 type: application
-version: 3.0.0
+version: 3.1.1
 # renovate: datasource=docker depName=opencloudeu/opencloud-rolling
-appVersion: 3.0.0
+appVersion: 3.1.0
 kubeVersion: ""
 sources:
   - https://github.com/opencloud-eu/helm

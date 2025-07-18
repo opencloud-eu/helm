@@ -2,6 +2,17 @@ bundle: {
     apiVersion: "v1alpha1"
     name:       "opencloud"
     instances: {
+        "service-account": {
+            module: url: "oci://ghcr.io/stefanprodan/modules/flux-tenant"
+            namespace: "opencloud"
+            values: {
+                role: "namespace-admin"
+                resourceQuota: {
+                    kustomizations: 100
+                    helmreleases:   100
+                }
+            }
+        },
         "opencloud": {
             module: {
                 url:     "oci://ghcr.io/stefanprodan/modules/flux-helm-release"
@@ -14,7 +25,7 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-full"
-                    version: "2.0.x"
+                    version: "*"
                 }
                 sync: {
                     timeout: 10
