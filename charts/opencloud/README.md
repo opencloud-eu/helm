@@ -280,8 +280,7 @@ global:
     issuer: "https://keycloak.example.com/realms/openCloud"
     clientId: "opencloud-web"
 
-# External S3 storage (recommended for HA)
-opencloud:
+  # External S3 storage (recommended for HA)
   storage:
     s3:
       internal:
@@ -304,7 +303,7 @@ For multiple replicas with RWX volumes, the following storage solutions are reco
 
 ### Important Notes
 
-- The `opencloud.replicas` description mentioning "persistence should be disabled" is misleading. You need RWX storage, not disabled persistence.
+- You need RWX storage or external S3 storage, not disabled persistence.
 - Each OpenCloud instance needs access to the same data, which requires either RWX volumes or external S3 storage.
 - The embedded NATS service will be automatically disabled when external NATS is configured.
 
