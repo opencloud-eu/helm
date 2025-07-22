@@ -485,7 +485,9 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister" : false,
   "webAuthnPolicyPasswordlessAcceptableAaguids" : [ ],
   "webAuthnPolicyPasswordlessExtraOrigins" : [ ],
-  "users" : [ {
+  "users" : [
+{{- if .Values.opencloud.createDemoUsers }}
+  {
     "id" : "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53",
     "username" : "admin",
     "firstName" : "Admin",
@@ -622,7 +624,9 @@
     "realmRoles" : [ "default-roles-opencloud", "opencloudUser" ],
     "notBefore" : 0,
     "groups" : [ "/bible-readers", "/users" ]
-  } ],
+  }
+{{- end }}
+  ],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
     "roles" : [ "offline_access" ]

@@ -252,7 +252,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
 | `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
-| `opencloud.createDemoUsers` | Create demo users | `false` |
+| `opencloud.createDemoUsers` | Create demo users in OpenCloud and Keycloak (alan, dennis, lynn, margaret, mary) | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
 | `opencloud.persistence.enabled` | Enable persistence | `true` |
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
