@@ -252,7 +252,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
 | `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
-| `opencloud.createDemoUsers` | Create demo users in OpenCloud and Keycloak (alan, dennis, lynn, margaret, mary) | `false` |
+| `opencloud.createDemoUsers` | Create demo users in OpenCloud and Keycloak (alan, dennis, lynn, margaret, mary). **WARNING**: Demo users have hardcoded passwords and should never be used in production! | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
 | `opencloud.persistence.enabled` | Enable persistence | `true` |
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
@@ -346,6 +346,29 @@ keycloak:
 ```
 
 **Note**: If `keycloak.internal.enabled` is `true`, the `global.oidc.issuer` should be left empty to not override the generated issuer URL.
+
+#### User Management
+
+When `opencloud.createDemoUsers` is set to `false` (default for production), you need to manually create users in Keycloak:
+
+1. **Access Keycloak Admin Console**:
+   - URL: `https://[your-keycloak-domain]/admin/`
+   - Login with Keycloak admin credentials (from `keycloak.internal.adminUser/adminPassword`)
+
+2. **Create Users in the openCloud Realm**:
+   - Switch to the "openCloud" realm (dropdown in top-left corner)
+   - Navigate to Users → Add User
+   - Create users and set passwords in the Credentials tab
+
+3. **Assign Roles**:
+   - Available roles in the openCloud realm:
+     - `opencloudAdmin` - Full administrative access
+     - `opencloudSpaceAdmin` - Space administration capabilities
+     - `opencloudUser` - Regular user access
+     - `opencloudGuest` - Guest access
+   - Assign roles in the Role Mappings tab for each user
+
+**WARNING**: The demo users (when `createDemoUsers: true`) have hardcoded passwords and should NEVER be used in production environments. They are intended for development and testing only.
 
 ### PostgreSQL Settings
 
