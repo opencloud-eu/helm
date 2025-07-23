@@ -486,7 +486,7 @@
   "webAuthnPolicyPasswordlessAcceptableAaguids" : [ ],
   "webAuthnPolicyPasswordlessExtraOrigins" : [ ],
   "users" : [
-{{- if .Values.opencloud.createDemoUsers }}
+{{- if .Values.opencloud.demoUsers.enabled }}
   {
     "id" : "0ab77e6d-23b4-4ba3-9843-a3b3efdcfc53",
     "username" : "admin",

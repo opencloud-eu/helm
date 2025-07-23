@@ -278,7 +278,7 @@ spec:
                   key: adminPassword
             # Demo users
             - name: IDM_CREATE_DEMO_USERS
-              value: {{ .Values.opencloud.createDemoUsers | quote }}
+              value: {{ .Values.opencloud.demoUsers.enabled | quote }}
             {{- if .Values.opencloud.nats.external.enabled }}
             # Use the external nats as the service registry
             - name: MICRO_REGISTRY_ADDRESS

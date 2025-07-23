@@ -252,7 +252,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
 | `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
-| `opencloud.createDemoUsers` | Create demo users in OpenCloud and Keycloak (alan, dennis, lynn, margaret, mary). **WARNING**: Demo users have hardcoded passwords and should never be used in production! | `false` |
+| `opencloud.demoUsers.enabled` | Create demo users in OpenCloud and Keycloak (alan, dennis, lynn, margaret, mary). **WARNING**: Demo users have hardcoded passwords and should never be used in production! | `false` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
 | `opencloud.persistence.enabled` | Enable persistence | `true` |
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
@@ -349,7 +349,7 @@ keycloak:
 
 #### User Management
 
-When `opencloud.createDemoUsers` is set to `false` (default for production), you need to manually create users in Keycloak:
+When `opencloud.demoUsers.enabled` is set to `false` (default for production), you need to manually create users in Keycloak:
 
 1. **Access Keycloak Admin Console**:
    - URL: `https://[your-keycloak-domain]/admin/`
@@ -368,7 +368,7 @@ When `opencloud.createDemoUsers` is set to `false` (default for production), you
      - `opencloudGuest` - Guest access
    - Assign roles in the Role Mappings tab for each user
 
-**WARNING**: The demo users (when `createDemoUsers: true`) have hardcoded passwords and should NEVER be used in production environments. They are intended for development and testing only.
+**WARNING**: The demo users (when `demoUsers.enabled: true`) have hardcoded passwords and should NEVER be used in production environments. They are intended for development and testing only.
 
 ### PostgreSQL Settings
 
