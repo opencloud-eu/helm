@@ -409,6 +409,40 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collaboration.enabled` | Enable collaboration service | `true` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
+## Ingress Configuration
+
+The chart supports standard Kubernetes Ingress resources to expose services externally.
+
+### Ingress Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `ingress.enabled` | Enable Ingress resources | `false` |
+| `ingress.ingressClassName` | Ingress class name (e.g., nginx, traefik) | `""` |
+| `ingress.annotationsPreset` | Preset for ingress annotations (see below) | `""` |
+| `ingress.annotations` | Custom annotations for all ingress resources | `{}` |
+
+#### Annotation Presets
+
+The `ingress.annotationsPreset` parameter provides pre-configured annotations for common ingress controllers:
+
+- **`nginx`**: Standard NGINX ingress with configuration snippets support
+- **`nginx-no-snippets`**: NGINX ingress for environments where snippets are disabled (uses headers instead)
+- **`traefik`**: Traefik ingress with middleware support
+- **`haproxy`**: HAProxy ingress
+- **`contour`**: Contour ingress
+- **`istio`**: Istio ingress
+
+For OnlyOffice, these presets automatically configure the required `X-Forwarded-Proto: https` header.
+
+**Example: Using NGINX in restricted environments**
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotationsPreset: nginx-no-snippets  # Avoids using configuration-snippet
+```
+
 ## Gateway API Configuration
 
 This chart includes HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.

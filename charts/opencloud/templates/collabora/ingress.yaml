@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: {{ include "opencloud.fullname" . }}-collabora
   annotations:
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- include "opencloud.ingress.annotations" (dict "preset" .Values.ingress.annotationsPreset "annotations" .Values.ingress.annotations "needsXForwardedProto" false "namespace" .Release.Namespace) | nindent 4 }}
 spec:
   {{- if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName | quote }}

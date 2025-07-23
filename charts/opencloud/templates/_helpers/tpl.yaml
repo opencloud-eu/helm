@@ -184,3 +184,31 @@ Return the appropriate apiVersion for ingress
 {{- print "networking.k8s.io/v1beta1" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Get ingress annotations based on preset
+Usage: include "opencloud.ingress.annotations" (dict "preset" .Values.ingress.annotationsPreset "annotations" .Values.ingress.annotations "needsXForwardedProto" true)
+*/}}
+{{- define "opencloud.ingress.annotations" -}}
+{{- $annotations := dict }}
+{{- if .annotations }}
+{{- $_ := mergeOverwrite $annotations .annotations }}
+{{- end }}
+{{- if and .needsXForwardedProto (eq .preset "nginx") }}
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/configuration-snippet" "more_set_headers \"X-Forwarded-Proto: https\";" }}
+{{- else if and .needsXForwardedProto (eq .preset "nginx-no-snippets") }}
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/use-forwarded-headers" "true" }}
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/forwarded-for-header" "X-Forwarded-For" }}
+{{- else if and .needsXForwardedProto (eq .preset "haproxy") }}
+  {{- $_ := set $annotations "haproxy.ingress.kubernetes.io/request-set-headers" "X-Forwarded-Proto https" }}
+{{- else if and .needsXForwardedProto (eq .preset "contour") }}
+  {{- $_ := set $annotations "projectcontour.io/request-add" "X-Forwarded-Proto: https" }}
+{{- else if and .needsXForwardedProto (eq .preset "istio") }}
+  {{- $_ := set $annotations "istio.io/request-headers" "X-Forwarded-Proto: https" }}
+{{- else if and .needsXForwardedProto (eq .preset "traefik") }}
+  {{- $_ := set $annotations "traefik.ingress.kubernetes.io/router.middlewares" (printf "%s-add-x-forwarded-proto-https@kubernetescrd" .namespace) }}
+{{- end }}
+{{- if $annotations }}
+{{- toYaml $annotations }}
+{{- end }}
+{{- end -}}
