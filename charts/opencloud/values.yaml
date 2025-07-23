@@ -435,7 +435,10 @@ opencloud:
   adminPassword: admin
   
   # Create demo users
-  createDemoUsers: false
+  # Demo users configuration
+  demoUsers:
+    # Enable demo users (WARNING: Only for development/testing, NOT for production!)
+    enabled: false
   # Additional services to start
   additionalServices: []
   # Services to exclude from starting
