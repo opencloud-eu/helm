@@ -223,7 +223,7 @@ Alternatively, you can set the environment variable:
 opencloud:
   env:
     - name: OC_EXCLUDE_RUN_SERVICES
-      value: "idp,idm"
+      value: "idp,idm,auth-basic"
 ```
 
 ### External NATS Configuration
@@ -256,6 +256,7 @@ opencloud:
   excludeServices:
     - "idp"
     - "idm"
+    - "auth-basic"  # Also exclude auth-basic to prevent LDAP cert lookup errors
   
   # Use RWX storage for shared access
   persistence:
@@ -280,7 +281,8 @@ global:
     issuer: "https://keycloak.example.com/realms/openCloud"
     clientId: "opencloud-web"
 
-  # External S3 storage (recommended for HA)
+# External S3 storage (recommended for HA)
+opencloud:
   storage:
     s3:
       internal:
@@ -303,9 +305,10 @@ For multiple replicas with RWX volumes, the following storage solutions are reco
 
 ### Important Notes
 
-- You need RWX storage or external S3 storage, not disabled persistence.
-- Each OpenCloud instance needs access to the same data, which requires either RWX volumes or external S3 storage.
+- For HA deployments, you need BOTH RWX storage (for OpenCloud metadata) AND external S3 storage (for file data).
+- Each OpenCloud instance needs access to the same data and metadata.
 - The embedded NATS service will be automatically disabled when external NATS is configured.
+- The auth-basic service should be excluded to prevent LDAP certificate lookup errors when using external authentication.
 
 For more details on this limitation, see [issue #53](https://github.com/opencloud-eu/helm/issues/53).
 
