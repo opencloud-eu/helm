@@ -2,6 +2,14 @@
 
 This file lists the maintainers and reviewers for the OpenCloud Helm Charts repository.
 
+## Roles
+
+### Maintainers
+Maintainers have the ability to merge PRs, create releases, and guide the overall direction of the project.
+
+### Reviewers
+Reviewers have the ability to review PRs and approve them, but do not have merge access.
+
 ## Team Members
 
 | Member | Role | Permissions | Known Platforms/Environments |
