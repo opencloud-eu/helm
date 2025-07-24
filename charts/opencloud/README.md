@@ -427,7 +427,7 @@ The chart supports standard Kubernetes Ingress resources to expose services exte
 The `ingress.annotationsPreset` parameter provides pre-configured annotations for common ingress controllers:
 
 - **`nginx`**: Standard NGINX ingress with configuration snippets support
-- **`nginx-no-snippets`**: NGINX ingress for environments where snippets are disabled (uses headers instead)
+- **`nginx-no-snippets`**: NGINX ingress for environments where snippets are disabled (see note below)
 - **`traefik`**: Traefik ingress with middleware support
 - **`haproxy`**: HAProxy ingress
 - **`contour`**: Contour ingress
@@ -435,12 +435,22 @@ The `ingress.annotationsPreset` parameter provides pre-configured annotations fo
 
 For OnlyOffice, these presets automatically configure the required `X-Forwarded-Proto: https` header.
 
+**Note about `nginx-no-snippets`**: This preset uses `use-forwarded-headers: "true"` which tells NGINX to trust X-Forwarded-* headers from upstream proxies/load balancers. It does NOT directly set the X-Forwarded-Proto header. This preset is designed for:
+- Cloud environments where SSL termination happens at the load balancer level
+- Environments where configuration snippets are forbidden by security policies
+- Setups where the infrastructure already provides correct X-Forwarded-* headers
+
+If your environment requires explicit X-Forwarded-Proto header setting without snippets, consider:
+1. Configuring it globally in the nginx-ingress ConfigMap
+2. Using a different ingress controller
+3. Handling SSL termination at the load balancer level
+
 **Example: Using NGINX in restricted environments**
 ```yaml
 ingress:
   enabled: true
   ingressClassName: nginx
-  annotationsPreset: nginx-no-snippets  # Avoids using configuration-snippet
+  annotationsPreset: nginx-no-snippets  # For environments that forbid snippets
 ```
 
 ## Gateway API Configuration

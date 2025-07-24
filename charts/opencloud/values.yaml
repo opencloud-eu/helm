@@ -676,6 +676,9 @@ ingress:
   # Set 'annotationsPreset' to inject known ingress-controller-specific annotations
   # for injecting the header. Supported values: nginx, nginx-no-snippets, traefik, haproxy, contour, istio
   #
+  # Note: nginx-no-snippets uses 'use-forwarded-headers' which trusts upstream X-Forwarded-* headers
+  # but does NOT directly set them. Use this preset only when your load balancer sets these headers.
+  #
   # If set to "traefik" and OnlyOffice is enabled, the chart will create a Middleware
   # named 'add-x-forwarded-proto-https' for use in both Ingress and Gateway HTTPRoute.
   #
