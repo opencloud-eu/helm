@@ -303,128 +303,519 @@ The following sections outline the main configuration parameters for the microse
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `externalDomain` | Domain where OC is reachable for the outside world | `cloud.opencloud.test` |
-| `ingress.enabled` | Enables the Ingress | `false` |
-| `gateway.httproute.enabled` | Enable HTTPRoutes | `false` |
-| `gateway.httproute.gateway.name` | Gateway name | `cilium-gateway` |
-| `gateway.httproute.gateway.namespace` | Gateway namespace | `kube-system` |
-| `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
-| `global.tls.secretName` | Secret name for TLS certificate | `""` |
-| `services.*.persistence.storageClassName` | Storage class for persistent volumes (per service) | `""` |
-
-### Image Settings
-
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
 | `image.repository` | OpenCloud image repository | `opencloudeu/opencloud-rolling` |
-| `image.tag` | OpenCloud image tag | `latest` |
+| `image.tag` | OpenCloud image tag | `""` (uses chart appVersion) |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `image.pullSecrets` | Image pull secrets | `[]` |
+| `image.sha` | Image sha / digest | `""` |
+| `initContainerImage.repository` | Init container image repository | `busybox` |
+| `initContainerImage.tag` | Init container image tag | `stable` |
+| `initContainerImage.pullPolicy` | Init container pull policy | `IfNotPresent` |
+| `initContainerImage.sha` | Init container image sha / digest | `""` |
 
-### OpenCloud Settings
+### Logging Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `opencloud.enabled` | Enable OpenCloud | `true` |
-| `opencloud.replicas` | Number of replicas (Note: When using multiple replicas, persistence should be disabled or use a storage class that supports ReadWriteMany access mode) | `1` |
-| `opencloud.logLevel` | Log level | `info` |
-| `opencloud.logColor` | Enable log color | `false` |
-| `opencloud.logPretty` | Enable pretty logging | `false` |
-| `opencloud.insecure` | Insecure mode (for self-signed certificates) | `true` |
-| `opencloud.enableBasicAuth` | Enable basic auth | `false` |
-| `opencloud.adminPassword` | Admin password | `admin` |
-| `opencloud.createDemoUsers` | Create demo users | `false` |
-| `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
-| `opencloud.persistence.enabled` | Enable persistence | `true` |
-| `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
-| `opencloud.persistence.storageClass` | Storage class | `""` |
-| `opencloud.persistence.accessMode` | Access mode | `ReadWriteOnce` |
-| `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
-| `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
-| `opencloud.storage.s3.internal.rootPassword` | MinIO root password | `opencloud-secret-key` |
-| `opencloud.storage.s3.internal.bucketName` | MinIO bucket name | `opencloud-bucket` |
-| `opencloud.storage.s3.internal.region` | MinIO region | `default` |
-| `opencloud.storage.s3.internal.resources` | CPU/Memory resource requests/limits | See values.yaml |
-| `opencloud.storage.s3.internal.persistence.enabled` | Enable MinIO persistence | `true` |
-| `opencloud.storage.s3.internal.persistence.size` | Size of the MinIO persistent volume | `30Gi` |
-| `opencloud.storage.s3.internal.persistence.storageClass` | MinIO storage class | `""` |
-| `opencloud.storage.s3.internal.persistence.accessMode` | MinIO access mode | `ReadWriteOnce` |
-| `opencloud.storage.s3.external.enabled` | Enable external S3 | `false` |
-| `opencloud.storage.s3.external.endpoint` | External S3 endpoint URL | `""` |
-| `opencloud.storage.s3.external.region` | External S3 region | `default` |
-| `opencloud.storage.s3.external.accessKey` | External S3 access key | `""` |
-| `opencloud.storage.s3.external.secretKey` | External S3 secret key | `""` |
-| `opencloud.storage.s3.external.bucket` | External S3 bucket | `""` |
-| `opencloud.storage.s3.external.createBucket` | Create bucket if it doesn't exist | `true` |
+| `logging.level` | Log level (panic, fatal, error, warn, info, debug, trace) | `info` |
+| `logging.pretty` | Enable pretty log output | `false` |
+| `logging.color` | Enable colorized log output | `false` |
+
+### Tracing Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `tracing.enabled` | Enable tracing | `false` |
+| `tracing.type` | Trace provider type | `jaeger` |
+| `tracing.endpoint` | Tracing system endpoint | `""` |
+| `tracing.collector` | HTTP endpoint for sending spans | `""` |
+
+### HTTP Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `http.cors.allow_origins` | List of allowed CORS origins | `[]` |
+| `http.csp.directives.childSrc` | CSP child-src directive values | `["'self'"]` |
+| `http.csp.directives.connectSrc` | CSP connect-src directive values | `["'self'", "blob:", "https://${COMPANION_DOMAIN|companion.opencloud.test}/", "wss://${COMPANION_DOMAIN|companion.opencloud.test}/", "https://raw.githubusercontent.com/opencloud-eu/awesome-apps/", "https://${KEYCLOAK_DOMAIN|keycloak.opencloud.test}/"]` |
+| `http.csp.directives.defaultSrc` | CSP default-src directive values | `["'none'"]` |
+| `http.csp.directives.fontSrc` | CSP font-src directive values | `["'self'"]` |
+| `http.csp.directives.frameAncestors` | CSP frame-ancestors directive values | `["'self'"]` |
+| `http.csp.directives.frameSrc` | CSP frame-src directive values | `["'self'", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.imgSrc` | CSP img-src directive values | `["'self'", "data:", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.manifestSrc` | CSP manifest-src directive values | `["'self'"]` |
+| `http.csp.directives.mediaSrc` | CSP media-src directive values | `["'self'"]` |
+| `http.csp.directives.objectSrc` | CSP object-src directive values | `["'self'", "blob:"]` |
+| `http.csp.directives.scriptSrc` | CSP script-src directive values | `["'self'", "'unsafe-inline'", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.styleSrc` | CSP style-src directive values | `["'self'", "'unsafe-inline'", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.workerSrc` | CSP worker-src directive values | `["'self'", "blob:"]` |
 
 ### Keycloak Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `keycloak.enabled` | Enable Keycloak | `true` |
-| `keycloak.replicas` | Number of replicas | `1` |
-| `keycloak.adminUser` | Admin user | `admin` |
-| `keycloak.adminPassword` | Admin password | `admin` |
-| `keycloak.resources` | CPU/Memory resource requests/limits | `{}` |
-| `keycloak.realm` | Realm name | `openCloud` |
-| `keycloak.persistence.enabled` | Enable persistence | `true` |
-| `keycloak.persistence.size` | Size of the persistent volume | `1Gi` |
-| `keycloak.persistence.storageClass` | Storage class | `""` |
-| `keycloak.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `keycloak.domain` | Keycloak domain | `keycloak.opencloud.test` |
+| `keycloak.roleAssignmentDriver` | OIDC role assignment driver | `oidc` |
+| `keycloak.oidcIssuer` | OIDC issuer URL | `""` |
+| `keycloak.webOidcClientId` | Web OIDC client ID | `web` |
+| `keycloak.adminUserId` | Admin user ID | `""` |
+| `keycloak.roleAssignmentOidcClaim` | OIDC role assignment claim | `roles` |
+| `keycloak.webOidcMetadataUrl` | Web OIDC metadata URL | `""` |
+| `keycloak.webOidcScope` | Web OIDC scope | `openid profile email groups` |
+| `keycloak.image.registry` | Keycloak image registry | `quay.io` |
+| `keycloak.image.repository` | Keycloak image repository | `keycloak/keycloak` |
+| `keycloak.image.tag` | Keycloak image tag | `25.0.0` |
+| `keycloak.postgresql.host` | PostgreSQL host | `keycloak-postgresql` |
+| `keycloak.postgresql.port` | PostgreSQL port | `5432` |
+| `keycloak.postgresql.database` | PostgreSQL database | `keycloak` |
+| `keycloak.postgresql.username` | PostgreSQL username | `keycloak` |
+| `keycloak.postgresql.password` | PostgreSQL password | `keycloak` |
+| `keycloak.postgresql.version` | PostgreSQL version | `14` |
+| `keycloak.config.adminUser` | Keycloak admin username | `admin` |
+| `keycloak.config.adminPassword` | Keycloak admin password | `admin` |
+| `keycloak.config.realm` | Keycloak realm | `openCloud` |
+| `keycloak.config.clientId` | Keycloak client ID | `web` |
 
-### PostgreSQL Settings
+### MinIO Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `postgres.enabled` | Enable PostgreSQL | `true` |
-| `postgres.database` | Database name | `keycloak` |
-| `postgres.user` | Database user | `keycloak` |
-| `postgres.password` | Database password | `keycloak` |
-| `postgres.resources` | CPU/Memory resource requests/limits | `{}` |
-| `postgres.persistence.enabled` | Enable persistence | `true` |
-| `postgres.persistence.size` | Size of the persistent volume | `1Gi` |
-| `postgres.persistence.storageClass` | Storage class | `""` |
-| `postgres.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `minio.enabled` | Enable MinIO | `true` |
+| `minio.domain` | MinIO domain | `minio.opencloud.test` |
+| `minio.version` | MinIO chart version | `5.4.0` |
+| `minio.image.registry` | MinIO image registry | `docker.io` |
+| `minio.image.repository` | MinIO image repository | `minio/minio` |
+| `minio.image.tag` | MinIO image tag | `latest` |
+| `minio.config.mode` | MinIO mode (standalone or distributed) | `
 
+### MinIO Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `minio.enabled` | Enable MinIO | `true` |
+| `minio.domain` | MinIO domain | `minio.opencloud.test` |
+| `minio.version` | MinIO chart version | `5.4.0` |
+| `minio.image.registry` | MinIO image registry | `docker.io` |
+| `minio.image.repository` | MinIO image repository | `minio/minio` |
+| `minio.image.tag` | MinIO image tag | `latest` |
+| `minio.config.mode` | MinIO mode (standalone or distributed) | `standalone` |
+| `minio.config.rootUser` | MinIO root user | `opencloud` |
+| `minio.config.rootPassword` | MinIO root password | `opencloud-secret-key` |
+| `minio.persistence.enabled` | Enable persistence | `true` |
+| `minio.persistence.size` | Size of the persistent volume | `10Gi` |
+| `minio.persistence.storageClass` | Storage class | `""` |
+| `minio.resources` | CPU/Memory resource requests/limits | `{}` |
+
+### Tika Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `tika.enabled` | Enable Tika | `true` |
+| `tika.replicas` | Number of replicas | `1` |
+| `tika.image.repository` | Tika image repository | `apache/tika` |
+| `tika.image.tag` | Tika image tag | `2.9.2.1` |
+| `tika.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `tika.resources` | CPU/Memory resource requests/limits | `{}` |
+
+### NATS Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `nats.enabled` | Enable NATS | `true` |
+| `nats.replicas` | Number of replicas | `1` |
+| `nats.image.repository` | NATS image repository | `nats` |
+| `nats.image.tag` | NATS image tag | `2.10.18-alpine` |
+| `nats.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `nats.resources` | CPU/Memory resource requests/limits | `{}` |
+
+### Individual Service Settings
+
+Each OpenCloud service can be individually configured. The following parameters apply to most services:
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `<service>.enabled` | Enable the service | varies by service |
+| `<service>.replicas` | Number of replicas | `1` |
+| `<service>.image.repository` | Service image repository | uses global image |
+| `<service>.image.tag` | Service image tag | uses global image |
+| `<service>.image.pullPolicy` | Service image pull policy | uses global image |
+| `<service>.resources` | CPU/Memory resource requests/limits | `{}` |
+| `<service>.nodeSelector` | Node selector for pod placement | `{}` |
+| `<service>.tolerations` | Tolerations for pod placement | `[]` |
+| `<service>.affinity` | Affinity rules for pod placement | `{}` |
+| `<service>.podAnnotations` | Annotations for pods | `{}` |
+| `<service>.podLabels` | Labels for pods | `{}` |
+| `<service>.persistence.enabled` | Enable persistence | `false` |
+| `<service>.persistence.size` | Size of persistent volume | `1Gi` |
+| `<service>.persistence.storageClass` | Storage class | `""` |
+| `<service>.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+
+#### Activitylog Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `activitylog.enabled` | Enable activitylog service | `true` |
+| `activitylog.replicas` | Number of replicas | `1` |
+
+#### Antivirus Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `antivirus.enabled` | Enable antivirus service | `true` |
+| `antivirus.replicas` | Number of replicas | `1` |
+
+#### Appregistry Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `appregistry.enabled` | Enable appregistry service | `true` |
+| `appregistry.replicas` | Number of replicas | `1` |
+
+#### Audit Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `audit.enabled` | Enable audit service | `true` |
+| `audit.replicas` | Number of replicas | `1` |
+
+#### Auth-app Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `authapp.enabled` | Enable auth-app service | `true` |
+| `authapp.replicas` | Number of replicas | `1` |
+
+#### Auth-machine Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `authmachine.enabled` | Enable auth-machine service | `true` |
+| `authmachine.replicas` | Number of replicas | `1` |
+
+#### Auth-service Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `authservice.enabled` | Enable auth-service | `true` |
+| `authservice.replicas` | Number of replicas | `1` |
+
+#### Clientlog Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `clientlog.enabled` | Enable clientlog service | `true` |
+| `clientlog.replicas` | Number of replicas | `1` |
+
+#### Collabora Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `collabora.enabled` | Enable Collabora | `true` |
+| `collabora.replicas` | Number of replicas | `1` |
+| `collabora.image.repository` | Collabora image repository | `collabora/code` |
+| `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
+| `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.config.username` | Admin username | `admin` |
+| `collabora.config.password` | Admin password | `admin` |
+| `collabora.config.server_name` | Server name | `collaboration.opencloud.test` |
+| `collabora.config.dictionaries` | Enabled dictionaries | `de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru` |
+| `collabora.config.extra_params` | Extra configuration parameters | `""` |
+
+#### Collaboration Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `collaboration.enabled` | Enable collaboration service | `true` |
+| `collaboration.replicas` | Number of replicas | `1` |
+| `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
+
+#### Eventhistory Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `eventhistory.enabled` | Enable eventhistory service | `true` |
+| `eventhistory.replicas` | Number of replicas | `1` |
+
+#### Frontend Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `frontend.enabled` | Enable frontend service | `true` |
+| `frontend.replicas` | Number of replicas | `1` |
+
+#### Graph Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `graph.enabled` | Enable graph service | `true` |
+| `graph.replicas` | Number of replicas | `1` |
+
+#### Groups Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `groups.enabled` | Enable groups service | `true` |
+| `groups.replicas` | Number of replicas | `1` |
+
+#### IDM Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `idm.enabled` | Enable IDM service | `true` |
+| `idm.replicas` | Number of replicas | `1` |
+
+#### IDP Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `idp.enabled` | Enable IDP service | `true` |
+| `idp.replicas` | Number of replicas | `1` |
+
+#### Notifications Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `notifications.enabled` | Enable notifications service | `true` |
+| `notifications.replicas` | Number of replicas | `1` |
+
+#### OCDAV Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `ocdav.enabled` | Enable ocdav service | `true` |
+| `ocdav.replicas` | Number of replicas | `1` |
+
+#### OCM Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `ocm.enabled` | Enable ocm service | `true` |
+| `ocm.replicas` | Number of replicas | `1` |
+
+#### OCS Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `ocs.enabled` | Enable ocs service | `true` |
+| `ocs.replicas` | Number of replicas | `1` |
+
+#### Policies Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `policies.enabled` | Enable policies service | `true` |
+| `policies.replicas` | Number of replicas | `1` |
+
+#### Postprocessing Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `postprocessing.enabled` | Enable postprocessing service | `true` |
+| `postprocessing.replicas` | Number of replicas | `1` |
+
+#### Proxy Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `proxy.enabled` | Enable proxy service | `true` |
+| `proxy.replicas` | Number of replicas | `1` |
+
+#### Search Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `search.enabled` | Enable search service | `true` |
+| `search.replicas` | Number of replicas | `1` |
+
+#### Settings Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `settings.enabled` | Enable settings service | `true` |
+| `settings.replicas` | Number of replicas | `1` |
+
+#### Sharing Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `sharing.enabled` | Enable sharing service | `true` |
+| `sharing.replicas` | Number of replicas | `1` |
+
+#### SSE Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `sse.enabled` | Enable sse service | `true` |
+| `sse.replicas` | Number of replicas | `1` |
+
+#### Storagepubliclink Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `storagepubliclink.enabled` | Enable storagepubliclink service | `true` |
+| `storagepubliclink.replicas` | Number of replicas | `1` |
+
+#### Storageshares Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `storageshares.enabled` | Enable storageshares service | `true` |
+| `storageshares.replicas` | Number of replicas | `1` |
+
+#### Storagesystem Service
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `storagesystem.enabled` | Enable storagesystem service | `true` |
+| `storagesystem.replicas` | Number of replicas | `1` |
+
+#### Storageusers Service
+| Parameter | Description | Default |
+| --------- |
+
+
+### Global Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `image.repository` | OpenCloud image repository | `opencloudeu/opencloud-rolling` |
+| `image.tag` | OpenCloud image tag | `""` (uses chart appVersion) |
+| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `image.pullSecrets` | Image pull secrets | `[]` |
+| `image.sha` | Image sha / digest | `""` |
+| `externalDomain` | Domain where OpenCloud is reachable | `cloud.opencloud.test` |
+
+### Logging Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `logging.level` | Log level (panic, fatal, error, warn, info, debug, trace) | `info` |
+| `logging.pretty` | Enable pretty log output | `false` |
+| `logging.color` | Enable colorized log output | `false` |
+
+### Tracing Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `tracing.enabled` | Enable tracing | `false` |
+| `tracing.type` | Trace provider type | `jaeger` |
+| `tracing.endpoint` | Tracing system endpoint | `""` |
+| `tracing.collector` | HTTP endpoint for sending spans | `""` |
+
+### HTTP Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `http.cors.allow_origins` | List of allowed CORS origins | `[]` |
+| `http.csp.directives.childSrc` | CSP child-src directive values | `["'self'"]` |
+| `http.csp.directives.connectSrc` | CSP connect-src directive values | `["'self'", "blob:", "https://${COMPANION_DOMAIN|companion.opencloud.test}/", "wss://${COMPANION_DOMAIN|companion.opencloud.test}/", "https://raw.githubusercontent.com/opencloud-eu/awesome-apps/", "https://${KEYCLOAK_DOMAIN|keycloak.opencloud.test}/"]` |
+| `http.csp.directives.defaultSrc` | CSP default-src directive values | `["'none'"]` |
+| `http.csp.directives.fontSrc` | CSP font-src directive values | `["'self'"]` |
+| `http.csp.directives.frameAncestors` | CSP frame-ancestors directive values | `["'self'"]` |
+| `http.csp.directives.frameSrc` | CSP frame-src directive values | `["'self'", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.imgSrc` | CSP img-src directive values | `["'self'", "data:", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.manifestSrc` | CSP manifest-src directive values | `["'self'"]` |
+| `http.csp.directives.mediaSrc` | CSP media-src directive values | `["'self'"]` |
+| `http.csp.directives.objectSrc` | CSP object-src directive values | `["'self'", "blob:"]` |
+| `http.csp.directives.scriptSrc` | CSP script-src directive values | `["'self'", "'unsafe-inline'", "blob:", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.styleSrc` | CSP style-src directive values | `["'self'", "'unsafe-inline'", "https://${ONLYOFFICE_DOMAIN|onlyoffice.opencloud.test}/", "https://${COLLABORA_DOMAIN|collabora.opencloud.test}/"]` |
+| `http.csp.directives.workerSrc` | CSP worker-src directive values | `["'self'", "blob:"]` |
+
+### Messaging System Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `messagingSystem.external.enabled` | Use external NATS | `false` |
+| `messagingSystem.external.endpoint` | External NATS endpoint | `""` |
+| `messagingSystem.external.cluster` | External NATS cluster | `""` |
+| `messagingSystem.external.tls.enabled` | Enable TLS for external NATS | `true` |
+| `messagingSystem.external.tls.certTrusted` | Trust external NATS certificate | `true` |
+| `messagingSystem.external.tls.insecure` | Allow insecure TLS | `false` |
+
+### Keycloak Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `keycloak.enabled` | Enable Keycloak | `true` |
+| `keycloak.domain` | Keycloak domain | `keycloak.opencloud.test` |
+| `keycloak.roleAssignmentDriver` | OIDC role assignment driver | `oidc` |
+| `keycloak.oidcIssuer` | OIDC issuer URL | `""` |
+| `keycloak.webOidcClientId` | Web OIDC client ID | `web` |
+| `keycloak.adminUserId` | Admin user ID | `""` |
+| `keycloak.roleAssignmentOidcClaim` | OIDC role assignment claim | `roles` |
+| `keycloak.webOidcMetadataUrl` | Web OIDC metadata URL | `""` |
+| `keycloak.webOidcScope` | Web OIDC scope | `openid profile email groups` |
+| `keycloak.image.registry` | Keycloak image registry | `quay.io` |
+| `keycloak.image.repository` | Keycloak image repository | `keycloak/keycloak` |
+| `keycloak.image.tag` | Keycloak image tag | `25.0.0` |
+| `keycloak.postgresql.host` | PostgreSQL host | `keycloak-postgresql` |
+| `keycloak.postgresql.port` | PostgreSQL port | `5432` |
+| `keycloak.postgresql.database` | PostgreSQL database | `keycloak` |
+| `keycloak.postgresql.username` | PostgreSQL username | `keycloak` |
+| `keycloak.postgresql.password` | PostgreSQL password | `keycloak` |
+| `keycloak.postgresql.version` | PostgreSQL version | `14` |
+| `keycloak.config.adminUser` | Keycloak admin username | `admin` |
+| `keycloak.config.adminPassword` | Keycloak admin password | `admin` |
+| `keycloak.config.realm` | Keycloak realm | `openCloud` |
+| `keycloak.config.clientId` | Keycloak client ID | `web` |
+
+### MinIO Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `minio.enabled` | Enable MinIO | `true` |
+| `minio.domain` | MinIO domain | `minio.opencloud.test` |
+| `minio.version` | MinIO chart version | `5.4.0` |
+| `minio.image.registry` | MinIO image registry | `docker.io` |
+| `minio.image.repository` | MinIO image repository | `minio/minio` |
+| `minio.image.tag` | MinIO image tag | `latest` |
+| `minio.config.mode` | MinIO mode (standalone or distributed) | `standalone` |
+| `minio.config.rootUser` | MinIO root user | `opencloud` |
+| `minio.config.rootPassword` | MinIO root password | `opencloud-secret-key` |
+| `minio.config.buckets` | MinIO buckets configuration | See values.yaml |
+| `minio.persistence.enabled` | Enable persistence | `true` |
+| `minio.persistence.size` | Size of the persistent volume | `40Gi` |
+| `minio.resources` | CPU/Memory resource requests/limits | See values.yaml |
+
+### Tika Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `tika.enabled` | Enable Tika | `true` |
+| `tika.replicas` | Number of replicas | `1` |
+| `tika.image.registry` | Tika image registry | `apache` |
+| `tika.image.repository` | Tika image repository | `tika` |
+| `tika.image.tag` | Tika image tag | `latest-full` |
+| `tika.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `tika.service.port` | Tika service port | `9000` |
+| `tika.resources` | CPU/Memory resource requests/limits | See values.yaml |
+| `tika.securityContext` | Security context for Tika | See values.yaml |
+| `tika.probes` | Health probes configuration | See values.yaml |
+
+### NATS Settings
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `nats.enabled` | Enable NATS | `true` |
+| `nats.replicas` | Number of replicas | `1` |
+| `nats.image.repository` | NATS image repository | `nats` |
+| `nats.image.tag` | NATS image tag | `2.10.18-alpine` |
+| `nats.image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `nats.resources` | CPU/Memory resource requests/limits | `{}` |
 
 ### OnlyOffice Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `onlyoffice.enabled` | Enable OnlyOffice | `true` |
+| `onlyoffice.enabled` | Enable OnlyOffice | `false` |
+| `onlyoffice.domain` | OnlyOffice domain | `onlyoffice.opencloud.test` |
 | `onlyoffice.repository` | OnlyOffice image repository | `onlyoffice/documentserver` |
 | `onlyoffice.tag` | OnlyOffice image tag | `8.2.2` |
 | `onlyoffice.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `onlyoffice.wopi.enabled` | Enable WOPI integration | `true` |
-| `onlyoffice.useUnauthorizedStorage` | Use unauthorized storage (for self-signed certificates) | `true` |
+| `onlyoffice.useUnauthorizedStorage` | Use unauthorized storage | `true` |
 | `onlyoffice.persistence.enabled` | Enable persistence | `true` |
 | `onlyoffice.persistence.size` | Size of the persistent volume | `2Gi` |
-| `onlyoffice.resources` | CPU/Memory resource requests/limits | `{}` |
-| `onlyoffice.config.coAuthoring.token.enable.request.inbox` | Enable token for incoming requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.request.outbox` | Enable token for outgoing requests | `true` |
-| `onlyoffice.config.coAuthoring.token.enable.browser` | Enable token for browser requests | `true` |
-| `onlyoffice.collaboration.enabled` | Enable collaboration service | `true` |
-
-If you use Traefik and enable OnlyOffice, this chart will automatically create a `Middleware`
-named `add-x-forwarded-proto-https`, used by:
-* Ingress (if `annotationsPreset: traefik`)
-* Gateway API `HTTPRoute` (if `gateway.className: traefik`)
-
-This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyOffice.
+| `onlyoffice.resources` | CPU/Memory resource requests/limits | See values.yaml |
+| `onlyoffice.config.coAuthoring.token.enable.request.inbox` | Enable inbox token | `true` |
+| `onlyoffice.config.coAuthoring.token.enable.request.outbox` | Enable outbox token | `true` |
+| `onlyoffice.config.coAuthoring.token.enable.browser` | Enable browser token | `true` |
+| `onlyoffice.config.coAuthoring.sql.type` | SQL database type | `postgres` |
+| `onlyoffice.config.coAuthoring.sql.dbHost` | SQL database host | `localhost` |
+| `onlyoffice.config.coAuthoring.sql.dbPort` | SQL database port | `5432` |
+| `onlyoffice.config.coAuthoring.sql.dbName` | SQL database name | `onlyoffice` |
+| `onlyoffice.config.coAuthoring.sql.dbUser` | SQL database user | `onlyoffice` |
+| `onlyoffice.config.coAuthoring.secret.inbox` | Inbox secret | Generated |
+| `onlyoffice.config.coAuthoring.secret.outbox` | Outbox secret | Generated |
+| `onlyoffice.config.coAuthoring.secret.session` | Session secret | Generated |
+| `onlyoffice.config.rabbitmq.url` | RabbitMQ URL | Generated |
+| `onlyoffice.db.existingSecret` | Existing secret for DB password | `""` |
+| `onlyoffice.db.secretKeyName` | Secret key name for DB password | `password` |
 
 ### Collabora Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `collabora.enabled` | Enable Collabora | `true` |
-| `collabora.image.repository` | Collabora image repository | `collabora/code` |
-| `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
-| `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
-| `collabora.adminUser` | Admin user | `admin` |
-| `collabora.adminPassword` | Admin password | `admin` |
-| `collabora.ssl.enabled` | Enable SSL | `true` |
-| `collabora.ssl.verification` | SSL verification | `true` |
-| `collabora.resources` | CPU/Memory resource requests/limits | `{}` |
+| `collabora.domain` | Collabora domain | `collabora.opencloud.test` |
+| `collabora.repository` | Collabora image repository | `collabora/code` |
+| `collabora.tag` | Collabora image tag | `latest` |
+| `collabora.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `collabora.ssl.enabled` | Enable SSL for Collabora | `false` |
+| `collabora.ssl.verification` | Enable SSL verification | `false` |
+| `collabora.resources` | CPU/Memory resource requests/limits | See values.yaml |
+| `collabora.admin.user` | Admin username | `admin` |
+| `collabora.admin.password` | Admin password | `admin` |
 
 ### Collaboration Service Settings
 
@@ -434,51 +825,107 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collaboration.wopiDomain` | WOPI server domain | `collaboration.opencloud.test` |
 | `collaboration.resources` | CPU/Memory resource requests/limits | `{}` |
 
+### Individual Service Settings
+
+Each OpenCloud service can be individually configured. The following parameters apply to most services:
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `<service>.enabled` | Enable the service | varies by service |
+| `<service>.replicas` | Number of replicas | `1` |
+| `<service>.image.repository` | Service image repository | uses global image |
+| `<service>.image.tag` | Service image tag | uses global image |
+| `<service>.image.pullPolicy` | Service image pull policy | uses global image |
+| `<service>.resources` | CPU/Memory resource requests/limits | `{}` |
+| `<service>.nodeSelector` | Node selector for pod placement | `{}` |
+| `<service>.tolerations` | Tolerations for pod placement | `[]` |
+| `<service>.affinity` | Affinity rules for pod placement | `{}` |
+| `<service>.podAnnotations` | Annotations for pods | `{}` |
+| `<service>.podLabels` | Labels for pods | `{}` |
+| `<service>.persistence.enabled` | Enable persistence | `false` |
+| `<service>.persistence.size` | Size of persistent volume | `1Gi` |
+| `<service>.persistence.storageClass` | Storage class | `""` |
+| `<service>.persistence.accessMode` | Access mode | `ReadWriteOnce` |
+| `<service>.persistence.chownInitContainer` | Enable init container for volume permissions | `false` |
+| `<service>.priorityClassName` | Priority class name | `""` |
+| `<service>.podDisruptionBudget` | Pod disruption budget | `{}` |
+| `<service>.autoscaling` | Autoscaling configuration | `{}` |
+| `<service>.extraLabels` | Extra labels for pods | `{}` |
+
+### Available Services
+
+The following services can be individually configured:
+
+- **activitylog** - Activity logging service
+- **antivirus** - Antivirus scanning service
+- **appregistry** - Application registry service
+- **audit** - Audit logging service
+- **authapp** - Authentication app service
+- **authmachine** - Machine authentication service
+- **authservice** - Authentication service
+- **clientlog** - Client logging service
+- **eventhistory** - Event history service
+- **frontend** - Frontend web interface
+- **graph** - Graph API service
+- **groups** - Groups management service
+- **idm** - Identity management service
+- **idp** - Identity provider service
+- **notifications** - Notifications service
+- **ocdav** - WebDAV service
+- **ocm** - OpenCloud Mesh service
+- **ocs** - OCS API service
+- **policies** - Policies service
+- **postprocessing** - Post-processing service
+- **proxy** - Proxy service
+- **search** - Search service
+- **settings** - Settings service
+- **sharing** - Sharing service
+- **sse** - Server-sent events service
+- **storagepubliclink** - Storage public link service
+- **storageshares** - Storage shares service
+- **storagesystem** - Storage system service
+- **storageusers** - Storage users service
+- **thumbnails** - Thumbnails service
+- **userlog** - User logging service
+- **users** - Users service
+- **web** - Web service
+- **webdav** - WebDAV service
+- **webfinger** - WebFinger service
 
 ### LDAP Settings
 
-
-
 | Parameter | Description | Default |
-
 | --------- | ----------- | ------- |
-
 | `ldap.enabled` | Enable LDAP integration | `false` |
-
 | `ldap.host` | LDAP server hostname or IP | `""` |
-
 | `ldap.port` | LDAP server port | `389` |
-
 | `ldap.useTLS` | Use TLS for LDAP connection | `false` |
-
 | `ldap.bindDN` | Bind DN for LDAP authentication | `""` |
-
 | `ldap.bindPassword` | Bind password for LDAP authentication | `""` |
-
 | `ldap.userSearchBase` | Base DN for user searches | `""` |
-
 | `ldap.userSearchFilter` | Filter for user searches | `(objectClass=person)` |
-
 | `ldap.groupSearchBase` | Base DN for group searches | `""` |
-
 | `ldap.groupSearchFilter` | Filter for group searches | `(objectClass=groupOfNames)` |
 
 
 ## Gateway API Configuration
 
-The microservices chart includes HTTPRoute resources that can be used to expose the OpenCloud services externally. The HTTPRoutes are configured to route traffic to the respective services.
+The production chart includes HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.
 
 ### HTTPRoute Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `gateway.httproute.enabled` | Enable HTTPRoutes | `false` |
-| `gateway.httproute.gateway.name` | Gateway name | `cilium-gateway` |
-| `gateway.httproute.gateway.namespace` | Gateway namespace | `kube-system` |
+| `httpRoute.enabled` | Enable HTTPRoutes | `false` |
+Comment
+| `httpRoute.gateway.create` | Create Gateway resource | `false` |
+| `httpRoute.gateway.name` | Gateway name | `opencloud-gateway` |
+| `httpRoute.gateway.namespace` | Gateway namespace | `""` (defaults to Release.Namespace) |
+| `httpRoute.gateway.className` | Gateway class | `cilium` |
 
 ### Advanced Configuration Options
 
-The microservices chart supports several advanced configuration options:
+The production chart supports several advanced configuration options introduced in recent updates:
 
 #### Environment Variables
 
@@ -522,19 +969,19 @@ The chart now automatically uses the correct namespace across all resources, eli
 The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
 
 1. **OpenCloud Proxy HTTPRoute (`oc-proxy-https`)**:
-   - Hostname: `externalDomain` (defaults to `cloud.opencloud.test`)
+   - Hostname: `global.domain.opencloud`
    - Service: `{{ release-name }}-opencloud`
    - Port: 9200
    - Headers: Removes Permissions-Policy header to prevent browser console errors
 
 2. **Keycloak HTTPRoute (`oc-keycloak-https`)** (when `keycloak.enabled` is `true`):
-   - Hostname: `keycloak.domain` (defaults to `keycloak.opencloud.test`)
+   - Hostname: `global.domain.keycloak`
    - Service: `{{ release-name }}-keycloak`
    - Port: 8080
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 3. **MinIO HTTPRoute (`oc-minio-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
-   - Hostname: `minio.domain` (defaults to `minio.opencloud.test`)
+   - Hostname: `global.domain.minio`
    - Service: `{{ release-name }}-minio`
    - Port: 9001
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
@@ -543,33 +990,33 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    pass: opencloud-secret-key
 
 4. **MinIO Console HTTPRoute (`oc-minio-console-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
-   - Hostname: `console.minio.opencloud.test`
+   - Hostname: `console.minio.opencloud.test` (or `global.domain.minioConsole` if defined)
    - Service: `{{ release-name }}-minio`
    - Port: 9001
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 5. **OnlyOffice HTTPRoute (`oc-onlyoffice-https`)** (when `onlyoffice.enabled` is `true`):
-   - Hostname: `onlyoffice.domain` (defaults to `onlyoffice.opencloud.test`)
+   - Hostname: `global.domain.onlyoffice`
    - Service: `{{ release-name }}-onlyoffice`
    - Port: 443 (or 80 if using HTTP)
    - Path: "/"
    - This route is used to access the OnlyOffice Document Server for collaborative editing
 
 6. **WOPI HTTPRoute (`oc-wopi-https`)** (when `onlyoffice.collaboration.enabled` and `onlyoffice.enabled` are `true`):
-   - Hostname: `collaboration.wopiDomain` (defaults to `collaboration.opencloud.test`)
+   - Hostname: `global.domain.wopi` (or `collaboration.wopiDomain`)
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Path: "/"
    - This route is used for the WOPI protocol communication between OnlyOffice and the collaboration service
 
 7. **Collabora HTTPRoute** (when `collabora.enabled` is `true`):
-   - Hostname: `collabora.domain` (defaults to `collabora.opencloud.test`)
+   - Hostname: `global.domain.collabora`
    - Service: `{{ release-name }}-collabora`
    - Port: 9980
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 8. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
-   - Hostname: `collaboration.wopiDomain` (defaults to `collaboration.opencloud.test`)
+   - Hostname: `collaboration.wopiDomain`
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
@@ -578,7 +1025,7 @@ All HTTPRoutes are configured to use the same Gateway specified by `httpRoute.ga
 
 ## Setting Up Gateway API with Talos, Cilium, and cert-manager
 
-This section provides a practical guide to setting up the Gateway API with Talos, Cilium, and cert-manager for the microservices OpenCloud chart.
+This section provides a practical guide to setting up the Gateway API with Talos, Cilium, and cert-manager for the production OpenCloud chart.
 
 ### Prerequisites
 
@@ -799,7 +1246,7 @@ Finally, install OpenCloud using Helmfile:
 ```bash
 # Clone the repository
 git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd charts/opencloud-microservices/deployments
+cd charts/opencloud-full/deployments
 
 # Install OpenCloud
 helmfile sync
@@ -917,15 +1364,46 @@ kubectl apply -f cluster-issuer.yaml
 
 ### Step 4: Install OpenCloud
 
-Finally, install OpenCloud using Helmfile:
+Finally, install OpenCloud using Helm:
 
 ```bash
 # Clone the repository
-git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd charts/opencloud-microservices/deployments
+git clone https://github.com/your-repo/opencloud-helm.git
+cd opencloud-helm
+```
 
+Customize the chart to use Ingress objects instead of the newer gateway API
+
+```yaml
+global:
+  # TLS settings
+  tls:
+    # Enable TLS
+    enabled: true
+    secretName: opencloud-wildcard-tls
+
+# Disable Gateway API configuration
+httpRoute:
+  enabled: false
+
+# Enable ingress
+ingress:
+  enabled: true
+  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
+  # The chart currently knows how to add this header for traefik, nginx,
+  # haproxy, contour, and istio. PR welcome.
+  annotationsPreset: "traefik"  # optional, default ""
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+```
+
+```bash
 # Install OpenCloud
-helmfile sync
+helm install opencloud . \
+  --namespace opencloud \
+  --create-namespace \
+  --set httpRoute.gateway.name=opencloud-gateway \
+  --set httpRoute.gateway.namespace=kube-system
 ```
 
 
