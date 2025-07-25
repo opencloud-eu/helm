@@ -88,7 +88,7 @@ jobs:
           echo "Verifying the pushed chart..."
           helm pull oci://ghcr.io/${{ github.repository_owner }}/helm-charts/opencloud-dev --version $(helm show chart charts/opencloud-dev | grep version | awk '{print $2}')
 
-      - name: Package and push OpenCloud Full chart
+      - name: Package and push OpenCloud Microservice chart
         run: |
           # Update Chart.yaml version if we have a tag
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then

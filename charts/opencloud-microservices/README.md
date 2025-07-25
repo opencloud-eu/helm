@@ -159,7 +159,7 @@ You can install the Helm charts either directly from this Git repository or from
 # Clone the repository
 git clone https://github.com/opencloud-eu/helm.git
 
-# Install Full Chart
+# Install Microservice Chart
 cd charts/opencloud-microservices/deployments/helm
 helmfile sync
 ```
