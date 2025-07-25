@@ -4,6 +4,46 @@
 
 Welcome to the **OpenCloud Helm Charts** repository! This repository is intended as a community-driven space for developing and maintaining Helm charts for deploying OpenCloud on Kubernetes.
 
+## ⚠️ IMPORTANT: Architectural Considerations
+
+This chart implements a **pod-per-service architecture** where each OpenCloud service runs in its own Kubernetes pod. 
+
+
+### Problems with Pod-Per-Service:
+1. **Service Discovery Complexity**: Requires complex service mesh configuration
+2. **Resource Overhead**: Each pod needs its own container runtime overhead
+3. **Debugging Complexity**: Issues become harder to trace across multiple pods
+4. **Unnecessary Separation**: Most services don't need isolation
+
+### Recommended Approach:
+The standard `opencloud` chart (found in `charts/opencloud`) groups services intelligently:
+- Frontend services (web, graph, ocdav, ocs) in one pod
+- Backend services (postprocessing, eventhistory) in another pod
+- Only security-critical services (antivirus, thumbnails, tika) isolated
+
+## When to Use This Chart
+
+Only consider this chart if you:
+- ✅ Have specific regulatory requirements for service isolation
+- ✅ Need fine-grained resource limits per service
+- ✅ Have expertise in Kubernetes service mesh debugging
+- ✅ Accept higher resource usage and complexity
+- ✅ Are prepared for NATS HA setup
+
+Otherwise, use the standard `opencloud` chart (found in `charts/opencloud`).
+
+## Scaling Limitations
+
+The following services CANNOT be scaled beyond 1 replica:
+
+| Service | Reason | Tracking Issue |
+|---------|--------|----------------|
+| IDM | Embedded LDAP doesn't support replication | |
+| IDP | Depends on IDM | |
+| Search | Uses BoltDB (single-writer database) | |
+| OCM | Federation service state |  |
+| NATS | Embedded NATS (use external for HA) |  |
+
 ## 📑 Table of Contents
 
 - [About](#-about)
@@ -66,7 +106,7 @@ The current maintainers and reviewers are listed in [MAINTAINERS.md](./MAINTAINE
 ## Prerequisites
 
 - Kubernetes 1.19+ (e.g. Talos Kubernetes, RKE2)
-- Helm 3.2.0+ or Timoni Bundle (flux-helm-release)
+- Helm 3.2.0+ or Timoni Bundle with FluxCD (flux-helm-release)
 - PVC provisioner support in the underlying infrastructure (if persistence is enabled)
 - External ingress controller (e.g., Cilium Gateway API) for routing traffic to the services
 
@@ -82,22 +122,32 @@ We recommend pinning to specific chart versions and thoroughly testing updates b
 
 ## 📦 Available Charts
 
-This repository contains the following charts:
+This repository contains the following chart:
 
-### Full Chart (`charts/opencloud-full`)
+### Microservices Chart (`charts/opencloud-microservices`)
 
-The complete OpenCloud deployment with all components for production use:
-
-- Full microservices architecture
+**Architecture**: Pod-per-service
+- Every single service in its own pod
+- Full Gateway API integration
+- NATS service discovery required
 - Keycloak for authentication
 - MinIO for object storage
+- Integrated LDAP 
 - Document editing with Collabora and/or OnlyOffice
+- Slightly higher resource usage due to microservices pod overhead
+### Microservices Chart (`charts/opencloud-microservices`)
+
+**Architecture**: Pod-per-service
+- Every single service in its own pod
 - Full Gateway API integration
-- LDAP, Antivirus and more
+- NATS service discovery required
+- Keycloak for authentication
+- MinIO for object storage
+- Integrated LDAP 
+- Document editing with Collabora and/or OnlyOffice
+- Slightly higher resource usage due to microservices pod overhead
+- See [architectural warnings](./charts/opencloud-microservices/README.md#architectural-considerations)
 
-[View Full Chart Documentation](./charts/opencloud-full/README.md)
-
-#
 
 ## 🚀 Installation
 
@@ -110,13 +160,13 @@ You can install the Helm charts either directly from this Git repository or from
 git clone https://github.com/opencloud-eu/helm.git
 
 # Install Full Chart
-cd charts/opencloud-full/deployments/helm
+cd charts/opencloud-microservices/deployments/helm
 helmfile sync
 ```
-You can also install it with timoni instead of helm:
+You can also install it with timoni and fluxcd instead of helm:
 ```bash
-kubectl apply -f ./charts/opencloud-full/deployments/timoni/ && \
-timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployments/timoni/runtime.cue
+kubectl apply -f ./charts/opencloud-microservices/deployments/timoni/ && \
+timoni bundle apply -f ./charts/opencloud-microservices/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-microservices/deployments/timoni/runtime.cue
 ```
 
 
@@ -125,52 +175,33 @@ timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue 
 The charts are also available in the GitHub Container Registry (GHCR) as OCI artifacts:
 
 ```bash
-cd charts/opencloud-full/deployments
+cd charts/opencloud-microservices/deployments
 helmfile sync
 
 ```
 You can also install it with timoni instead of helm:
 ```bash
-kubectl apply -f ./charts/opencloud-full/deployments/timoni/ && \
-timoni bundle apply -f ./charts/opencloud-full/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-full/deployments/timoni/runtime.cue
+kubectl apply -f ./charts/opencloud-microservices/deployments/timoni/ && \
+timoni bundle apply -f ./charts/opencloud-microservices/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-microservices/deployments/timoni/runtime.cue
 ```
 
-```bash
-# Install Production Chart
-helm install opencloud oci://ghcr.io/opencloud-eu/helm-charts/opencloud \
-  --version 0.1.4 \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.enabled=true \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
-
-# Or install Development Chart
-helm install opencloud-dev oci://ghcr.io/opencloud-eu/helm-charts/opencloud-dev \
-  --version 0.1.0 \
-  --namespace opencloud \
-  --create-namespace
-```
-
-You can list available versions with:
-
-```bash
-helm search repo oci://ghcr.io/opencloud-eu/helm-charts --versions
-```
 
 ## Architecture
 
-The production chart (`charts/opencloud`) deploys the following components:
+The microservices chart (`charts/opencloud-microservices`) deploys each OpenCloud service in its own pod with the following components:
 
-1. **OpenCloud** - Main application (fork of ownCloud Infinite Scale)
+1. **OpenCloud Services** - Each service (web, graph, ocdav, ocs, storageusers, storagesystem, etc.) runs in its own pod
 2. **Keycloak** - Authentication provider with OpenID Connect
-3. **PostgreSQL** - Database for Keycloak and OnlyOffice
+3. **PostgreSQL** - Database for Keycloak
 4. **MinIO** - S3-compatible object storage
-5. **Collabora** - Online document editor (CODE - Collabora Online Development Edition)
-6. **OnlyOffice** - Alternative document editor with real-time collaboration
-7. **Collaboration Service** - WOPI server that connects OpenCloud with document editors
-8. **Redis** - Cache for OnlyOffice
-9. **RabbitMQ** - Message queue for OnlyOffice
+5. **NATS** - Messaging system for service discovery and communication
+6. **Collabora** - Online document editor (CODE - Collabora Online Development Edition)
+7. **OnlyOffice** - Alternative document editor with real-time collaboration
+8. **Collaboration Service** - WOPI server that connects OpenCloud with document editors
+9. **Redis** - Cache for OnlyOffice
+10. **RabbitMQ** - Message queue for OnlyOffice
+11. **LDAP** - LDAP for auth
+12. **IDM** - Integrated LDAP service
 
 All services are deployed with `ClusterIP` type, which means they are only accessible within the Kubernetes cluster. You need to configure your own ingress controller (e.g., Cilium Gateway API) to expose the services externally.
 
@@ -266,22 +297,20 @@ Key interactions:
 
 ## Configuration
 
-The following sections outline the main configuration parameters for the production chart (`charts/opencloud`). For a complete list of configuration options, please refer to the [values.yaml](./charts/opencloud/values.yaml) file.
+The following sections outline the main configuration parameters for the microservices chart (`charts/opencloud-microservices`). For a complete list of configuration options, please refer to the [values.yaml](./values.yaml) file.
 
 ### Global Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `namespace` | Deprecated: Namespace is now controlled by Helm (.Release.Namespace) | (removed) |
-| `global.domain.opencloud` | Domain for OpenCloud | `cloud.opencloud.test` |
-| `global.domain.keycloak` | Domain for Keycloak | `keycloak.opencloud.test` |
-| `global.domain.minio` | Domain for MinIO | `minio.opencloud.test` |
-| `global.domain.collabora` | Domain for Collabora | `collabora.opencloud.test` |
-| `global.domain.onlyoffice` | Domain for OnlyOffice | `onlyoffice.opencloud.test` |
-| `global.domain.companion` | Domain for Companion | `companion.opencloud.test` |
+| `externalDomain` | Domain where OC is reachable for the outside world | `cloud.opencloud.test` |
+| `ingress.enabled` | Enables the Ingress | `false` |
+| `gateway.httproute.enabled` | Enable HTTPRoutes | `false` |
+| `gateway.httproute.gateway.name` | Gateway name | `cilium-gateway` |
+| `gateway.httproute.gateway.namespace` | Gateway namespace | `kube-system` |
 | `global.tls.enabled` | Enable TLS (set to false when using gateway TLS termination externally) | `false` |
 | `global.tls.secretName` | Secret name for TLS certificate | `""` |
-| `global.storage.storageClass` | Storage class for persistent volumes | `""` |
+| `services.*.persistence.storageClassName` | Storage class for persistent volumes (per service) | `""` |
 
 ### Image Settings
 
@@ -437,22 +466,19 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 
 ## Gateway API Configuration
 
-The production chart includes HTTPRoute resources that can be used to expose the OpenCloud, Keycloak, and MinIO services externally. The HTTPRoutes are configured to route traffic to the respective services.
+The microservices chart includes HTTPRoute resources that can be used to expose the OpenCloud services externally. The HTTPRoutes are configured to route traffic to the respective services.
 
 ### HTTPRoute Settings
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `httpRoute.enabled` | Enable HTTPRoutes | `false` |
-Comment
-| `httpRoute.gateway.create` | Create Gateway resource | `false` |
-| `httpRoute.gateway.name` | Gateway name | `opencloud-gateway` |
-| `httpRoute.gateway.namespace` | Gateway namespace | `""` (defaults to Release.Namespace) |
-| `httpRoute.gateway.className` | Gateway class | `cilium` |
+| `gateway.httproute.enabled` | Enable HTTPRoutes | `false` |
+| `gateway.httproute.gateway.name` | Gateway name | `cilium-gateway` |
+| `gateway.httproute.gateway.namespace` | Gateway namespace | `kube-system` |
 
 ### Advanced Configuration Options
 
-The production chart supports several advanced configuration options introduced in recent updates:
+The microservices chart supports several advanced configuration options:
 
 #### Environment Variables
 
@@ -496,19 +522,19 @@ The chart now automatically uses the correct namespace across all resources, eli
 The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
 
 1. **OpenCloud Proxy HTTPRoute (`oc-proxy-https`)**:
-   - Hostname: `global.domain.opencloud`
+   - Hostname: `externalDomain` (defaults to `cloud.opencloud.test`)
    - Service: `{{ release-name }}-opencloud`
    - Port: 9200
    - Headers: Removes Permissions-Policy header to prevent browser console errors
 
 2. **Keycloak HTTPRoute (`oc-keycloak-https`)** (when `keycloak.enabled` is `true`):
-   - Hostname: `global.domain.keycloak`
+   - Hostname: `keycloak.domain` (defaults to `keycloak.opencloud.test`)
    - Service: `{{ release-name }}-keycloak`
    - Port: 8080
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 3. **MinIO HTTPRoute (`oc-minio-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
-   - Hostname: `global.domain.minio`
+   - Hostname: `minio.domain` (defaults to `minio.opencloud.test`)
    - Service: `{{ release-name }}-minio`
    - Port: 9001
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
@@ -517,33 +543,33 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    pass: opencloud-secret-key
 
 4. **MinIO Console HTTPRoute (`oc-minio-console-https`)** (when `opencloud.storage.s3.internal.enabled` is `true`):
-   - Hostname: `console.minio.opencloud.test` (or `global.domain.minioConsole` if defined)
+   - Hostname: `console.minio.opencloud.test`
    - Service: `{{ release-name }}-minio`
    - Port: 9001
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 5. **OnlyOffice HTTPRoute (`oc-onlyoffice-https`)** (when `onlyoffice.enabled` is `true`):
-   - Hostname: `global.domain.onlyoffice`
+   - Hostname: `onlyoffice.domain` (defaults to `onlyoffice.opencloud.test`)
    - Service: `{{ release-name }}-onlyoffice`
    - Port: 443 (or 80 if using HTTP)
    - Path: "/"
    - This route is used to access the OnlyOffice Document Server for collaborative editing
 
 6. **WOPI HTTPRoute (`oc-wopi-https`)** (when `onlyoffice.collaboration.enabled` and `onlyoffice.enabled` are `true`):
-   - Hostname: `global.domain.wopi` (or `collaboration.wopiDomain`)
+   - Hostname: `collaboration.wopiDomain` (defaults to `collaboration.opencloud.test`)
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Path: "/"
    - This route is used for the WOPI protocol communication between OnlyOffice and the collaboration service
 
 7. **Collabora HTTPRoute** (when `collabora.enabled` is `true`):
-   - Hostname: `global.domain.collabora`
+   - Hostname: `collabora.domain` (defaults to `collabora.opencloud.test`)
    - Service: `{{ release-name }}-collabora`
    - Port: 9980
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
 8. **Collaboration (WOPI) HTTPRoute** (when `collaboration.enabled` is `true`):
-   - Hostname: `collaboration.wopiDomain`
+   - Hostname: `collaboration.wopiDomain` (defaults to `collaboration.opencloud.test`)
    - Service: `{{ release-name }}-collaboration`
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
@@ -552,7 +578,7 @@ All HTTPRoutes are configured to use the same Gateway specified by `httpRoute.ga
 
 ## Setting Up Gateway API with Talos, Cilium, and cert-manager
 
-This section provides a practical guide to setting up the Gateway API with Talos, Cilium, and cert-manager for the production OpenCloud chart.
+This section provides a practical guide to setting up the Gateway API with Talos, Cilium, and cert-manager for the microservices OpenCloud chart.
 
 ### Prerequisites
 
@@ -773,7 +799,7 @@ Finally, install OpenCloud using Helmfile:
 ```bash
 # Clone the repository
 git clone https://github.com/opencloud-eu/helm.git opencloud-helm
-cd charts/opencloud-full/deployments
+cd charts/opencloud-microservices/deployments
 
 # Install OpenCloud
 helmfile sync
@@ -891,46 +917,15 @@ kubectl apply -f cluster-issuer.yaml
 
 ### Step 4: Install OpenCloud
 
-Finally, install OpenCloud using Helm:
+Finally, install OpenCloud using Helmfile:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/opencloud-helm.git
-cd opencloud-helm
-```
+git clone https://github.com/opencloud-eu/helm.git opencloud-helm
+cd charts/opencloud-microservices/deployments
 
-Customize the chart to use Ingress objects instead of the newer gateway API
-
-```yaml
-global:
-  # TLS settings
-  tls:
-    # Enable TLS
-    enabled: true
-    secretName: opencloud-wildcard-tls
-
-# Disable Gateway API configuration
-httpRoute:
-  enabled: false
-
-# Enable ingress
-ingress:
-  enabled: true
-  # onlyoffice requires adding an X-Forwarded-Proto header to the request.
-  # The chart currently knows how to add this header for traefik, nginx,
-  # haproxy, contour, and istio. PR welcome.
-  annotationsPreset: "traefik"  # optional, default ""
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-issuer
-```
-
-```bash
 # Install OpenCloud
-helm install opencloud . \
-  --namespace opencloud \
-  --create-namespace \
-  --set httpRoute.gateway.name=opencloud-gateway \
-  --set httpRoute.gateway.namespace=kube-system
+helmfile sync
 ```
 
 

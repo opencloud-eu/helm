@@ -24,7 +24,7 @@ bundle: {
                     url: "oci://ghcr.io/suse-coder/helm-charts"
                 }
                 chart: {
-                    name:    "opencloud-full"
+                    name:    "opencloud-microservices"
                     version: "*"
                 }
                 sync: {

@@ -1,6 +1,9 @@
 apiVersion: v2
-name: opencloud-full
-description: openCloud Helm chart
+name: opencloud-microservices-pods
+description: |
+  Microservice OpenCloud deployment with pod-per-service architecture.
+  WARNING: Higher complexity and resource usage than standard deployment.
+  Each OpenCloud service runs in its own pod for fine-grained control.
 keywords:
   - opencloud
   - oc
@@ -9,9 +12,9 @@ maintainers:
     email: info@opencloud.eu
     url: https://opencloud.eu
 type: application
-version: 3.1.2
+version: 0.8.0
 # renovate: datasource=docker depName=opencloudeu/opencloud-rolling
-appVersion: 3.1.0
+appVersion: 3.2.0
 kubeVersion: ""
 sources:
   - https://github.com/opencloud-eu/helm
