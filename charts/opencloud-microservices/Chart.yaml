@@ -1,5 +1,5 @@
 apiVersion: v2
-name: opencloud-microservices-pods
+name: opencloud-microservices
 description: |
   Microservice OpenCloud deployment with pod-per-service architecture.
   WARNING: Higher complexity and resource usage than standard deployment.
