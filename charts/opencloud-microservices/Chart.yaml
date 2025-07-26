@@ -1,0 +1,22 @@
+apiVersion: v2
+name: opencloud-microservices
+description: |
+  Microservice OpenCloud deployment with pod-per-service architecture.
+  WARNING: Higher complexity and resource usage than standard deployment.
+  Each OpenCloud service runs in its own pod for fine-grained control.
+keywords:
+  - opencloud
+  - oc
+maintainers:
+  - name: OpenCloud EU
+    email: info@opencloud.eu
+    url: https://opencloud.eu
+type: application
+version: 0.8.0
+# renovate: datasource=docker depName=opencloudeu/opencloud-rolling
+appVersion: 3.2.0
+kubeVersion: ""
+sources:
+  - https://github.com/opencloud-eu/helm
+  - https://github.com/opencloud-eu/opencloud
+  - https://github.com/cs3org/reva
