@@ -174,6 +174,8 @@ timoni bundle apply -f ./charts/opencloud-microservices/deployments/timoni/openc
 
 The charts are also available in the GitHub Container Registry (GHCR) as OCI artifacts:
 
+Change the repo url to:  ghcr.io/opencloud-eu/helm-charts/opencloud-microservices
+
 ```bash
 cd charts/opencloud-microservices/deployments
 helmfile sync
