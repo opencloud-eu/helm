@@ -18,8 +18,8 @@ Reviewers have the ability to review PRs and approve them, but do not have merge
 | @michaelstingl | Co-Maintainer | Write (Push, Merge) | Rackspace Spot, Rancher Desktop (macOS) |
 | @WrenIX | Reviewer | Triage | - |
 | @suse-coder | Reviewer | Triage | Talos + Cilium |
-| @johanneskastl / @kastl-ars | Reviewer | None (pending) | - |
-| @Tim-herbie | Reviewer | None (pending) | External Keycloak, HA deployments |
+| @Tim-herbie | Reviewer | Triage | External Keycloak, HA deployments |
+| @johanneskastl / @kastl-ars | Reviewer | Read (pending Triage) | - |
 
 ## Becoming a Maintainer or Reviewer
 
