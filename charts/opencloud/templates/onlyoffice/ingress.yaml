@@ -9,6 +9,10 @@
 {{- else if eq .Values.ingress.annotationsPreset "nginx" }}
   # NGINX: inject custom header via configuration-snippet
   {{- $_ := set $annotations "nginx.ingress.kubernetes.io/configuration-snippet" "more_set_headers \"X-Forwarded-Proto: https\";" }}
+{{- else if eq .Values.ingress.annotationsPreset "nginx-no-snippets" }}
+  # NGINX without snippets: use built-in forwarded headers support
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/use-forwarded-headers" "true" }}
+  {{- $_ := set $annotations "nginx.ingress.kubernetes.io/forwarded-for-header" "X-Forwarded-For" }}
 {{- else if eq .Values.ingress.annotationsPreset "haproxy" }}
   # HAProxy: inject custom header via request-set-headers
   {{- $_ := set $annotations "haproxy.ingress.kubernetes.io/request-set-headers" "X-Forwarded-Proto https" }}
