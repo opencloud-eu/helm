@@ -184,3 +184,13 @@ Return the appropriate apiVersion for ingress
 {{- print "networking.k8s.io/v1beta1" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Validate office suite configuration
+Ensures that only one of Collabora or OnlyOffice can be enabled at the same time
+*/}}
+{{- define "opencloud.validateOfficeSuite" -}}
+{{- if and .Values.collabora.enabled .Values.onlyoffice.enabled }}
+  {{- fail "Error: Only one of Collabora or OnlyOffice can be enabled at the same time! Both services use the same WOPI endpoints and cannot coexist. Please set either collabora.enabled=false or onlyoffice.enabled=false" }}
+{{- end }}
+{{- end -}}
