@@ -10,7 +10,7 @@ spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}
       namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
-      sectionName: keycloak-https
+      sectionName: {{ .Values.httpRoute.gateway.sectionName | default "keycloak-https" }}
   hostnames:
     - {{ include "opencloud.keycloak.domain" . | quote }}
   rules:

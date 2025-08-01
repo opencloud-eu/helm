@@ -420,6 +420,7 @@ This chart includes HTTPRoute resources that can be used to expose the OpenCloud
 | `httpRoute.enabled` | Enable HTTPRoutes | `true` |
 | `httpRoute.gateway.name` | Gateway name | `opencloud-gateway` |
 | `httpRoute.gateway.namespace` | Gateway namespace | `""` (defaults to Release.Namespace) |
+| `httpRoute.gateway.sectionName` | Gateway section name | `""` (defaults to multiple route-specific section names for the routes listed below) |
 
 The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
 
@@ -470,7 +471,7 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    - Port: 9300
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
-All HTTPRoutes are configured to use the same Gateway specified by `httpRoute.gateway.name` and `httpRoute.gateway.namespace`.
+All HTTPRoutes are configured to use the same Gateway specified by `httpRoute.gateway.name` and `httpRoute.gateway.namespace`. If `httpRoute.gateway.sectionName` is set, they also all use a single section (e.g. `https`) in the gateway resource (useful when `httpRoute.gateway.create` is `false` because a gateway already exists). Otherwise, when `httpRoute.gateway.sectionName` is left empty, each route gets its own generated `sectionName` that points to a section in the gateway resource that is automatically set up when `httpRoute.gateway.create` is `true`.
 
 ## Setting Up Gateway API with Talos, Cilium, and cert-manager
 

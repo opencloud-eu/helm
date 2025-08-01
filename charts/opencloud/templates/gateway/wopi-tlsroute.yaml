@@ -11,7 +11,7 @@ spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}
       namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
-      sectionName: wopi-https
+      sectionName: {{ .Values.httpRoute.gateway.sectionName | default "wopi-https" }}
   hostnames:
     - {{ .Values.global.domain.wopi | quote }}
   rules:

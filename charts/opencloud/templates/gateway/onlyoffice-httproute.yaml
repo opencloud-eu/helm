@@ -10,7 +10,7 @@ spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}
       namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
-      sectionName: onlyoffice-https
+      sectionName: {{ .Values.httpRoute.gateway.sectionName | default "onlyoffice-https" }}
   hostnames:
     - {{ .Values.global.domain.onlyoffice | quote }}
   rules:

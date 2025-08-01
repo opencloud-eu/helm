@@ -10,7 +10,7 @@ spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}
       namespace: {{ .Values.httpRoute.gateway.namespace | default .Release.Namespace }}
-      sectionName: collabora-https
+      sectionName: {{ .Values.httpRoute.gateway.sectionName | default "collabora-https" }}
   hostnames:
     - {{ .Values.global.domain.collabora | quote }}
   rules:
