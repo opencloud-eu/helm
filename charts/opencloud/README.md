@@ -396,8 +396,8 @@ This ensures the `X-Forwarded-Proto: https` header is added as required by OnlyO
 | `collabora.image.tag` | Collabora image tag | `24.04.13.2.1` |
 | `collabora.image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `collabora.existingSecret` | Name of the existing secret | `` |
-| `collabora.adminUser` | Admin user | `admin` |
-| `collabora.adminPassword` | Admin password | `admin` |
+| `collabora.admin.username` | Admin user | `admin` |
+| `collabora.admin.password` | Admin password | `admin` |
 | `collabora.ssl.enabled` | Enable SSL | `true` |
 | `collabora.ssl.verification` | SSL verification | `true` |
 | `collabora.resources` | CPU/Memory resource requests/limits | `{}` |
