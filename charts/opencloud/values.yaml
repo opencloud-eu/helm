@@ -281,7 +281,7 @@ collabora:
 
   admin:
     # ignored if collabora.existingSecret is set
-    user: admin
+    username: admin
 
     # ignored if collabora.existingSecret is set
     password: admin
