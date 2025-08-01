@@ -692,7 +692,11 @@ ingress:
   # Some components (e.g., OnlyOffice) require the X-Forwarded-Proto header to be set.
   #
   # Set 'annotationsPreset' to inject known ingress-controller-specific annotations
-  # for injecting the header. Supported values: nginx, traefik, haproxy, contour, istio
+  # for injecting the header. Supported values: nginx, nginx-no-snippets, traefik, haproxy, contour, istio
+  #
+  # Use 'nginx-no-snippets' for environments where NGINX configuration snippets are forbidden
+  # (e.g., Rackspace, security-restricted clusters). This preset uses built-in NGINX features
+  # instead of custom configuration snippets.
   #
   # If set to "traefik" and OnlyOffice is enabled, the chart will create a Middleware
   # named 'add-x-forwarded-proto-https' for use in both Ingress and Gateway HTTPRoute.
