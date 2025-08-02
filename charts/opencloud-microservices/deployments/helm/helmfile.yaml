@@ -13,8 +13,8 @@ repositories:
 releases:
   # --- OpenCloud Microservice Chart Release ---
   # Deploys the main OpenCloud application with all its integrated services.
-  - name: opencloud-helm
-    namespace: opencloud-helm # Dedicated namespace for the OpenCloud deployment.
+  - name: opencloud
+    namespace: opencloud # Dedicated namespace for the OpenCloud deployment.
     chart: ../../ # Path to the OpenCloud Helm chart.
     values:
       # --- General Settings ---

@@ -93,6 +93,7 @@ data:
   # Collabora Configuration
   ###############################################################################
   COLLABORA_URI: "https://collabora.opencloud.test"
+  COLLABORA_DOMAIN: "collabora.opencloud.test"
   COLLABORA_ICON_URI: "https://collabora.opencloud.test/favicon.ico"
   COLLABORA_ENABLED: "true"
   COLLABORA_INSECURE: "true"

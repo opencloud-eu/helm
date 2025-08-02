@@ -21,11 +21,11 @@ bundle: {
             namespace: "opencloud"
             values: {
                 repository: {
-                    url: "oci://ghcr.io/suse-coder/helm-charts"
+                    url: "oci://ghcr.io/opencloud-eu/helm-charts"
                 }
                 chart: {
                     name:    "opencloud-microservices"
-                    version: "*"
+                    version: "0.1.0"
                 }
                 sync: {
                     timeout: 10
@@ -56,7 +56,12 @@ bundle: {
                             }
                         }
                     }
+                    collabora: {
+                        enabled: bool @timoni(runtime:bool:COLLABORA_ENABLED)
+                        domain: string @timoni(runtime:string:COLLABORA_DOMAIN)
+                    }
                     onlyoffice: {
+                        enabled: bool @timoni(runtime:bool:ONLYOFFICE_ENABLED)
                         domain: string @timoni(runtime:string:ONLYOFFICE_DOMAIN)
                         persistence: {
                             size: string @timoni(runtime:string:ONLYOFFICE_PERSISTENCE_SIZE)
@@ -499,3 +504,4 @@ bundle: {
         }
     }
 }
+
