@@ -27,16 +27,22 @@ releases:
           enabled: true # Enable Keycloak for authentication.
           domain: keycloak.opencloud.test # Domain for Keycloak.
       - minio:
-          enabled: true # Enable MinIO for object storage.
+          enabled: false # Enable MinIO for object storage.
           domain: minio.opencloud.test # Domain for MinIO.
           config:
             persistence:
               size: "40Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
       - onlyoffice:
           enabled: false
           domain: onlyoffice.opencloud.test # Domain for OnlyOffice.
           persistence:
-            size: "2Gi" # Added
+            size: "2Gi"
+            accessModes:
+              - ReadWriteMany
+            storageClassName: ceph-cephfs
 
       - collabora:
           enabled: true
@@ -118,31 +124,49 @@ releases:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
           search:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
             extractor:
               type: tika
           storagesystem:
             persistence:
               enabled: true
               size: "5Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
           storageusers:
             persistence:
               enabled: true
-              size: "50Gi"
+              size: "60Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
             storageBackend:
-              driver: decomposeds3
- 
+              driver: posix
+
           thumbnails:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
           web:
             persistence:
               enabled: true
               size: "1Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
             config:
               oidc:
                 webClientID: web
@@ -215,10 +239,16 @@ releases:
             persistence:
               enabled: false
               size: "10Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
           ocm:
             persistence:
               enabled: false
               size: "1Gi"
+              accessModes:
+                - ReadWriteMany
+              storageClassName: ceph-cephfs
       - extraResources:
           - |
             apiVersion: v1

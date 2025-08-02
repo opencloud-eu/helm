@@ -10286,10 +10286,10 @@
               "additionalProperties": false,
               "properties": {
                 "driver": {
-                  "default": "oc",
-                  "description": "Configures the storage driver. Possible values are \"oc\" and \"decomposeds3\".\nThe OC driver stores all data in the persistent volume if persistence is enabled.\nThe DECOMPOSEDS3 driver stores all metadata in the persistent volume and uploads blobs to s3 if persistence is enabled.",
+                  "default": "posix",
+                  "description": "Configures the storage driver. Possible values are \"posix\", \"decomposeds3\" and \"decomposed\".\nThe POSIX driver stores all data in the persistent volume if persistence is enabled.\nThe DECOMPOSEDS3 driver stores all metadata in the persistent volume and uploads blobs to s3 if persistence is enabled.",
                   "enum": [
-                    "oc",
+                    "posix",
                     "decomposeds3",
                     "decomposed"
                   ],
@@ -12712,9 +12712,30 @@
             "size": {
               "type": "string",
               "description": "Storage size"
+            },
+            "accessModes": {
+              "items": {
+                "enum": [
+                  "ReadWriteOnce",
+                  "ReadOnlyMany",
+                  "ReadWriteMany",
+                  "ReadWriteOncePod"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "storageClassName": {
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
-          "required": []
+          "required": [
+            "enabled",
+            "size"
+          ]
         },
         "resources": {
           "type": "object",
@@ -13170,8 +13191,26 @@
             "persistence": {
               "additionalProperties": false,
               "properties": {
+                "accessModes": {
+                  "items": {
+                    "enum": [
+                      "ReadWriteOnce",
+                      "ReadOnlyMany",
+                      "ReadWriteMany",
+                      "ReadWriteOncePod"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
                 "size": {
                   "type": "string"
+                },
+                "storageClassName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "type": "object"

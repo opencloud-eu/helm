@@ -18,36 +18,37 @@ data:
   # Global Configuration
   ###############################################################################
   EXTERNAL_DOMAIN: "cloud.opencloud.test"
+  TAG: "3.0.0"
+
   OPENCLOUD_WEB_URL: "https://www.opencloud.eu"
   OPENCLOUD_LOGGING_LEVEL: "debug"
+
+  ###############################################################################
+  # Ingress
+  ###############################################################################
   INGRESS_ENABLED: "false"
   INGRESS_CLASS_NAME: "nginx"
   INGRESS_PROXY_BODY_SIZE: "1024m"
   GATEWAY_HTTPROUTE_ENABLED: "true"
-  APPS_INTEGRATION_ENABLED: "true"
-  WEB_OIDC_WEB_CLIENT_ID: "web"
-  IDM_PERSISTENCE_ENABLED: "false"
-  IDM_PERSISTENCE_SIZE: "10Gi"
-  NATS_PERSISTENCE_ENABLED: "true"
-  NATS_PERSISTENCE_SIZE: "10Gi"
-  OCM_PERSISTENCE_ENABLED: "false"
-  OCM_PERSISTENCE_SIZE: "1Gi"
-  ONLYOFFICE_PERSISTENCE_SIZE: "2Gi"
-  SEARCH_EXTRACTOR_TYPE: "tika"
-  SEARCH_PERSISTENCE_ENABLED: "true"
-  SEARCH_PERSISTENCE_SIZE: "10Gi"
-  STORAGE_USERS_BACKEND_DRIVER: "decomposeds3"
-  STORAGE_SYSTEM_PERSISTENCE_ENABLED: "true"
-  STORAGE_SYSTEM_PERSISTENCE_SIZE: "5Gi"
-  STORAGE_USERS_PERSISTENCE_ENABLED: "true"
-  STORAGE_USERS_PERSISTENCE_SIZE: "50Gi"
-  THUMBNAILS_PERSISTENCE_ENABLED: "true"
-  THUMBNAILS_PERSISTENCE_SIZE: "10Gi"
-  WEB_PERSISTENCE_ENABLED: "true"
-  WEB_PERSISTENCE_SIZE: "1Gi"
 
+  ###############################################################################
+  # OIDC Configuration
+  ###############################################################################
   OIDC_IDP_INSECURE: "true"
   OC_HTTP_API_INSECURE: "true"
+  APPS_INTEGRATION_ENABLED: "true"
+  WEB_OIDC_WEB_CLIENT_ID: "web"
+
+  ###############################################################################
+  # Persistence StorageClass and AccessModes (global defaults)
+  ###############################################################################
+  PERSISTENCE_STORAGE_CLASS_NAME: "ceph-cephfs"
+  # Comma-separated for runtime to split into a list, e.g. "ReadWriteMany" or "ReadWriteOnce,ReadOnlyMany"
+  PERSISTENCE_ACCESS_MODES: "ReadWriteMany"
+
+  # NATS specific persistence options
+  # When true, a root init container will chown the NATS data volume before the main container starts.
+  NATS_PERSISTENCE_CHOWN_INIT_CONTAINER: "false"
 
   ###############################################################################
   # Internal Keycloak (for testing only)
@@ -59,7 +60,7 @@ data:
   # Internal Minio (for testing only)
   ###############################################################################
   MINIO_DOMAIN: "minio.opencloud.test"
-  MINIO_ENABLED: "true"
+  MINIO_ENABLED: "false"
   MINIO_PERSISTENCE_SIZE: "40Gi"
 
   ###############################################################################

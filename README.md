@@ -105,7 +105,7 @@ A lightweight single-container deployment for development and testing:
 
 ## 📜 License
 
-This project is licensed under the **AGPLv3** licence. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the **AGPLv3** license. See the [LICENSE](LICENSE) file for more details.
 
 ## Community Maintained
 

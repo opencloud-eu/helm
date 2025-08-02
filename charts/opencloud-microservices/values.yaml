@@ -5928,6 +5928,25 @@ onlyoffice:
     # -- Enable persistence
     enabled: true
     # @schema
+    # type: array
+    # items:
+    #   enum:
+    #     - ReadWriteOnce
+    #     - ReadOnlyMany
+    #     - ReadWriteMany
+    #     - ReadWriteOncePod
+    #   required: true
+    # @schema
+    # -- Persistent volume access modes.
+    accessModes:
+      - ReadWriteOnce
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Storage class to use. Uses the default storage class if not set.
+    storageClassName:
+    # @schema
     # type: string
     # required: true
     # @schema
@@ -6438,6 +6457,25 @@ minio:
         purge: false
     # MinIO persistence
     persistence:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes.
+      accessModes:
+        - ReadWriteOnce
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use. Uses the default storage class if not set.
+      storageClassName:
       # @schema
       # type: string
       # required: true
