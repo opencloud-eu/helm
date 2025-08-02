@@ -1,4 +1,4 @@
-{{- if and .Values.opencloud.storage.s3.internal.persistence.enabled (not .Values.opencloud.storage.s3.internal.persistence.existingClaim) }}
+{{- if and (eq .Values.opencloud.storage.mode "s3") (and .Values.opencloud.storage.s3.internal.persistence.enabled (not .Values.opencloud.storage.s3.internal.persistence.existingClaim)) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -268,6 +268,14 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.smtp.insecure` | SMTP insecure | `false` |
 | `opencloud.smtp.authentication` | SMTP authentication | `plain` |
 | `opencloud.smtp.encryption` | SMTP encryption | `starttls` |
+| `opencloud.storage.mode` | Choice between s3 and posixfs for user files | `s3` |
+
+### OpenCloud S3 Storage Settings
+
+The following options configure S3 for user file storage, either with the internal MinIO instance or with an external S3 provider.
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
 | `opencloud.storage.s3.internal.enabled` | Enable internal MinIO instance | `true` |
 | `opencloud.storage.s3.internal.existingSecret` | Name of the existing secret | `` |
 | `opencloud.storage.s3.internal.rootUser` | MinIO root user | `opencloud` |
@@ -276,6 +284,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.storage.s3.internal.region` | MinIO region | `default` |
 | `opencloud.storage.s3.internal.resources` | CPU/Memory resource requests/limits | See values.yaml |
 | `opencloud.storage.s3.internal.persistence.enabled` | Enable MinIO persistence | `true` |
+| `opencloud.storage.s3.internal.persistence.existingClaim` | Name of existing PVC instead of the settings below | `` |
 | `opencloud.storage.s3.internal.persistence.size` | Size of the MinIO persistent volume | `30Gi` |
 | `opencloud.storage.s3.internal.persistence.storageClass` | MinIO storage class | `""` |
 | `opencloud.storage.s3.internal.persistence.accessMode` | MinIO access mode | `ReadWriteOnce` |
@@ -287,6 +296,22 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.storage.s3.external.secretKey` | External S3 secret key | `""` |
 | `opencloud.storage.s3.external.bucket` | External S3 bucket | `""` |
 | `opencloud.storage.s3.external.createBucket` | Create bucket if it doesn't exist | `true` |
+
+### OpenCloud PosixFS Storage Settings
+
+The following options allow setting up a POSIX-compatible filesystem (such as NFS or CephFS) for user file storage instead of S3. This is useful for environments where object storage is not available or not desired.
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `opencloud.storage.posixfs.idCacheStore` | Cache store, between 'memory', 'redis-sentinel', 'nats-js-kv', 'noop' | `nats-js-kv` |
+| `opencloud.storage.posixfs.rootPath` | Path of storage root directory in openCloud pod | `/var/lib/opencloud/storage` |
+| `opencloud.storage.posixfs.persistence.enabled` | Enable persistence for PosixFS | `true` |
+| `opencloud.storage.posixfs.persistence.existingClaim` | Name of existing PVC instead of the settings below | `""` |
+| `opencloud.storage.posixfs.persistence.size` | Size of the PosixFS persistent volume | `30Gi` |
+| `opencloud.storage.posixfs.persistence.storageClass` | Storage class for PosixFS volume | `""` |
+| `opencloud.storage.posixfs.persistence.accessMode` | Access mode for PosixFS volume | `ReadWriteMany` |
+
+**Note:** When using `posixfs` mode, ensure that the underlying storage supports the required access mode (e.g., `ReadWriteMany` for multiple replicas). The underlying filesystem must support `flock` and `xattrs` so for NFS the minimum version is 4.2.
 
 ### NATS Messaging Configuration
 
@@ -435,7 +460,7 @@ The following HTTPRoutes are created when `httpRoute.enabled` is set to `true`:
    - Port: 8080
    - Headers: Adds Permissions-Policy header to prevent browser features like interest-based advertising
 
-3. **MinIO HTTPRoute** (when `opencloud.storage.s3.internal.enabled` is `true`):
+3. **MinIO HTTPRoute** (when `opencloud.storage.mode` is `s3` and `opencloud.storage.s3.internal.enabled` is `true`):
    - Hostname: `global.domain.minio`
    - Service: `{{ release-name }}-minio`
    - Port: 9001
