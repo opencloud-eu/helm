@@ -149,6 +149,52 @@ This repository contains the following chart:
 - See [architectural warnings](./charts/opencloud-microservices/README.md#architectural-considerations)
 
 
+# 🔐 Mandatory secret changes for production
+
+Set all of the following to strong, unique values before deploying to production. Rotate regularly and never commit real values to VCS. Names are taken from deployments/timoni/secret.yaml.
+
+1) LDAP / IDM
+- Secret: ldap-bind-secrets
+  - Key: reva-ldap-bind-password
+  - Note: Must match the LDAP admin password below
+
+- Secret: opencloud-ldap-secrets
+  - Key: adminPassword
+  - Key: configPassword
+  - Note: LDAP Administrator credentials
+
+2) Object Storage (MinIO / S3)
+- Secret: s3secret
+  - Key: accessKey
+  - Key: secretKey
+  - Note: Used by services for S3 access
+
+- Secret: opencloud-minio-secrets - for testing only
+  - Key: rootPassword
+  - Note: MinIO root account password
+
+3) Authentication (Keycloak) - for testing only
+- Secret: opencloud-keycloak-admin-secrets
+  - Key: adminPassword
+  - Note: Keycloak admin password
+
+- Secret: opencloud-keycloak-postgresql-secrets - for testing only
+  - Key: postgresqlPassword
+  - Note: Password for Keycloak’s PostgreSQL database user
+
+4) Messaging / Queues
+- Secret: opencloud-amqp-secret
+  - Key: amqpUrl
+  - Note: Contains credentials in URL form; replace with a strong user/password and secure endpoint
+
+5) Document Editing (OnlyOffice)
+- Secret: opencloud-onlyoffice-secrets
+  - Key: inbox
+  - Key: outbox
+  - Key: session
+  - Note: Tokens used by OnlyOffice/WOPI integration
+
+
 ## 🚀 Installation
 
 You can install the Helm charts either directly from this Git repository or from the OCI registry.
