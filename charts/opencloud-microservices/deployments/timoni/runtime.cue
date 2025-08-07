@@ -44,13 +44,18 @@ runtime: {
         {
             query: "k8s:v1:ConfigMap:opencloud:opencloud-config"
             for: {
+                "TAG":                       "obj.data.TAG"
                 "EXTERNAL_DOMAIN":           "obj.data.EXTERNAL_DOMAIN"
                 "KEYCLOAK_DOMAIN":           "obj.data.KEYCLOAK_DOMAIN"
+                "DEPLOY_TYPE":               "obj.data.DEPLOY_TYPE"
+                "MAX_SURGE":                 "obj.data.MAX_SURGE"
+                "MAX_UNAV":                  "obj.data.MAX_UNAV"
                 "MINIO_DOMAIN":              "obj.data.MINIO_DOMAIN"
                 "MINIO_PERSISTENCE_SIZE":    "obj.data.MINIO_PERSISTENCE_SIZE"
                 "LDAP_URI":                  "obj.data.LDAP_URI"
                 "OIDC_ISSUER_URI":           "obj.data.OIDC_ISSUER_URI"
                 "COLLABORA_URI":             "obj.data.COLLABORA_URI"
+                "COLLABORA_DOMAIN":          "obj.data.COLLABORA_DOMAIN"
                 "COLLABORA_ICON_URI":        "obj.data.COLLABORA_ICON_URI"
                 "WOPI_INGRESS_DOMAIN":       "obj.data.WOPI_INGRESS_DOMAIN"
                 "WOPI_COLLABORA_TLS_HOST":   "obj.data.WOPI_COLLABORA_TLS_HOST"
@@ -65,6 +70,8 @@ runtime: {
                 "INGRESS_CLASS_NAME": "obj.data.INGRESS_CLASS_NAME"
                 "INGRESS_PROXY_BODY_SIZE": "obj.data.INGRESS_PROXY_BODY_SIZE"
                 "GATEWAY_HTTPROUTE_ENABLED": "obj.data.GATEWAY_HTTPROUTE_ENABLED"
+                "PERSISTENCE_STORAGE_CLASS_NAME": "obj.data.PERSISTENCE_STORAGE_CLASS_NAME"
+                "PERSISTENCE_ACCESS_MODES":       "obj.data.PERSISTENCE_ACCESS_MODES"
                 "EXTERNAL_USER_MANAGEMENT_ENABLED": "obj.data.EXTERNAL_USER_MANAGEMENT_ENABLED"
                 "EXTERNAL_USER_MANAGEMENT_ADMIN_UUID": "obj.data.EXTERNAL_USER_MANAGEMENT_ADMIN_UUID"
                 "AUTOPROVISION_ACCOUNTS_ENABLED": "obj.data.AUTOPROVISION_ACCOUNTS_ENABLED"
@@ -115,10 +122,15 @@ runtime: {
                 "WEB_PERSISTENCE_ENABLED": "obj.data.WEB_PERSISTENCE_ENABLED"
                 "WEB_PERSISTENCE_SIZE": "obj.data.WEB_PERSISTENCE_SIZE"
                 "ONLYOFFICE_PERSISTENCE_SIZE": "obj.data.ONLYOFFICE_PERSISTENCE_SIZE"
+                "NATS_PERSISTENCE_CHOWN_INIT_CONTAINER": "obj.data.NATS_PERSISTENCE_CHOWN_INIT_CONTAINER"
             }
         }
     ]
     defaults: {
+        DEPLOY_TYPE: "Recreate"
+        MAX_SURGE: "25%"
+        MAX_UNAV: "25%"
+        TAG: ""
         LDAP_ADMIN_PASSWORD: "admin"
         LDAP_CONFIG_PASSWORD: "config"
         AMQP_URL: "amqp://guest:Dd0SXIe1k9osdfjkmA0TK1bb1B1d38OFSb@localhost"
@@ -135,6 +147,7 @@ runtime: {
         LDAP_URI: "ldap://openldap.openldap.svc.cluster.local:389"
         OIDC_ISSUER_URI: "https://keycloak.opencloud.test/realms/openCloud"
         COLLABORA_URI: "https://collabora.opencloud.test"
+        COLLABORA_DOMAIN: "collabora.opencloud.test"
         COLLABORA_ICON_URI: "https://collabora.opencloud.test/favicon.ico"
         WOPI_INGRESS_DOMAIN: "wopi.opencloud.test"
         WOPI_COLLABORA_TLS_HOST: "wopi-collabora.kube.opencloud.test"
@@ -177,7 +190,7 @@ runtime: {
         ONLYOFFICE_DISABLE_PROOF: false
         ONLYOFFICE_INGRESS_ENABLED: false
         SEARCH_EXTRACTOR_TYPE: "tika"
-        STORAGE_USERS_BACKEND_DRIVER: "decomposeds3"
+        STORAGE_USERS_BACKEND_DRIVER: "posix"
         WEB_OIDC_WEB_CLIENT_ID: "web"
         IDM_PERSISTENCE_ENABLED: false
         OPENLDAP_LTB_PASSWD_ENABLED: false
@@ -202,6 +215,9 @@ runtime: {
         THUMBNAILS_PERSISTENCE_SIZE: "10Gi"
         WEB_PERSISTENCE_SIZE: "1Gi"
         ONLYOFFICE_PERSISTENCE_SIZE: "2Gi"
+        PERSISTENCE_STORAGE_CLASS_NAME: ""
+        PERSISTENCE_ACCESS_MODES: "ReadWriteOnce"
+        NATS_PERSISTENCE_CHOWN_INIT_CONTAINER: true
 
         LDAP_ENABLED: true
         TIKA_ENABLED: true

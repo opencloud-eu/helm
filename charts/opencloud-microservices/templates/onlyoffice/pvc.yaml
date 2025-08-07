@@ -12,7 +12,16 @@ metadata:
     {{- include "oc.labels" . | nindent 4 }}
 spec:
   accessModes:
+  {{- if .Values.onlyoffice.persistence.accessModes }}
+  {{- range .Values.onlyoffice.persistence.accessModes }}
+    - {{ . }}
+  {{- end }}
+  {{- else }}
     - ReadWriteOnce
+  {{- end }}
+  {{- if .Values.onlyoffice.persistence.storageClassName }}
+  storageClassName: {{ .Values.onlyoffice.persistence.storageClassName }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.onlyoffice.persistence.size | default "5Gi" }}
