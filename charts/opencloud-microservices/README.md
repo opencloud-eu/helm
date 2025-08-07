@@ -135,19 +135,7 @@ This repository contains the following chart:
 - Integrated LDAP 
 - Document editing with Collabora and/or OnlyOffice
 - Slightly higher resource usage due to microservices pod overhead
-### Microservices Chart (`charts/opencloud-microservices`)
-
-**Architecture**: Pod-per-service
-- Every single service in its own pod
-- Full Gateway API integration
-- NATS service discovery required
-- Keycloak for authentication
-- MinIO for object storage
-- Integrated LDAP 
-- Document editing with Collabora and/or OnlyOffice
-- Slightly higher resource usage due to microservices pod overhead
 - See [architectural warnings](./charts/opencloud-microservices/README.md#architectural-considerations)
-
 
 # 🔐 Mandatory secret changes for production
 
