@@ -215,7 +215,7 @@ cd charts/opencloud-microservices/deployments
 helmfile sync
 
 ```
-You can also install it with timoni instead of helm:
+You can also install it with timoni and fluxcd instead of helm:
 ```bash
 kubectl apply -f ./charts/opencloud-microservices/deployments/timoni/ && \
 timoni bundle apply -f ./charts/opencloud-microservices/deployments/timoni/opencloud.cue --runtime ./charts/opencloud-microservices/deployments/timoni/runtime.cue
