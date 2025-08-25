@@ -32,10 +32,16 @@ bundle: {
                     createNamespace: true
                 }
                 helmValues: {
+                    // Global persistence indirection (like _domainFilter pattern)
+                    _persistenceStorageClassName: string @timoni(runtime:string:PERSISTENCE_STORAGE_CLASS_NAME)
+                    _persistenceAccessModes:     string @timoni(runtime:string:PERSISTENCE_ACCESS_MODES)
                     logging: {
                         level: string @timoni(runtime:string:OPENCLOUD_LOGGING_LEVEL)
                     }
                     externalDomain: string @timoni(runtime:string:EXTERNAL_DOMAIN)
+                    image: {
+                        tag: string @timoni(runtime:string:TAG)
+                    }
                     keycloak: {
                         enabled: bool @timoni(runtime:bool:KEYCLOAK_ENABLED)
                         domain: string @timoni(runtime:string:KEYCLOAK_DOMAIN)
@@ -177,12 +183,17 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:NATS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:NATS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
+                                chownInitContainer: bool @timoni(runtime:bool:NATS_PERSISTENCE_CHOWN_INIT_CONTAINER)
                             }
                         }
                         search: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:SEARCH_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:SEARCH_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             extractor: {
                                 type: string @timoni(runtime:string:SEARCH_EXTRACTOR_TYPE)
@@ -192,12 +203,16 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_SYSTEM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:STORAGE_SYSTEM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         storageusers: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_USERS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:STORAGE_USERS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             storageBackend: {
                                 driver: string @timoni(runtime:string:STORAGE_USERS_BACKEND_DRIVER)
@@ -207,12 +222,16 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:THUMBNAILS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:THUMBNAILS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         web: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:WEB_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:WEB_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             config: {
                                 oidc: {
@@ -332,12 +351,16 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:IDM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:IDM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         ocm: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:OCM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:OCM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                     }
@@ -504,4 +527,3 @@ bundle: {
         }
     }
 }
-

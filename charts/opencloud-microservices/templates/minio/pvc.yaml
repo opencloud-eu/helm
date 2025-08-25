@@ -13,7 +13,16 @@ metadata:
     {{- include "oc.labels" . | nindent 4 }}
 spec:
   accessModes:
+  {{- if .Values.minio.config.persistence.accessModes }}
+  {{- range .Values.minio.config.persistence.accessModes }}
+    - {{ . }}
+  {{- end }}
+  {{- else }}
     - ReadWriteOnce
+  {{- end }}
+  {{- if .Values.minio.config.persistence.storageClassName }}
+  storageClassName: {{ .Values.minio.config.persistence.storageClassName }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.minio.config.persistence.size }}
