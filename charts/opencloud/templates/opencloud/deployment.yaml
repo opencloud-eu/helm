@@ -317,12 +317,21 @@ spec:
             # Storage configuration
             # Always use decomposeds3 for user storage and decomposed for system storage
             - name: STORAGE_USERS_DRIVER
+            {{- if eq .Values.opencloud.storage.mode "posixfs" }}
+              value: "posix"
+            {{- else }}
               value: "decomposeds3"
+            {{- end }}
             - name: STORAGE_SYSTEM_DRIVER
               value: "decomposed"
             
+            {{- if eq .Values.opencloud.storage.mode "posixfs" }}
+            - name: STORAGE_USERS_POSIX_ROOT
+              value: {{ .Values.opencloud.storage.posixfs.rootPath | quote }}
+            - name: STORAGE_USERS_ID_CACHE_STORE
+              value: {{ .Values.opencloud.storage.posixfs.idCacheStore | quote }}
             # S3 storage configuration
-            {{- if .Values.opencloud.storage.s3.external.enabled }}
+            {{- else if and (eq .Values.opencloud.storage.mode "s3") .Values.opencloud.storage.s3.external.enabled }}
             # External S3 storage
             - name: STORAGE_USERS_DECOMPOSEDS3_ENDPOINT
               value: {{ .Values.opencloud.storage.s3.external.endpoint | quote }}
@@ -397,6 +406,10 @@ spec:
               mountPath: /etc/opencloud
             - name: data
               mountPath: /var/lib/opencloud
+            {{- if and (eq .Values.opencloud.storage.mode "posixfs") .Values.opencloud.storage.posixfs.persistence.enabled }}
+            - name: posixfs
+              mountPath: {{ .Values.opencloud.storage.posixfs.rootPath | default "/var/lib/opencloud/storage" | quote }}
+            {{- end }}
             - name: config-json
               mountPath: /var/lib/opencloud/config.json
               subPath: config.json
@@ -439,6 +452,15 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if and (eq .Values.opencloud.storage.mode "posixfs") .Values.opencloud.storage.posixfs.persistence.enabled }}
+        - name: posixfs
+          persistentVolumeClaim:
+            {{- if .Values.opencloud.storage.posixfs.persistence.existingClaim }}
+            claimName: {{ .Values.opencloud.storage.posixfs.persistence.existingClaim | quote }}
+            {{- else }}
+            claimName: {{ include "opencloud.opencloud.fullname" . }}-posixfs
+            {{- end }}
+        {{- end }}
         - name: config-json
           configMap:
             name: {{ include "opencloud.opencloud.fullname" . }}-config-json

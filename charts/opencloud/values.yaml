@@ -568,6 +568,8 @@ opencloud:
   
   # Storage configuration
   storage:
+    # Storage mode for user files, can be "s3" (default) or "posixfs"
+    mode: s3
     # S3 storage configuration
     s3:
       # Internal MinIO instance
@@ -647,6 +649,22 @@ opencloud:
         bucket: ""
         # Create bucket if it doesn't exist
         createBucket: true
+    posixfs:
+      # The type of the cache store, supported values are: 'memory', 'redis-sentinel', 'nats-js-kv' (default), 'noop'
+      idCacheStore: nats-js-kv
+      # Path of storage root directory, default is /var/lib/opencloud/storage
+      rootPath: "/var/lib/opencloud/storage"
+      persistence:
+        # Enable persistence
+        enabled: true
+        # Name of existing PVC to use (overrides all other persistence values)
+        existingClaim: ""
+        # Size of the persistent volume for data
+        size: 30Gi
+        # Storage class
+        storageClass: ""
+        # Access mode (ReadWriteOnce or ReadWriteMany for multiple replicas)
+        accessMode: ReadWriteMany
 
 # =====================================================================
 # GATEWAY-API HTTPRoute
