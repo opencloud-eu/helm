@@ -13,7 +13,8 @@ spec:
         fsGroup: 1000
       initContainers:
         - name: init-minio-bucket
-          image: busybox
+          image: "{{ .Values.initContainerImage.repository }}:{{ .Values.initContainerImage.tag }}"
+          imagePullPolicy: {{ .Values.initContainerImage.pullPolicy | default "IfNotPresent" }}
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -25,7 +26,7 @@ spec:
       containers:
         - name: minio
           image: "{{ .Values.minio.image.registry }}/{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag | default .Values.minio.version }}"
-          imagePullPolicy: {{.Values.minio.image.pullPolicy | default "IfNotPresent" }}
+          imagePullPolicy: {{ .Values.minio.image.pullPolicy | default "IfNotPresent" }}
           args:
             - server
             - --console-address
