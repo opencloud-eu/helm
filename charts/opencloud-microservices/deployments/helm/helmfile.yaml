@@ -32,11 +32,17 @@ releases:
           config:
             persistence:
               size: "40Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
       - onlyoffice:
           enabled: false
           domain: onlyoffice.opencloud.test # Domain for OnlyOffice.
           persistence:
-            size: "2Gi" # Added
+            size: "2Gi"
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: 
 
       - collabora:
           enabled: true
@@ -118,20 +124,32 @@ releases:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
           search:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
             extractor:
               type: tika
           storagesystem:
             persistence:
               enabled: true
               size: "5Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
           storageusers:
             persistence:
               enabled: true
-              size: "50Gi"
+              size: "60Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
             storageBackend:
               driver: decomposeds3
  
@@ -139,10 +157,16 @@ releases:
             persistence:
               enabled: true
               size: "10Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
           web:
             persistence:
               enabled: true
               size: "1Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
             config:
               oidc:
                 webClientID: web
@@ -215,10 +239,16 @@ releases:
             persistence:
               enabled: false
               size: "10Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
           ocm:
             persistence:
               enabled: false
               size: "1Gi"
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: 
       - extraResources:
           - |
             apiVersion: v1

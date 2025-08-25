@@ -21,11 +21,11 @@ bundle: {
             namespace: "opencloud"
             values: {
                 repository: {
-                    url: "oci://ghcr.io/opencloud-eu/helm-charts"
+                    url: "oci://ghcr.io/suse-coder/helm-charts"
                 }
                 chart: {
                     name:    "opencloud-microservices"
-                    version: "0.1.0"
+                    version: "0.2.0"
                 }
                 sync: {
                     timeout: 10
