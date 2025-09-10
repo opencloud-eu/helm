@@ -1,0 +1,15 @@
+{{- if .Values.opencloud.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.opencloud.fullname" . }}-proxy-config
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opencloud
+data:
+  proxy.yaml: |-
+    additional_policies:
+{{- if .Values.radicale.enabled }}
+{{- (tpl (.Files.Get "files/radicale/proxy.config.gotml") . ) | nindent 4 }}
+{{- end }}
+{{- end }}
