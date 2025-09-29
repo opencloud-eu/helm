@@ -255,7 +255,7 @@ spec:
             - name: GRAPH_USERNAME_MATCH
               value: "none"
             - name: PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM
-              value: "roles"
+              value: {{ .Values.global.oidc.roleAttributePath  | default "roles" | quote }}
             - name: PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD
               value: "jwt"
             - name: WEB_OIDC_METADATA_URL
