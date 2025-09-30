@@ -26,6 +26,17 @@ data:
   GATEWAY_HTTPROUTE_ENABLED: "true"
   APPS_INTEGRATION_ENABLED: "true"
   WEB_OIDC_WEB_CLIENT_ID: "web"
+
+  ###############################################################################
+  # Persistence StorageClass and AccessModes (global defaults)
+  ###############################################################################
+  PERSISTENCE_STORAGE_CLASS_NAME: "ceph-cephfs"
+  # Comma-separated for runtime to split into a list, e.g. "ReadWriteMany" or "ReadWriteOnce,ReadOnlyMany"
+  PERSISTENCE_ACCESS_MODES: "ReadWriteMany"
+
+  ###############################################################################
+  # Persistence (service PVC sizes and toggles)
+  ###############################################################################
   IDM_PERSISTENCE_ENABLED: "false"
   IDM_PERSISTENCE_SIZE: "10Gi"
   NATS_PERSISTENCE_ENABLED: "true"
@@ -33,10 +44,9 @@ data:
   OCM_PERSISTENCE_ENABLED: "false"
   OCM_PERSISTENCE_SIZE: "1Gi"
   ONLYOFFICE_PERSISTENCE_SIZE: "2Gi"
-  SEARCH_EXTRACTOR_TYPE: "tika"
   SEARCH_PERSISTENCE_ENABLED: "true"
   SEARCH_PERSISTENCE_SIZE: "10Gi"
-  STORAGE_USERS_BACKEND_DRIVER: "decomposeds3"
+  STORAGE_USERS_BACKEND_DRIVER: "posix"
   STORAGE_SYSTEM_PERSISTENCE_ENABLED: "true"
   STORAGE_SYSTEM_PERSISTENCE_SIZE: "5Gi"
   STORAGE_USERS_PERSISTENCE_ENABLED: "true"
@@ -46,8 +56,9 @@ data:
   WEB_PERSISTENCE_ENABLED: "true"
   WEB_PERSISTENCE_SIZE: "1Gi"
 
-  OIDC_IDP_INSECURE: "true"
-  OC_HTTP_API_INSECURE: "true"
+  # NATS specific persistence options
+  # When true, a root init container will chown the NATS data volume before the main container starts.
+  NATS_PERSISTENCE_CHOWN_INIT_CONTAINER: "false"
 
   ###############################################################################
   # Internal Keycloak (for testing only)
@@ -88,6 +99,11 @@ data:
   OIDC_USER_ID_CLAIM: "sub"
   OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING: "username"
   OIDC_ROLE_ASSIGNMENT_CLAIM: "roles"
+
+  ###############################################################################
+  # Search Configuration
+  ###############################################################################
+  SEARCH_EXTRACTOR_TYPE: "tika"
 
   ###############################################################################
   # Collabora Configuration
