@@ -4,11 +4,6 @@ metadata:
   name: opencloud
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: openldap
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: opencloud-config
@@ -18,14 +13,36 @@ data:
   # Global Configuration
   ###############################################################################
   EXTERNAL_DOMAIN: "cloud.opencloud.test"
+  TAG: ""
+
+  ###############################################################################
+  # Deployment Strategy
+  ###############################################################################
+  DEPLOY_TYPE: "Recreate"
+  MAX_SURGE: "25%"
+  MAX_UNAV: "25%"
+
   OPENCLOUD_WEB_URL: "https://www.opencloud.eu"
   OPENCLOUD_LOGGING_LEVEL: "debug"
+
+  ###############################################################################
+  # Ingress
+  ###############################################################################
   INGRESS_ENABLED: "false"
   INGRESS_CLASS_NAME: "nginx"
   INGRESS_PROXY_BODY_SIZE: "1024m"
   GATEWAY_HTTPROUTE_ENABLED: "true"
-  APPS_INTEGRATION_ENABLED: "true"
-  WEB_OIDC_WEB_CLIENT_ID: "web"
+
+  ###############################################################################
+  # Persistence StorageClass and AccessModes (global defaults)
+  ###############################################################################
+  PERSISTENCE_STORAGE_CLASS_NAME: ""
+  # Comma-separated for runtime to split into a list, e.g. "ReadWriteMany" or "ReadWriteOnce,ReadOnlyMany"
+  PERSISTENCE_ACCESS_MODES: "ReadWriteOnce"
+
+  ###############################################################################
+  # Persistence (service PVC sizes and toggles)
+  ###############################################################################
   IDM_PERSISTENCE_ENABLED: "false"
   IDM_PERSISTENCE_SIZE: "10Gi"
   NATS_PERSISTENCE_ENABLED: "true"
@@ -33,10 +50,9 @@ data:
   OCM_PERSISTENCE_ENABLED: "false"
   OCM_PERSISTENCE_SIZE: "1Gi"
   ONLYOFFICE_PERSISTENCE_SIZE: "2Gi"
-  SEARCH_EXTRACTOR_TYPE: "tika"
   SEARCH_PERSISTENCE_ENABLED: "true"
   SEARCH_PERSISTENCE_SIZE: "10Gi"
-  STORAGE_USERS_BACKEND_DRIVER: "decomposeds3"
+  STORAGE_USERS_BACKEND_DRIVER: "posix"
   STORAGE_SYSTEM_PERSISTENCE_ENABLED: "true"
   STORAGE_SYSTEM_PERSISTENCE_SIZE: "5Gi"
   STORAGE_USERS_PERSISTENCE_ENABLED: "true"
@@ -46,8 +62,17 @@ data:
   WEB_PERSISTENCE_ENABLED: "true"
   WEB_PERSISTENCE_SIZE: "1Gi"
 
-  OIDC_IDP_INSECURE: "true"
-  OC_HTTP_API_INSECURE: "true"
+  # NATS specific persistence options
+  # When true, a root init container will chown the NATS data volume before the main container starts.
+  NATS_PERSISTENCE_CHOWN_INIT_CONTAINER: "false"
+  
+  ###############################################################################
+  # Quotas
+  ###############################################################################
+  QUOTAS_DEFAULT: "300000000000"
+  QUOTAS_GUEST: "20000000000"
+  QUOTAS_USER: "300000000000"
+  QUOTAS_SPACE_ADMIN: "10000000000000"
 
   ###############################################################################
   # Internal Keycloak (for testing only)
@@ -59,23 +84,19 @@ data:
   # Internal Minio (for testing only)
   ###############################################################################
   MINIO_DOMAIN: "minio.opencloud.test"
-  MINIO_ENABLED: "true"
+  MINIO_ENABLED: "false"
   MINIO_PERSISTENCE_SIZE: "40Gi"
 
   ###############################################################################
   # LDAP Configuration
   ###############################################################################
   LDAP_URI: "ldaps://openldap.openldap.svc.cluster.local:636"
-  LDAP_GLOBAL_DOMAIN: "opencloud.eu"
   LDAP_WRITEABLE: "true"
   LDAP_INSECURE: "true"
   LDAP_BIND_DN: "cn=admin,dc=opencloud,dc=eu"
   LDAP_USER_NAME_MATCH: "none"
   LDAP_USER_SCHEMA_ID: "openCloudUUID"
   LDAP_GROUP_SCHEMA_ID: "openCloudUUID"
-  OPENLDAP_LTB_PASSWD_ENABLED: "false"
-  OPENLDAP_REPLICATION_ENABLED: "false"
-  OPENLDAP_REPLICA_COUNT: "1"
 
   ###############################################################################
   # OIDC Configuration
@@ -88,14 +109,28 @@ data:
   OIDC_USER_ID_CLAIM: "sub"
   OIDC_USER_ID_CLAIM_ATTRIBUTE_MAPPING: "username"
   OIDC_ROLE_ASSIGNMENT_CLAIM: "roles"
+  OIDC_IDP_INSECURE: "true"
+  OC_HTTP_API_INSECURE: "true"
+  APPS_INTEGRATION_ENABLED: "true"
+  WEB_OIDC_WEB_CLIENT_ID: "web"
+
+  ###############################################################################
+  # Search Configuration
+  ###############################################################################
+  SEARCH_EXTRACTOR_TYPE: "tika"
+
+  ###############################################################################
+  # Demo Users
+  ###############################################################################
+  DEMO_USERS_ENABLED: "false"
 
   ###############################################################################
   # Collabora Configuration
   ###############################################################################
+  COLLABORA_ENABLED: "true"
   COLLABORA_URI: "https://collabora.opencloud.test"
   COLLABORA_DOMAIN: "collabora.opencloud.test"
   COLLABORA_ICON_URI: "https://collabora.opencloud.test/favicon.ico"
-  COLLABORA_ENABLED: "true"
   COLLABORA_INSECURE: "true"
   COLLABORA_DISABLE_PROOF: "false"
   COLLABORA_INGRESS_ENABLED: "false"
@@ -105,10 +140,10 @@ data:
   ###############################################################################
   # OnlyOffice Configuration
   ###############################################################################
+  ONLYOFFICE_ENABLED: "false"
   ONLYOFFICE_URI: "https://onlyoffice.opencloud.test"
   ONLYOFFICE_DOMAIN: "onlyoffice.opencloud.test"
   ONLYOFFICE_ICON_URI: "https://onlyoffice.opencloud.test/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
-  ONLYOFFICE_ENABLED: "false"
   ONLYOFFICE_INSECURE: "true"
   ONLYOFFICE_DISABLE_PROOF: "false"
   ONLYOFFICE_INGRESS_ENABLED: "false"
@@ -117,4 +152,11 @@ data:
   # WOPI Configuration
   ###############################################################################
   WOPI_INGRESS_DOMAIN: "wopi.opencloud.test"
-  WOPI_COLLABORA_TLS_HOST: "wopi-collabora.kube.opencloud.test"
+
+  ###############################################################################
+  # Antivirus
+  ###############################################################################
+  ANTIVIRUS_ENABLED: "true"
+  ANTIVIRUS_INFECTED_FILE_HANDLING: "abort"
+  ANTIVIRUS_ICAP_URL: "http://clamav-icap.clamav:1344"
+  ANTIVIRUS_ICAP_SERVICE: "avscan"

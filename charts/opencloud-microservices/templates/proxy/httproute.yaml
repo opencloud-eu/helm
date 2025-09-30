@@ -9,7 +9,7 @@ spec:
   parentRefs:
     - name: cilium-gateway
       namespace: kube-system
-      sectionName: oc-proxy-http
+      sectionName: {{ template "oc.namespace" . }}-proxy-http
   hostnames:
     - {{ .Values.externalDomain}}
   rules:
@@ -32,7 +32,7 @@ spec:
   parentRefs:
     - name: cilium-gateway
       namespace: kube-system
-      sectionName: oc-proxy-https
+      sectionName: {{ template "oc.namespace" . }}-proxy-https
   hostnames:
     - {{ .Values.externalDomain}}
   rules:

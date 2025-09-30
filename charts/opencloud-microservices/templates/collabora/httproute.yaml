@@ -13,7 +13,7 @@ spec:
   parentRefs:
     - name: {{ .Values.gateway.httproute.gateway.name }}
       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
-      sectionName: oc-collabora-https
+      sectionName: {{ template "oc.namespace" . }}-collabora-https
   hostnames:
     - {{ .Values.collabora.domain }}
   rules:

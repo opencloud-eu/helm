@@ -13,7 +13,7 @@ spec:
   parentRefs:
     - name: {{ .Values.gateway.httproute.gateway.name }}
       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
-      sectionName: oc-onlyoffice-https
+      sectionName: {{ template "oc.namespace" . }}-onlyoffice-https
   hostnames:
     - {{ .Values.onlyoffice.domain }}
   rules:

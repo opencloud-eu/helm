@@ -13,7 +13,7 @@ spec:
   parentRefs:
     - name: {{ .Values.gateway.httproute.gateway.name }}
       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
-      sectionName: oc-keycloak-https
+      sectionName: {{ template "oc.namespace" . }}-keycloak-https
   hostnames:
     - {{ .Values.keycloak.domain }}
   rules:

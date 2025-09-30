@@ -2,20 +2,9 @@ bundle: {
     apiVersion: "v1alpha1"
     name:       "opencloud"
     instances: {
-        // "service-account": {
-        //     module: url: "oci://ghcr.io/stefanprodan/modules/flux-tenant"
-        //     namespace: "opencloud"
-        //     values: {
-        //         role: "namespace-admin"
-        //         resourceQuota: {
-        //             kustomizations: 100
-        //             helmreleases:   100
-        //         }
-        //     }
-        // },
         "opencloud": {
             module: {
-                url:     "oci://ghcr.io/stefanprodan/modules/flux-helm-release"
+                url: "oci://ghcr.io/stefanprodan/modules/flux-helm-release"
                 version: "latest"
             }
             namespace: "opencloud"
@@ -25,17 +14,32 @@ bundle: {
                 }
                 chart: {
                     name:    "opencloud-microservices"
-                    version: "0.1.0"
+                    version: "0.3.4"
                 }
                 sync: {
                     timeout: 10
                     createNamespace: true
                 }
                 helmValues: {
+                    // Global persistence indirection (like _domainFilter pattern)
+                    _persistenceStorageClassName: string @timoni(runtime:string:PERSISTENCE_STORAGE_CLASS_NAME)
+                    _persistenceAccessModes:     string @timoni(runtime:string:PERSISTENCE_ACCESS_MODES)
+
+                    deploymentStrategy: {
+                        type: string @timoni(runtime:string:DEPLOY_TYPE)
+                        rollingUpdate: {
+                            maxSurge: string @timoni(runtime:string:MAX_SURGE)
+                            maxUnavailable: string @timoni(runtime:string:MAX_UNAV)
+                        }
+                    }
+
                     logging: {
                         level: string @timoni(runtime:string:OPENCLOUD_LOGGING_LEVEL)
                     }
                     externalDomain: string @timoni(runtime:string:EXTERNAL_DOMAIN)
+                    image: {
+                        tag: string @timoni(runtime:string:TAG)
+                    }
                     keycloak: {
                         enabled: bool @timoni(runtime:bool:KEYCLOAK_ENABLED)
                         domain: string @timoni(runtime:string:KEYCLOAK_DOMAIN)
@@ -100,6 +104,26 @@ bundle: {
                         }
                     }
                     features: {
+                        demoUsers: bool @timoni(runtime:bool:DEMO_USERS_ENABLED)
+                        virusscan: {
+                            enabled: bool @timoni(runtime:bool:ANTIVIRUS_ENABLED)
+                            infectedFileHandling: string @timoni(runtime:string:ANTIVIRUS_INFECTED_FILE_HANDLING)
+                            icap: {
+                                url: string @timoni(runtime:string:ANTIVIRUS_ICAP_URL)
+                                service: string @timoni(runtime:string:ANTIVIRUS_ICAP_SERVICE)
+                            }
+                        }
+                        quotas: {
+                            default: string @timoni(runtime:string:QUOTAS_DEFAULT)
+                            roles: {
+                                // Guest Role set to 20GB
+                                "38071a68-456a-4553-846a-fa67bf5596cc": int @timoni(runtime:number:QUOTAS_GUEST)
+                                // User Role set to 300GB
+                                "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11": int @timoni(runtime:number:QUOTAS_USER)
+                                // Space Administrator Role set to 100TB
+                                "2aadd357-682c-406b-8874-293091995fdd": int @timoni(runtime:number:QUOTAS_SPACE_ADMIN)
+                            }
+                        }
                         externalUserManagement: {
                             enabled: bool @timoni(runtime:bool:EXTERNAL_USER_MANAGEMENT_ENABLED)
                             adminUUID: string @timoni(runtime:string:EXTERNAL_USER_MANAGEMENT_ADMIN_UUID)
@@ -177,12 +201,17 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:NATS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:NATS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
+                                chownInitContainer: bool @timoni(runtime:bool:NATS_PERSISTENCE_CHOWN_INIT_CONTAINER)
                             }
                         }
                         search: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:SEARCH_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:SEARCH_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             extractor: {
                                 type: string @timoni(runtime:string:SEARCH_EXTRACTOR_TYPE)
@@ -192,12 +221,16 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_SYSTEM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:STORAGE_SYSTEM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         storageusers: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:STORAGE_USERS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:STORAGE_USERS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             storageBackend: {
                                 driver: string @timoni(runtime:string:STORAGE_USERS_BACKEND_DRIVER)
@@ -207,12 +240,16 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:THUMBNAILS_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:THUMBNAILS_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         web: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:WEB_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:WEB_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                             config: {
                                 oidc: {
@@ -238,7 +275,7 @@ bundle: {
                             additionalInitContainers: [
                                 {
                                     name: "external-sites"
-                                    image: "opencloudeu/web-extensions:external-sites-latest"
+                                    image: "opencloudeu/web-extensions:external-sites-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -253,7 +290,7 @@ bundle: {
                                 },
                                 {
                                     name: "drawio"
-                                    image: "opencloudeu/web-extensions:draw-io-latest"
+                                    image: "opencloudeu/web-extensions:draw-io-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -268,7 +305,7 @@ bundle: {
                                 },
                                 {
                                     name: "importer"
-                                    image: "opencloudeu/web-extensions:importer-latest"
+                                    image: "opencloudeu/web-extensions:importer-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -283,7 +320,7 @@ bundle: {
                                 },
                                 {
                                     name: "jsonviewer"
-                                    image: "opencloudeu/web-extensions:json-viewer-latest"
+                                    image: "opencloudeu/web-extensions:json-viewer-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -298,7 +335,7 @@ bundle: {
                                 },
                                 {
                                     name: "progressbars"
-                                    image: "opencloudeu/web-extensions:progress-bars-latest"
+                                    image: "opencloudeu/web-extensions:progress-bars-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -313,7 +350,7 @@ bundle: {
                                 },
                                 {
                                     name: "unzip"
-                                    image: "opencloudeu/web-extensions:unzip-latest"
+                                    image: "opencloudeu/web-extensions:unzip-1.0.0"
                                     command: [
                                         "/bin/sh",
                                         "-c",
@@ -332,176 +369,21 @@ bundle: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:IDM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:IDM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                         ocm: {
                             persistence: {
                                 enabled: bool @timoni(runtime:bool:OCM_PERSISTENCE_ENABLED)
                                 size: string @timoni(runtime:string:OCM_PERSISTENCE_SIZE)
+                                storageClassName: "\(_persistenceStorageClassName)"
+                                accessModes: [ "\(_persistenceAccessModes)" ]
                             }
                         }
                     }
                 }
             }
         },
-        "openldap": {
-            module: {
-                url:     "oci://ghcr.io/stefanprodan/modules/flux-helm-release"
-                version: "latest"
-            }
-            namespace: "openldap"
-            values: {
-                repository: {
-                    url: "https://jp-gouin.github.io/helm-openldap/"
-                }
-                chart: {
-                    name:    "openldap-stack-ha"
-                    version: "4.3.3"
-                }
-                sync: {
-                    timeout: 5
-                    createNamespace: true
-                }
-                helmValues: {
-                    "ltb-passwd": {
-                        enabled: bool @timoni(runtime:bool:OPENLDAP_LTB_PASSWD_ENABLED)
-                    }
-                    replication: {
-                        enabled: bool @timoni(runtime:bool:OPENLDAP_REPLICATION_ENABLED)
-                    }
-                    replicaCount: string @timoni(runtime:string:OPENLDAP_REPLICA_COUNT)
-                    global: {
-                        ldapDomain: string @timoni(runtime:string:LDAP_GLOBAL_DOMAIN)
-                        adminPassword: string @timoni(runtime:string:LDAP_ADMIN_PASSWORD)
-                        configPassword: string @timoni(runtime:string:LDAP_CONFIG_PASSWORD)
-                    }
-                    customLdifFiles: {
-                        "opencloud_root.ldif": """
-                            dn: dc=opencloud,dc=eu
-                            objectClass: organization
-                            objectClass: dcObject
-                            dc: opencloud
-                            o: openCloud
-
-                            dn: ou=users,dc=opencloud,dc=eu
-                            objectClass: organizationalUnit
-                            ou: users
-
-                            dn: cn=admin,dc=opencloud,dc=eu
-                            objectClass: inetOrgPerson
-                            objectClass: person
-                            cn: admin
-                            sn: admin
-
-                            dn: ou=groups,dc=opencloud,dc=eu
-                            objectClass: organizationalUnit
-                            ou: groups
-
-                            dn: ou=custom,ou=groups,dc=opencloud,dc=eu
-                            objectClass: organizationalUnit
-                            ou: custom
-                            """
-                        "users.ldif": """
-                            """
-                        "groups.ldif": """
-                            dn: cn=users,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: users
-                            dn: cn=chess-lovers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: chess-lovers
-                            description: Chess lovers
-
-                            dn: cn=machine-lovers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: machine-lovers
-                            description: Machine Lovers
-
-                            dn: cn=bible-readers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: bible-readers
-                            description: Bible readers
-
-                            dn: cn=apollos,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: apollos
-                            description: Contributors to the Appollo mission
-
-                            dn: cn=unix-lovers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: unix-lovers
-                            description: Unix lovers
-
-                            dn: cn=basic-haters,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: basic-haters
-                            description: Haters of the Basic programming language
-
-                            dn: cn=vlsi-lovers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: vlsi-lovers
-                            description: Lovers of VLSI microchip design
-
-                            dn: cn=programmers,ou=groups,dc=opencloud,dc=eu
-                            objectClass: groupOfNames
-                            objectClass: top
-                            cn: programmers
-                            description: Computer Programmers
-                            """
-                    }
-                    customSchemaFiles: {
-                        "10_opencloud_schema.ldif": """
-                            dn: cn=opencloud,cn=schema,cn=config
-                            objectClass: olcSchemaConfig
-                            cn: opencloud
-                            olcObjectIdentifier: openCloudOid 1.3.6.1.4.1.63016
-                            # We'll use openCloudOid:1 subarc for LDAP related stuff
-                            #   openCloudOid:1.1 for AttributeTypes and openCloudOid:1.2 for ObjectClasses
-                            olcAttributeTypes: ( openCloudOid:1.1.1 NAME 'openCloudUUID'
-                              DESC 'A non-reassignable and persistent account ID)'
-                              EQUALITY uuidMatch
-                              SUBSTR caseIgnoreSubstringsMatch
-                              SYNTAX 1.3.6.1.1.16.1 SINGLE-VALUE )
-                            olcAttributeTypes: ( openCloudOid:1.1.2 NAME 'openCloudExternalIdentity'
-                              DESC 'A triple separated by "$" representing the objectIdentity resource type of the Graph API ( signInType $ issuer $ issuerAssignedId )'
-                              EQUALITY caseIgnoreMatch
-                              SUBSTR caseIgnoreSubstringsMatch
-                              SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-                            olcAttributeTypes: ( openCloudOid:1.1.3 NAME 'openCloudUserEnabled'
-                              DESC 'A boolean value indicating if the user is enabled'
-                              EQUALITY booleanMatch
-                              SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE)
-                            olcAttributeTypes: ( openCloudOid:1.1.4 NAME 'openCloudUserType'
-                              DESC 'User type (e.g. Member or Guest)'
-                              EQUALITY caseIgnoreMatch
-                              SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-                            olcAttributeTypes: ( openCloudOid:1.1.5 NAME 'openCloudLastSignInTimestamp'
-                              DESC 'The timestamp of the last sign-in'
-                              EQUALITY generalizedTimeMatch
-                              ORDERING generalizedTimeOrderingMatch
-                              SYNTAX  1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
-                            olcObjectClasses: ( openCloudOid:1.2.1 NAME 'openCloudObject'
-                              DESC 'OpenCloud base objectclass'
-                              AUXILIARY
-                              MAY ( openCloudUUID ) )
-                            olcObjectClasses: ( openCloudOid:1.2.2 NAME 'openCloudUser'
-                              DESC 'OpenCloud User objectclass'
-                              SUP openCloudObject
-                              AUXILIARY
-                              MAY ( openCloudExternalIdentity $ openCloudUserEnabled $ openCloudUserType $ openCloudLastSignInTimestamp) )
-                            """
-                    }
-                }
-            }
-        }
     }
 }
-

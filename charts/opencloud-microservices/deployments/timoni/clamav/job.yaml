@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: clamav-db-chown
+  namespace: clamav
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      ttlSecondsAfterFinished: 0
+      restartPolicy: Never
+      containers:
+        - name: chown
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c", "chown -R 100:100 /var/lib/clamav"]
+          volumeMounts:
+            - name: clamav-database
+              mountPath: /var/lib/clamav
+      volumes:
+        - name: clamav-database
+          persistentVolumeClaim:
+            claimName: clamav-db

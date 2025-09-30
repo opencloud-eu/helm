@@ -13,7 +13,7 @@ spec:
   parentRefs:
     - name: {{ .Values.gateway.httproute.gateway.name }}
       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
-      sectionName: oc-minio-https
+      sectionName: {{ template "oc.namespace" . }}-minio-https
   hostnames:
     - {{ .Values.minio.domain }}
   rules:
@@ -36,7 +36,7 @@ spec:
   parentRefs:
     - name: {{ .Values.gateway.httproute.gateway.name }}
       namespace: {{ .Values.gateway.httproute.gateway.namespace }}
-      sectionName: oc-minio-console-https
+      sectionName: {{ template "oc.namespace" . }}-minio-console-https
   hostnames:
     - console.{{ .Values.minio.domain }}
   rules:
