@@ -1,0 +1,75 @@
+{{- if .Values.radicale.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}-radicale
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+    app.kubernetes.io/component: radicale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: radicale
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: radicale
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: init-data
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.busybox.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.busybox.image.pullPolicy "global" .Values.global) | quote }}
+          command: ['sh', '-c', 'mkdir -p /var/lib/radicale']
+          volumeMounts:
+            - name: radicale-data
+              mountPath: /var/lib/radicale
+      containers:
+        - name: radicale
+          image: {{ include "opencloud.image" (dict "imageValues" .Values.radicale.image "global" .Values.global) | quote }}
+          imagePullPolicy: {{ include "opencloud.image.pullPolicy" (dict "pullPolicy" .Values.radicale.image.pullPolicy "global" .Values.global) }}
+          env:
+            - name: RADICALE_CONFIG
+              value: "/etc/radicale/config"
+          ports:
+            - containerPort: 5232
+              name: http
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.radicale.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /.web
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /.web
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          volumeMounts:
+            - name: radicale-config
+              mountPath: /etc/radicale/config
+              subPath: config
+            {{- if .Values.radicale.persistence.enabled }}
+            - name: radicale-data
+              mountPath: /var/lib/radicale
+            {{- end }}
+      volumes:
+        - name: radicale-config
+          configMap:
+            name: {{ include "opencloud.fullname" . }}-radicale-config
+        - name: radicale-data
+        {{- if .Values.radicale.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "opencloud.fullname" . }}-radicale-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}

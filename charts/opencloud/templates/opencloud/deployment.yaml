@@ -33,6 +33,7 @@ spec:
       annotations:
         checksum/config-json: {{ include (print $.Template.BasePath "/opencloud/config-json-configmap.yaml") . | sha256sum }}
         checksum/configmap: {{ include (print $.Template.BasePath "/opencloud/configmap.yaml") . | sha256sum }}
+        checksum/proxy-config: {{ include (print $.Template.BasePath "/opencloud/config-proxy-configmap.yaml") . | sha256sum }}
         checksum/web-extensions-init: {{ include (print $.Template.BasePath "/opencloud/web-extensions-init.yaml") . | sha256sum }}
     spec:
       securityContext:
@@ -411,8 +412,11 @@ spec:
               mountPath: {{ .Values.opencloud.storage.posixfs.rootPath | default "/var/lib/opencloud/storage" | quote }}
             {{- end }}
             - name: config-json
-              mountPath: /var/lib/opencloud/config.json
+              mountPath: /etc/opencloud/config.json
               subPath: config.json
+            - name: proxy-config
+              mountPath: /etc/opencloud/proxy.yaml
+              subPath: proxy.yaml
             - name: config-files
               mountPath: /etc/opencloud/search.yaml
               subPath: search.yaml
