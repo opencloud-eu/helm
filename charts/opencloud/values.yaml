@@ -57,6 +57,10 @@ global:
     # This is the URL where users can manage their accounts, typically provided by Keycloak.
     # Example: https://keycloak.opencloud.test/realms/openCloud/account
     accountUrl: ""
+    # JSON path expression to extract user roles from the OIDC token claims.
+    # This defines where to find the user's roles in the JWT token structure.
+    # Example: If roles are in token.resource_access.web.roles, use "resource_access.web.roles"
+    roleAttributePath: roles
 
   # Global storage settings
   storage:
