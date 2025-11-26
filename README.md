@@ -1,6 +1,6 @@
 > [!CAUTION]
-> ## Community Charts – Not Officially Supported
-> This repository is maintained by the community and is **not** officially supported by OpenCloud GmbH.  
+> ## This repository has been archived
+> Due to the high amount of AI generated contributions and poor maintenance, this repository has been archived.
 >  
 > For **production-ready Helm charts** designed for **mission-critical** workloads, please use the enterprise offering, available with a [business subscription](https://opencloud.eu/en/product/service-and-support).  
 >  
