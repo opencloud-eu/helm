@@ -13,6 +13,12 @@ Welcome to the **OpenCloud Helm Charts** repository! This repository is intended
 - [Installing the Helm Charts](#-installing-the-helm-charts)
 - [Architecture](#architecture)
   - [Component Interaction Diagram](#component-interaction-diagram)
+- [High Availability (HA) Configuration](#high-availability-ha-configuration)
+  - [Prerequisites for HA](#prerequisites-for-ha)
+  - [Disabling Embedded Services](#disabling-embedded-services)
+  - [External NATS Configuration](#external-nats-configuration)
+  - [Complete HA Example](#complete-ha-example)
+  - [Storage Requirements](#storage-requirements)
 - [Configuration](#configuration)
   - [Global Settings](#global-settings)
   - [Image Settings](#image-settings)
@@ -187,6 +193,125 @@ Key interactions:
    - Object storage for all files
    - Accessed by OpenCloud and Collaboration pods
 
+## High Availability (HA) Configuration
+
+Running OpenCloud in a high-availability setup with multiple replicas requires careful configuration of several components. The embedded services in OpenCloud are designed for single-instance deployments and do not support replication.
+
+### Prerequisites for HA
+
+For a proper HA deployment, you need:
+
+1. **External Identity Provider**: Keycloak or LDAP (embedded IDM doesn't support replication)
+2. **Shared Storage**: ReadWriteMany (RWX) volumes or S3-compatible object storage
+3. **External NATS**: For distributed cache and messaging
+4. **Disable Embedded Services**: IDM and IDP must be disabled
+
+### Disabling Embedded Services
+
+To run multiple OpenCloud replicas, you must disable the embedded IDM and IDP services:
+
+```yaml
+opencloud:
+  replicas: 3
+  excludeServices:
+    - "idp"
+    - "idm"
+```
+
+Alternatively, you can set the environment variable:
+```yaml
+opencloud:
+  env:
+    - name: OC_EXCLUDE_RUN_SERVICES
+      value: "idp,idm,auth-basic"
+```
+
+### External NATS Configuration
+
+For HA deployments, configure an external NATS cluster:
+
+```yaml
+opencloud:
+  nats:
+    external:
+      enabled: true
+      endpoint: nats.opencloud-nats.svc.cluster.local:4222
+      cluster: opencloud-cluster
+      tls:
+        enabled: true
+        certTrusted: false
+        caSecretName: opencloud-nats-ca
+```
+
+### Complete HA Example
+
+Here's a complete example configuration for HA deployment:
+
+```yaml
+# High Availability OpenCloud Configuration
+opencloud:
+  replicas: 3
+  
+  # Exclude embedded services that don't support replication
+  excludeServices:
+    - "idp"
+    - "idm"
+    - "auth-basic"  # Also exclude auth-basic to prevent LDAP cert lookup errors
+  
+  # Use RWX storage for shared access
+  persistence:
+    enabled: true
+    accessMode: ReadWriteMany
+    storageClass: "cephfs"  # or any RWX-capable storage class
+  
+  # External NATS for distributed messaging
+  nats:
+    external:
+      enabled: true
+      endpoint: nats-cluster.nats.svc.cluster.local:4222
+      cluster: opencloud-cluster
+
+# Use external Keycloak instead of embedded IDM
+keycloak:
+  internal:
+    enabled: false
+
+global:
+  oidc:
+    issuer: "https://keycloak.example.com/realms/openCloud"
+    clientId: "opencloud-web"
+
+# External S3 storage (recommended for HA)
+opencloud:
+  storage:
+    s3:
+      internal:
+        enabled: false
+      external:
+        enabled: true
+        endpoint: "https://s3.example.com"
+        accessKey: "your-access-key"
+        secretKey: "your-secret-key"
+        bucket: "opencloud-data"
+```
+
+### Storage Requirements
+
+For multiple replicas with RWX volumes, the following storage solutions are recommended:
+- **CephFS** (recommended)
+- **GlusterFS**
+- **NFS v4** (with extended attributes support - slower option)
+- **Cloud provider managed RWX storage** (e.g., AWS EFS, Azure Files)
+
+### Important Notes
+
+- For HA deployments, you need BOTH RWX storage (for OpenCloud metadata) AND external S3 storage (for file data).
+- Each OpenCloud instance needs access to the same data and metadata.
+- The embedded NATS service will be automatically disabled when external NATS is configured.
+- The auth-basic service should be excluded to prevent LDAP certificate lookup errors when using external authentication.
+
+For more details on this limitation, see [issue #53](https://github.com/opencloud-eu/helm/issues/53).
+
 ## Configuration
 
 The following table lists the configurable parameters of the OpenCloud chart and their default values.
@@ -245,7 +370,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `opencloud.enabled` | Enable OpenCloud | `true` |
-| `opencloud.replicas` | Number of replicas (Note: When using multiple replicas, persistence should be disabled or use a storage class that supports ReadWriteMany access mode) | `1` |
+| `opencloud.replicas` | Number of replicas (Note: When using multiple replicas, use a storage class that supports ReadWriteMany access mode and configure external services. See [HA Configuration](#high-availability-ha-configuration) for details) | `1` |
 | `opencloud.logLevel` | Log level | `info` |
 | `opencloud.logColor` | Enable log color | `false` |
 | `opencloud.logPretty` | Enable pretty logging | `false` |
@@ -253,6 +378,7 @@ This will prepend `my-registry.com/` to all image references in the chart. For e
 | `opencloud.existingSecret` | Name of the existing secret | `` |
 | `opencloud.adminPassword` | Admin password | `admin` |
 | `opencloud.createDemoUsers` | Create demo users | `false` |
+| `opencloud.excludeServices` | Services to exclude from starting (e.g., ["idp", "idm"] for HA deployments) | `["idp"]` |
 | `opencloud.resources` | CPU/Memory resource requests/limits | `{}` |
 | `opencloud.persistence.enabled` | Enable persistence | `true` |
 | `opencloud.persistence.size` | Size of the persistent volume | `10Gi` |
