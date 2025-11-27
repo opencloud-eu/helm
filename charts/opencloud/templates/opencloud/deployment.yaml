@@ -178,11 +178,13 @@ spec:
               value: "false"
             - name: OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
               value: "banned-password-list.txt"
+            {{ if .Values.tika.enabled }}
             # Search settings
             - name: SEARCH_EXTRACTOR_TYPE
               value: "tika"
             - name: SEARCH_EXTRACTOR_TIKA_TIKA_URL
               value: "http://{{ include "opencloud.tika.fullname" . }}:9998"
+            {{ end }}
             # Performance settings
             - name: OC_GRPC_MAX_RECEIVED_MESSAGE_SIZE
               value: "102400000"
@@ -324,7 +326,7 @@ spec:
             {{- end }}
             - name: STORAGE_SYSTEM_DRIVER
               value: "decomposed"
-            
+
             {{- if eq .Values.opencloud.storage.mode "posixfs" }}
             - name: STORAGE_USERS_POSIX_ROOT
               value: {{ .Values.opencloud.storage.posixfs.rootPath | quote }}
